@@ -1,0 +1,47 @@
+:root {
+  --cor-texto: #333333;
+}
+
+body {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: #F0ECE3;
+}
+
+h1 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 400;
+}
+
+h2 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 400;
+}
+
+h3 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 400;
+}
+
+h4 {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+a {
+  font-family: "Segoe UI", Arial, sans-serif;
+  text-decoration: none;
+}
+
+p {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+ul {
+  margin: 0px;
+  padding: 0px;
+}
+
+li {
+  list-style: none;
+}

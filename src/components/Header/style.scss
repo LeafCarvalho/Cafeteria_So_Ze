@@ -1,0 +1,20 @@
+nav {
+    background-color: #F0ECE3;
+
+    .nav-link {
+        color: #333333;
+        font-size: 18px;
+        font-weight: 400;
+        margin-right: 1rem;
+        cursor: pointer;
+    
+        &:active {
+            color: #0D5C63;
+            font-weight: 700;
+        }
+        &:hover {
+            border-bottom: 2px solid #0D5C63;
+            font-weight: 700;
+        }
+    }
+}
