@@ -10,8 +10,12 @@ const Home = () => {
     <>
       <Element name="home">
         <Header />
-        <div>
-          <img src={BannerHome} alt="" />
+        <div id="banner-principal">
+          <img src={BannerHome} alt="" className="banner-principal-img"/>
+          <div>
+            <h1>Bem-Vindo a</h1>
+            <h2>Cafeteria So Zé</h2>
+          </div>
         </div>
         <Element name="produtos">
           <Produtos />

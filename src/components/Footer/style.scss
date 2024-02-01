@@ -1,7 +1,33 @@
 footer {
     background-color: #F0ECE3;
-
+    padding: 20px 0;
+    text-align: center;
+  
     p, a {
-        color: #333333;
+      color: #333333;
+      font-size: 0.9rem;
+      margin: 10px 0;
+  
+      &:hover {
+        color: #0D5C63;
+      }
     }
-}
+  
+    a {
+      text-decoration: none;
+      transition: color 0.3s ease;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  
+    .copied-feedback {
+      display: inline-block;
+      margin-left: 5px;
+      color: #0D5C63;
+      font-size: 0.8rem;
+      transition: opacity 0.3s ease;
+    }
+  }
+  

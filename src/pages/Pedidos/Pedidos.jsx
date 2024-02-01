@@ -33,12 +33,14 @@ const Pedidos = () => {
   };
 
   const cartItems = Object.entries(quantities)
-    .filter(([_, quantity]) => quantity > 0)
-    .map(([id, quantity]) => {
-      const product = products.find((product) => product.id === id);
-      return product ? { ...product, quantity } : null;
-    })
-    .filter(Boolean);
+  .filter(([_, quantity]) => quantity > 0)
+  .map(([id, quantity]) => {
+    const product = products.find((product) => product.id === id);
+    return product ? { ...product, quantity } : null;
+  })
+  .filter(Boolean);
+  const totalValue = cartItems.reduce((total, item) => total + item.valor * item.quantity, 0);
+  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     function formatPhoneNumber(phoneNumberString) {
       const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
@@ -73,14 +75,16 @@ const Pedidos = () => {
           </Form>
         </Col>
         <Col>
-          <h2>Seu Pedido</h2>
-          {cartItems.map((item) => (
-            <div key={item.id}>
-              <h3>{item.nome}</h3>
-              <p>Quantidade: {item.quantity}</p>
-              <p>Preço: {item.valor}</p>
-            </div>
-          ))}
+        <h2>Seu Pedido</h2>
+        {cartItems.map((item) => (
+          <div key={item.id}>
+            <img src={item.imagem} alt={item.nome} />
+            <h3>{item.nome}</h3>
+            <p>Quantidade: {item.quantity}</p>
+            <p>Preço: {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+          </div>
+        ))}
+        <h2>Valor Total: {formattedTotalValue}</h2>
         </Col>
       </Row>
     </Container>

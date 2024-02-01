@@ -8,7 +8,12 @@ body {
   padding: 0;
   background-color: #F0ECE3;
 }
-
+body, p, li, a {
+  font-family: 'Roboto', sans-serif !important;
+}
+h1,h2,h3 {
+  font-family: 'Playfair Display', serif !important;
+}
 h1 {
   font-family: "Segoe UI", Arial, sans-serif;
   font-weight: 400;

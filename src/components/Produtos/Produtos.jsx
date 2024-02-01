@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { Container, Row, Col, Modal, Button } from "react-bootstrap";
+import { Container, Row, Col, Modal } from "react-bootstrap";
 import { FcPlus, FcMinus } from "react-icons/fc";
 import { db } from "../../services/firebaseConfig";
 import { Link } from "react-router-dom";
 import { useCart } from "../../Context/CartContext";
+import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import "./style.scss";
 
 export const Produtos = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -13,21 +15,24 @@ export const Produtos = () => {
   const { isCartOpen, setIsCartOpen } = useCart();
   const [displayCount, setDisplayCount] = useState(6);
   const { products, setProducts, quantities, setQuantities } = useCart();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  const getProducts = async () => {
-    if (products.length === 0) { // Só carrega produtos se ainda não estiverem carregados
-      const querySnapshot = await getDocs(collection(db, "products"));
-      const productsArray = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setProducts(productsArray);
-    }
-  };
+    const getProducts = async () => {
+      setIsLoading(true);
+      if (products.length === 0) {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const productsArray = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setProducts(productsArray);
+      }
+      setIsLoading(false);
+    };
 
-  getProducts();
-}, [products, setProducts]);
+    getProducts();
+  }, [products, setProducts]);
 
   const handleViewMoreClick = () => {
     setDisplayCount(displayCount + 6);
@@ -85,31 +90,41 @@ export const Produtos = () => {
     <>
       <Container className="mt-5 mb-5">
         <Row className="mb-5">
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Pesquisar..."
-          />
-          <select value={selectedType} onChange={handleTypeChange}>
-            {types.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+          <div className="d-flex align-items-center justify-content-start search-and-filter">
+            <div className="d-flex flex-column">
+              <input
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder="Pesquisar..."
+              />
+              <select value={selectedType} onChange={handleTypeChange}>
+                {types.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </Row>
         <Row>
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <Col className="d-flex justify-content-center">
+              <p>Carregando...</p>
+            </Col>
+          ) : filteredProducts.length > 0 ? (
             <>
               {filteredProducts.slice(0, displayCount).map((product) => (
                 <Col sm={12} md={6} lg={4} xl={4} key={product.id}>
                   <div className="product-card">
-                    <img
-                      src={product.imagem}
-                      alt={product.nome}
-                      onClick={() => handleImageClick(product)}
-                    />
+                    <div id="imgProdutoHome">
+                      <img
+                        src={product.imagem}
+                        alt={product.nome}
+                        onClick={() => handleImageClick(product)}
+                      />
+                    </div>
                     <Row className="d-flex align-items-start">
                       <Col>
                         <p>{product.nome}</p>
@@ -120,15 +135,19 @@ export const Produtos = () => {
                           })}
                         </p>
                       </Col>
-                      <Col className="d-flex flex-column justify-content-end">
+                      <Col className="d-flex flex-column text-end">
                         <Row>
                           <p>Quantidade: {quantities[product.id] || 0}</p>
-                          <Button onClick={() => addProduct(product.id)}>
-                            <FcPlus />
-                          </Button>
-                          <Button onClick={() => removeProduct(product.id)}>
-                            <FcMinus />
-                          </Button>
+                          <Col>
+                            <DefaultButton onClick={() => addProduct(product.id)}>
+                              <FcPlus />
+                            </DefaultButton>
+                            <DefaultButton
+                              onClick={() => removeProduct(product.id)}
+                            >
+                              <FcMinus />
+                            </DefaultButton>
+                          </Col>
                         </Row>
                       </Col>
                     </Row>
@@ -137,7 +156,9 @@ export const Produtos = () => {
               ))}
               {filteredProducts.length > displayCount && (
                 <Col className="d-flex justify-content-center">
-                  <Button onClick={handleViewMoreClick}>Ver Mais</Button>
+                  <DefaultButton onClick={handleViewMoreClick}>
+                    Ver Mais
+                  </DefaultButton>
                 </Col>
               )}
             </>
@@ -160,32 +181,28 @@ export const Produtos = () => {
             />
             <p className="mt-3 mb-3">{selectedProduct?.descricao}</p>
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Fechar
-            </Button>
-          </Modal.Footer>
+          <Modal.Footer></Modal.Footer>
         </Modal>
         {isCartOpen && (
-          <div
-            style={{
-              width: "650px",
-              padding: "1rem",
-              height: "100%",
-              top: 0,
-              zIndex: 9,
-              overflow: "auto",
-              position: "fixed",
-              background: "#F0ECE3",
-              right: "0",
-            }}
+          <div className="cart-overlay"
+            // style={{
+            //   width: "650px",
+            //   padding: "1rem",
+            //   height: "100%",
+            //   top: 0,
+            //   zIndex: 9,
+            //   overflow: "auto",
+            //   position: "fixed",
+            //   background: "#F0ECE3",
+            //   right: "0",
+            // }}
           >
-            <Button
+            <DefaultButton
               onClick={() => setIsCartOpen(false)}
               style={{ position: "absolute", top: "10px", left: "10px" }}
             >
               Fechar
-            </Button>
+            </DefaultButton>
             {Object.entries(quantities).filter(([_, quantity]) => quantity > 0)
               .length > 0 ? (
               <>
@@ -201,7 +218,7 @@ export const Produtos = () => {
                     const valorTotalProduto = product.valor * quantity;
 
                     return (
-                      <Row key={id} className="mb-3">
+                      <Row key={id} className="mb-3 cart-container">
                         <Col>
                           <img
                             src={product.imagem}
@@ -212,12 +229,16 @@ export const Produtos = () => {
                         <Col>
                           <p>{product.nome}</p>
                           <p>Quantidade: {quantity}</p>
-                          <Button onClick={() => addProduct(product.id)}>
-                            <FcPlus />
-                          </Button>
-                          <Button onClick={() => removeProduct(product.id)}>
-                            <FcMinus />
-                          </Button>
+                          <Col>
+                            <DefaultButton onClick={() => addProduct(product.id)}>
+                              <FcPlus />
+                            </DefaultButton>
+                            <DefaultButton
+                              onClick={() => removeProduct(product.id)}
+                            >
+                              <FcMinus />
+                            </DefaultButton>
+                          </Col>
                           <p>
                             Valor Unitário:{" "}
                             {valorUnitario.toLocaleString("pt-BR", {
@@ -250,7 +271,9 @@ export const Produtos = () => {
                       currency: "BRL",
                     })}
                 </p>
-                <Button onClick={emptyCart}>Esvaziar Carrinho</Button>
+                <DefaultButton onClick={emptyCart}>
+                  Esvaziar Carrinho
+                </DefaultButton>
                 <Link to="/pedidos">Continuar</Link>
               </>
             ) : (
