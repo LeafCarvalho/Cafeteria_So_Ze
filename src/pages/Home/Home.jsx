@@ -9,7 +9,6 @@ const Home = () => {
   return (
     <>
       <Element name="home">
-        <Header />
         <div id="banner-principal">
           <img src={BannerHome} alt="" className="banner-principal-img"/>
           <div>
@@ -20,7 +19,6 @@ const Home = () => {
         <Element name="produtos">
           <Produtos />
         </Element>
-        <Footer />
       </Element>
     </>
   );
