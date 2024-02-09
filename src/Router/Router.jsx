@@ -4,6 +4,7 @@ import Pedidos from "../pages/Pedidos/Pedidos";
 import Login from "../pages/Login/Login";
 import Cadastro from "../pages/Cadastro/Cadastro";
 import DefaultLayout from "../Layout/DefaultLayout";
+import Efetuacao from "../pages/Efetuacao/Efetuacao";
 
 
 const Router = () => {
@@ -15,6 +16,7 @@ const Router = () => {
             <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/efetuacao" element={<Efetuacao />} />
         </Route>
       </Routes>
     </>
