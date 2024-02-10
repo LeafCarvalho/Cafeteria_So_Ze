@@ -1,4 +1,25 @@
 button {
-    background-color: #0D5C63 !important;
-    border: 1px solid #BC986A !important;
+    background-color: #0D5C63 !important; // Cor principal
+    color: #F0ECE3 !important; // Cor do texto
+    border: 2px solid #BC986A !important; // Cor da borda
+    border-radius: 20px !important; // Arredondamento das bordas
+    padding: 0.5rem 1rem !important; // Espaçamento interno
+    font-size: 1rem !important; // Tamanho do texto
+    font-weight: bold !important; // Peso do texto
+    text-transform: uppercase !important; // Transformação do texto
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s !important; // Transições suaves
+
+    &:hover, &:focus {
+        background-color: darken(#0D5C63, 10%) !important; // Escurece a cor de fundo ao passar o mouse ou focar
+        color: #FFF !important; // Cor do texto ao passar o mouse ou focar
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important; // Sombreamento ao passar o mouse ou focar
+        outline: none !important; // Remove o contorno padrão ao focar
+    }
+
+    &:disabled {
+        background-color: lighten(#0D5C63, 10%) !important; // Clareia a cor de fundo para o estado desabilitado
+        border-color: lighten(#BC986A, 10%) !important;
+        color: lighten(#F0ECE3, 10%) !important; // Clareia a cor do texto para o estado desabilitado
+        cursor: not-allowed !important; // Muda o cursor para indicar que o botão está desabilitado
+    }
 }

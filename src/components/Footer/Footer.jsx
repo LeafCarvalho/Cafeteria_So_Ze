@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Container, Row } from "react-bootstrap";
-import './style.scss';
+import "./style.scss";
 
 export const Footer = () => {
   const anoAtual = new Date().getFullYear();
@@ -21,12 +21,10 @@ export const Footer = () => {
   const handleEmailClick = async () => {
     try {
       await navigator.clipboard.writeText(email);
-      toast.success('Email copiado!', {
-        position: toast.POSITION.BOTTOM_LEFT,
-        autoClose: 5000
-      });
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1000);
     } catch (err) {
-      console.error('Failed to copy email: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
@@ -35,16 +33,21 @@ export const Footer = () => {
       <footer>
         <Container>
           <Row className="d-flex flex-column justify-content-center align-items-center">
-          <p onClick={handleEmailClick} style={{ cursor: 'pointer' }}>
-              {email} {isCopied && <span>Copiado!</span>}
+            <p onClick={handleEmailClick} style={{ cursor: "pointer" }}>
+              {email}{" "}
+              {isCopied && (
+                <div className={`copied-toast ${isCopied ? "visible" : ""}`}>
+                  Copiado!
+                </div>
+              )}
             </p>
             <p>
-                <a href={urlWpp} target="_blank" rel="noopener noreferrer">
+              <a href={urlWpp} target="_blank" rel="noopener noreferrer">
                 {formatPhoneNumber("31999999999")}
-                </a>
+              </a>
             </p>
             <p>
-              © {anoAtual} Cafeteria Só Zé. Todos os direitos reservados. |
+              © {anoAtual} Cafeteria Sô Zé. Todos os direitos reservados. |
               Desenvolvido por Rafael Carvalho
             </p>
           </Row>

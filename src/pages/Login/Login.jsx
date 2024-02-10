@@ -43,23 +43,25 @@ function Login() {
 
   return (
     <>
-    <Header />
-    <input
-    type="Email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-  />
-  <input
-    type="Senha"
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-  />
-      <button type="submit" onClick={handleSignIn}>Login</button>
-      <p>
-        <span>Não possui conta ainda?</span>
-        <Link as={Link} to="/cadastro">Cadastre-se</Link>
-      </p>
-      <Footer />
+
+    <div className="container pt-5 pb-5 mt-5">
+      <input
+      type="Email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+      type="Senha"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit" onClick={handleSignIn}>Login</button>
+        <p>
+          <span>Não possui conta ainda?</span>
+          <Link as={Link} to="/cadastro">Cadastre-se</Link>
+        </p>
+    </div>
+
       </>
   );
 }

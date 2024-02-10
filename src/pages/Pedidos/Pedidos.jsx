@@ -4,6 +4,7 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../services/firebaseConfig';
+import './style.scss';
 
 const Pedidos = () => {
   const { quantities, products, setQuantities, setLastOrder } = useCart();
@@ -76,33 +77,42 @@ const Pedidos = () => {
   
 
   return (
-    <Container>
+    <Container className="pedidos-page">
       <Row>
         <Col>
           <Button variant="secondary" onClick={() => navigate(-1)}>Voltar</Button>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="formName">
-              <Form.Label>Nome completo</Form.Label>
-              <Form.Control type="text" value={name} onChange={handleNameChange} required />
-            </Form.Group>
-            <Form.Group controlId="formPhone">
-              <Form.Label>Telefone</Form.Label>
-              <Form.Control type="tel" value={phone} onChange={handlePhoneChange} required />
-            </Form.Group>
-            <Button variant="primary" type="submit">Enviar Pedido</Button>
-          </Form>
+          {/* <div className="pedido-info">
+            <p>Para finalizar sua compra, preencha seu nome completo e telefone abaixo. Esses dados são essenciais para o registro e acompanhamento do seu pedido.</p>
+          </div> */}
+          <div className="pedido-form">
+            <Form onSubmit={handleSubmit}>
+              <Form.Group controlId="formName">
+                <Form.Label>Nome completo</Form.Label>
+                <Form.Control type="text" value={name} onChange={handleNameChange} required />
+              </Form.Group>
+              <Form.Group controlId="formPhone">
+                <Form.Label>Telefone</Form.Label>
+                <Form.Control type="tel" value={phone} onChange={handlePhoneChange} required />
+              </Form.Group>
+              <Button variant="primary" type="submit">Finalizar Pedido</Button>
+            </Form>
+          </div>
         </Col>
         <Col>
-          <h2>Seu Pedido</h2>
-          {cartItems.map((item) => (
-            <div key={item.id}>
-              <img src={item.imagem} alt={item.nome} style={{ width: "100px" }} />
-              <h3>{item.nome}</h3>
-              <p>Quantidade: {item.quantity}</p>
-              <p>Preço: {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-            </div>
-          ))}
-          <h3>Valor Total: {formattedTotalValue}</h3>
+          <div className="pedido-resumo">
+            <h2>Seu Pedido</h2>
+            {cartItems.map((item) => (
+              <div key={item.id} className="item">
+                <img src={item.imagem} alt={item.nome} />
+                <div className="info">
+                  <h3>{item.nome}</h3>
+                  <p>Quantidade: {item.quantity}</p>
+                  <p>Preço: {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </div>
+              </div>
+            ))}
+            <div className="total">Valor Total: {totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+          </div>
         </Col>
       </Row>
     </Container>

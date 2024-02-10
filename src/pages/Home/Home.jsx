@@ -13,7 +13,7 @@ const Home = () => {
           <img src={BannerHome} alt="" className="banner-principal-img"/>
           <div>
             <h1>Bem-Vindo a</h1>
-            <h2>Cafeteria So Zé</h2>
+            <h2>Cafeteria Sô Zé</h2>
           </div>
         </div>
         <Element name="produtos">

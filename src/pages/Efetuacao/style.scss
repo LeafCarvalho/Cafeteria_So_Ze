@@ -1,0 +1,45 @@
+.efetuacao-container {
+    padding: 5rem 0; // Espaço no topo para não ficar muito perto da navbar, se houver
+  
+    .container {
+      background: #F0ECE3; // Cor de fundo suave
+      padding: 2rem; // Espaçamento interno
+      border-radius: 8px; // Cantos arredondados
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // Sombra sutil para profundidade
+  
+      h1 {
+        color: #0D5C63; // Cor do título
+        margin-bottom: 1rem; // Espaçamento abaixo do título
+      }
+  
+      h3, h4 {
+        color: #333; // Cor para os subtítulos
+        margin-bottom: 0.5rem; // Espaçamento abaixo dos subtítulos
+      }
+  
+      .pedido-item {
+        display: flex;
+        align-items: center; // Alinha os itens verticalmente
+        margin-bottom: 1rem; // Espaçamento entre os itens do pedido
+        border-bottom: 1px solid #ccc; // Linha separadora
+        padding-bottom: 1rem; // Espaçamento abaixo de cada item
+  
+        img {
+          width: 100px; // Largura fixa para as imagens
+          height: auto; // Altura automática para manter a proporção
+          margin-right: 1rem; // Espaçamento à direita da imagem
+          border-radius: 4px; // Cantos arredondados da imagem
+        }
+  
+        p {
+          margin: 0.25rem 0; // Reduz o espaçamento entre os parágrafos
+          color: #333; // Cor do texto
+  
+          &:first-of-type {
+            font-weight: bold; // Nome do produto em negrito
+          }
+        }
+      }
+    }
+  }
+  

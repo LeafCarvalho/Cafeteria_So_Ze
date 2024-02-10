@@ -33,7 +33,7 @@ export const CartProvider = ({ children }) => {
         setLastOrder,
       }}
     >
-      {children} // Renderiza componentes filhos
+      {children}
     </CartContext.Provider>
   );
 };
