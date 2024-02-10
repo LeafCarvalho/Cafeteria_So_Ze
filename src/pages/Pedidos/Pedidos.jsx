@@ -21,19 +21,28 @@ const Pedidos = () => {
     })
     .filter(Boolean);
 
-
   const totalValue = cartItems.reduce((total, item) => total + item.valor * item.quantity, 0);
 
   const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const handleNameChange = (event) => setName(event.target.value);
-  const handlePhoneChange = (event) => setPhone(event.target.value);
+  const handlePhoneChange = (event) => {
+    let value = event.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+    let formattedValue = '';
 
-  function formatPhoneNumber(phoneNumberString) {
-    const cleaned = phoneNumberString.replace(/\D/g, '');
-    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
-    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : null;
-  }
+    if (value.length > 2) {
+      formattedValue += `(${value.substring(0, 2)}) `; // Adiciona o DDD com parênteses
+      value = value.substring(2);
+    }
+
+    if (value.length > 5) {
+      formattedValue += `${value.substring(0, 5)}-${value.substring(5, 9)}`; // Separa os 5 primeiros dos 4 últimos dígitos com um hífen
+    } else {
+      formattedValue += value; // Mantém o restante do número sem formatação
+    }
+
+    setPhone(formattedValue); // Atualiza o estado com o valor formatado
+  };
 
   function generateRandomPassword() {
     const timestamp = new Date().getTime();
@@ -42,11 +51,11 @@ const Pedidos = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const telefone = phone; 
+    const telefone = phone;
     console.log("telefone:", telefone);
     const senha = generateRandomPassword();
     console.log("senha:", senha);
-  
+
     if (telefone && cartItems.length > 0) {
       const pedido = {
         produtos: cartItems.map(item => ({
@@ -69,21 +78,17 @@ const Pedidos = () => {
       } catch (error) {
         console.error("Erro ao enviar o pedido:", error);
         alert("Erro ao enviar o pedido.");
-      }      
+      }
     } else {
       alert("Número de telefone inválido ou carrinho vazio.");
     }
   };
-  
 
   return (
     <Container className="pedidos-page">
       <Row>
         <Col>
           <Button variant="secondary" onClick={() => navigate(-1)}>Voltar</Button>
-          {/* <div className="pedido-info">
-            <p>Para finalizar sua compra, preencha seu nome completo e telefone abaixo. Esses dados são essenciais para o registro e acompanhamento do seu pedido.</p>
-          </div> */}
           <div className="pedido-form">
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formName">
@@ -92,7 +97,7 @@ const Pedidos = () => {
               </Form.Group>
               <Form.Group controlId="formPhone">
                 <Form.Label>Telefone</Form.Label>
-                <Form.Control type="tel" value={phone} onChange={handlePhoneChange} required />
+                <Form.Control type="tel" value={phone} onChange={handlePhoneChange} placeholder="(XX) XXXXX-XXXX" required />
               </Form.Group>
               <Button variant="primary" type="submit">Finalizar Pedido</Button>
             </Form>
@@ -111,7 +116,7 @@ const Pedidos = () => {
                 </div>
               </div>
             ))}
-            <div className="total">Valor Total: {totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+            <div className="total">Valor Total: {formattedTotalValue}</div>
           </div>
         </Col>
       </Row>

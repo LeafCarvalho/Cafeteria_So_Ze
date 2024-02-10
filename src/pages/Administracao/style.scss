@@ -1,0 +1,19 @@
+.admin-container {
+    #sidebar-wrapper {
+        background-color: #0D5C63;
+        min-height: 100vh;
+
+        .nav-link {
+            color: #F0ECE3;
+            &:hover, &.active {
+                color: #0D5C63;
+                background-color: #F0ECE3;
+            }
+        }
+    }
+
+    #page-content-wrapper {
+        padding: 20px;
+        background-color: #F0ECE3;
+    }
+}

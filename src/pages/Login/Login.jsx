@@ -1,69 +1,51 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../services/firebaseConfig';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { Header } from '../../components/Header/Header';
-import { Footer } from '../../components/Footer/Footer';
-
-
-
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { Alert, Form, Button, Container } from 'react-bootstrap';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [
-        signInWithEmailAndPassword,
-        user,
-        loading,
-        error,
-    ] = useSignInWithEmailAndPassword(auth);
+    const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
+    const navigate = useNavigate();
 
-    function handleSignIn(e) {
+    const handleSignIn = async (e) => {
         e.preventDefault();
-        signInWithEmailAndPassword(email, password);
+        await signInWithEmailAndPassword(email, password);
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            alert('Por favor, insira seu e-mail para redefinição de senha.');
+            return;
+        }
+        await sendPasswordResetEmail(auth, email);
+        alert('Link de redefinição de senha enviado. Verifique seu e-mail.');
+    };
+
+    if (user) {
+        navigate('/administracao');
     }
 
-    if (error) {
-        return (
-          <div>
-            <p>Error: {error.message}</p>
-          </div>
-        );
-      }
-      if (loading) {
-        return <p>Carregando...</p>;
-      }
-      if (user) {
-        return (
-          <div>
-            <p>Email logado: {user.user.email}</p>
-          </div>
-        );
-      }
-
-  return (
-    <>
-
-    <div className="container pt-5 pb-5 mt-5">
-      <input
-      type="Email"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-      type="Senha"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit" onClick={handleSignIn}>Login</button>
-        <p>
-          <span>Não possui conta ainda?</span>
-          <Link as={Link} to="/cadastro">Cadastre-se</Link>
-        </p>
-    </div>
-
-      </>
-  );
+    return (
+        <Container className="pt-5 pb-5 mt-5">
+            <Form onSubmit={handleSignIn}>
+                <Form.Group controlId="loginEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Form.Group>
+                <Form.Group controlId="loginPassword">
+                    <Form.Label>Senha</Form.Label>
+                    <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </Form.Group>
+                <Button variant="primary" type="submit" disabled={loading}>Login</Button>
+                <Button variant="link" onClick={handleForgotPassword}>Esqueceu a senha?</Button>
+            </Form>
+            {error && <Alert variant="danger" style={{ marginTop: '1rem' }}>{error.message}</Alert>}
+        </Container>
+    );
 }
 
 export default Login;
