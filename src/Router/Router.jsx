@@ -6,21 +6,32 @@ import DefaultLayout from "../Layout/DefaultLayout";
 import Efetuacao from "../pages/Efetuacao/Efetuacao";
 import PrivateRoute from "./PrivateRoute";
 import Administracao from "../pages/Administracao/Administracao";
-
+import { ProductProvider } from "../Context/ProductProvider";
+import React from "react";
 
 const Router = () => {
   return (
     <>
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/pedidos" element={<Pedidos />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/efetuacao" element={<Efetuacao />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/pedidos" element={<Pedidos />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/efetuacao" element={<Efetuacao />} />
         </Route>
-            <Route element={<PrivateRoute />}>
-              <Route path="/administracao" element={<Administracao />} />
-            </Route>
+        <Route element={<PrivateRoute />}>
+          {/* Usar React.Fragment para envolver o ProductProvider e o Route */}
+          <React.Fragment>
+            <Route
+              path="/administracao"
+              element={
+                <ProductProvider>
+                  <Administracao />
+                </ProductProvider>
+              }
+            />
+          </React.Fragment>
+        </Route>
       </Routes>
     </>
   );
