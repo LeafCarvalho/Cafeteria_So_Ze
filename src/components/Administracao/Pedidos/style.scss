@@ -1,0 +1,50 @@
+.pedidos-container {
+  max-width: 800px; // Ajuste a largura conforme necessário
+  margin: auto;
+  padding: 20px;
+  background: #f8f8f8; // Cor de fundo suave
+  border-radius: 10px; // Bordas arredondadas
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); // Sombra sutil
+
+  .pedido-item {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+      h3 {
+          margin-bottom: 20px;
+          color: #333;
+      }
+
+      .table {
+          margin-bottom: 20px;
+      }
+
+      svg {
+          margin-right: 10px;
+      }
+  }
+
+  .nav-tabs {
+      margin-bottom: 20px;
+
+      .nav-link {
+          color: #555;
+          &.active {
+              color: #fff;
+              background-color: #0d6efd; // Cor primária do Bootstrap
+          }
+      }
+
+      .nav-item {
+          display: flex;
+          align-items: center;
+
+          svg {
+              margin-right: 5px;
+          }
+      }
+  }
+}

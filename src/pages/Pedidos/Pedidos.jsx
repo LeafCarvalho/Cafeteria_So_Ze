@@ -27,21 +27,21 @@ const Pedidos = () => {
 
   const handleNameChange = (event) => setName(event.target.value);
   const handlePhoneChange = (event) => {
-    let value = event.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+    let value = event.target.value.replace(/\D/g, '');
     let formattedValue = '';
 
     if (value.length > 2) {
-      formattedValue += `(${value.substring(0, 2)}) `; // Adiciona o DDD com parênteses
+      formattedValue += `(${value.substring(0, 2)}) `;
       value = value.substring(2);
     }
 
     if (value.length > 5) {
-      formattedValue += `${value.substring(0, 5)}-${value.substring(5, 9)}`; // Separa os 5 primeiros dos 4 últimos dígitos com um hífen
+      formattedValue += `${value.substring(0, 5)}-${value.substring(5, 9)}`;
     } else {
-      formattedValue += value; // Mantém o restante do número sem formatação
+      formattedValue += value;
     }
 
-    setPhone(formattedValue); // Atualiza o estado com o valor formatado
+    setPhone(formattedValue);
   };
 
   function generateRandomPassword() {
@@ -63,12 +63,14 @@ const Pedidos = () => {
           nome: item.nome,
           tipo: item.tipo,
           valor: item.valor,
-          quantidade: item.quantity
+          quantidade: item.quantity,
         })),
         total: totalValue,
         nome_completo: name,
         telefone: telefone,
         senha: senha,
+        data_hora: new Date(),
+        status: "Em Andamento",
       };
       try {
         const docRef = await addDoc(collection(db, "pedidos"), pedido);

@@ -7,7 +7,7 @@ import "./style.scss";
 import Inicio from "../../components/Administracao/Inicio/Inicio";
 import TodosProdutos from "../../components/Administracao/Produtos/TodosProdutos/TodosProdutos";
 import Cadastro from "../../components/Administracao/Produtos/Cadastro/Cadastro";
-import Pedidos from "../../components/Administracao/Pedidos/Pedidos/Pedidos";
+import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
 
 const Administracao = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Administracao = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/login"); // Redireciona para a página de login após o logout
+      navigate("/login");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
@@ -25,7 +25,7 @@ const Administracao = () => {
   const handleSelect = (selectedKey) => {
     setActiveKey(selectedKey);
     if (selectedKey === "logout") {
-      handleLogout(); // Chama a função de logout quando o Logout é selecionado
+      handleLogout();
     }
   };
 
@@ -70,7 +70,6 @@ const Administracao = () => {
           {activeKey === "pedidos" && <Pedidos />}
           {activeKey === "todosProdutos" && <TodosProdutos />}
           {activeKey === "cadastro" && <Cadastro />}
-          {/* Add your content components based on the activeKey */}
         </Col>
       </Row>
     </Container>
