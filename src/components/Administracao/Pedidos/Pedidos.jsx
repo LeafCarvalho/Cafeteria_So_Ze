@@ -7,11 +7,12 @@ import { FaCircle } from 'react-icons/fa';
 const Pedidos = () => {
     const [pedidos, setPedidos] = useState([]);
     const [key, setKey] = useState('Em Andamento');
+    const [currentTime, setCurrentTime] = useState('');
 
     useEffect(() => {
         const fetchPedidos = async () => {
             const querySnapshot = await getDocs(collection(db, "pedidos"));
-            const fetchedPedidos = querySnapshot.docs.map(doc => ({ 
+            const fetchedPedidos = querySnapshot.docs.map(doc => ({
                 ...doc.data(),
                 id: doc.id,
                 data_hora: doc.data().data_hora ? doc.data().data_hora.toDate() : null,
@@ -20,12 +21,26 @@ const Pedidos = () => {
         };
 
         fetchPedidos();
+
+        const interval = setInterval(() => {
+            const now = new Date();
+            const formattedTime = new Intl.DateTimeFormat('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'America/Sao_Paulo'
+            }).format(now);
+
+            setCurrentTime(formattedTime);
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const atualizarStatusPedido = (pedido) => {
         const now = new Date();
         const pedidoTime = new Date(pedido.data_hora);
-        const hoursDiff = (now - pedidoTime) / 3600000; // Diferença em horas
+        const hoursDiff = (now - pedidoTime) / 3600000;
 
         if (hoursDiff < 1) return 'Em Andamento';
         if (hoursDiff >= 1 && hoursDiff < 48) return 'Finalizado';
@@ -34,13 +49,18 @@ const Pedidos = () => {
 
     const renderPedidoItem = (pedido) => {
         const statusPedido = atualizarStatusPedido(pedido);
+        const dataHoraFormatada = pedido.data_hora ? new Intl.DateTimeFormat('pt-BR', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        }).format(pedido.data_hora) : 'Indisponível';
 
         return (
             <tr key={pedido.id}>
                 <td>{pedido.nome_completo}</td>
                 <td>{pedido.produtos.map(produto => `${produto.nome} (x${produto.quantidade})`).join(', ')}</td>
                 <td>R$ {pedido.total.toFixed(2)}</td>
-                <td>{statusPedido}</td> {/* Exibindo o status calculado */}
+                <td>{dataHoraFormatada}</td>
+                <td>{statusPedido}</td>
             </tr>
         );
     };
@@ -49,6 +69,7 @@ const Pedidos = () => {
 
     return (
         <div>
+            <div style={{ textAlign: 'right', marginRight: '20px' }}>{currentTime}</div>
             <h2>Pedidos</h2>
             <Tabs activeKey={key} onSelect={(k) => setKey(k)}>
                 <Tab eventKey="Em Andamento" title={<span><FaCircle color="yellow" /> Em Andamento</span>}>
@@ -58,6 +79,7 @@ const Pedidos = () => {
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>
+                                <th>Data e Hora</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -73,6 +95,7 @@ const Pedidos = () => {
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>
+                                <th>Data e Hora</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -88,6 +111,7 @@ const Pedidos = () => {
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>
+                                <th>Data e Hora</th>
                                 <th>Status</th>
                             </tr>
                         </thead>

@@ -1,58 +1,80 @@
 .product-item {
-  background-color: #f0ece3; // Cor de fundo clara para cada item
-  border-radius: 8px; // Bordas arredondadas
-  padding: 15px; // Espaçamento interno
-  margin-bottom: 15px; // Espaçamento entre itens
-  display: flex; // Disposição em linha
-  align-items: start; // Alinhamento vertical dos itens
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Sombra suave para dar profundidade
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #f4f4f4;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
-  .product-image {
-    width: 100px; // Largura fixa para a imagem
-    height: 100px; // Altura fixa para a imagem
-    object-fit: cover; // Garante que a imagem cubra o espaço designado
-    border-radius: 4px; // Bordas arredondadas para a imagem
-    margin-right: 15px; // Espaçamento entre a imagem e o texto
-  }
+  .editable-field {
+    display: flex;
+    align-items: center;
 
-  p {
-    margin: 0; // Remove a margem padrão do parágrafo
-    color: #333; // Cor do texto
-    &:not(:last-child) {
-      margin-right: 10px; // Espaçamento entre os textos
+    p {
+      padding-right: 1rem;
     }
   }
 
-  .action-icon {
-    margin-left: auto; // Empurra os ícones para o lado direito
-    cursor: pointer; // Indica que o ícone é clicável
-    color: #0d5c63; // Cor dos ícones
+  .editInput {
+    display: flex;
+    align-items: center;
+  }
 
+  .description-container {
+    display: flex;
+
+    p {
+      width: 70%;
+    }
+  }
+
+  .product-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 80px;
+
+      p {
+        margin: 0;
+        &:nth-child(1) {
+          font-size: 1.2em;
+          font-weight: bold;
+        }
+        &:nth-child(2), &:nth-child(3) {
+          font-size: 1em;
+        }
+      }
+    }
+  }
+
+  .product-description {
+    margin-top: 10px;
+    font-size: 0.9em;
+    width: 100%;
+  }
+
+  .fa-trash {
+    margin-top: 10px;
+    font-size: 1.5em;
+    color: #c0392b;
+    cursor: pointer;
     &:hover {
-      color: #bc986a; // Cor ao passar o mouse sobre o ícone
-    }
-  }
-}
-
-// Estilização do Modal de confirmação
-.modal-content {
-  .modal-header,
-  .modal-footer {
-    background-color: #0d5c63; // Cor de fundo para o cabeçalho e rodapé do modal
-    color: #f0ece3; // Cor do texto
-
-    .close {
-      color: #f0ece3; // Cor do botão de fechar
-    }
-  }
-
-  .modal-body {
-    background-color: #f0ece3; // Cor de fundo para o corpo do modal
-  }
-
-  button {
-    &:not(:last-child) {
-      margin-right: 10px; // Espaçamento entre os botões
+      color: #e74c3c;
     }
   }
 }

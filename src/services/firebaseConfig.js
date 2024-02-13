@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage"; // Importe getStorage
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD_CCfIqWRggQsZxaVK6Cq_L0BiytV7xNM",
-    authDomain: "cafeteria-so-ze.firebaseapp.com",
-    projectId: "cafeteria-so-ze",
-    storageBucket: "cafeteria-so-ze.appspot.com",
-    messagingSenderId: "913264179492",
-    appId: "1:913264179492:web:53e72024a765f9f1599bb1",
-    measurementId: "G-T6NGFD3Q0W"
+    apiKey: import.meta.env.VITE_REACT_APP_API_KEY,
+    authDomain: import.meta.env.VITE_REACT_APP_authDomain,
+    projectId: import.meta.env.VITE_REACT_APP_projectId,
+    storageBucket: import.meta.env.VITE_REACT_APP_storageBucket,
+    messagingSenderId: import.meta.env.VITE_REACT_APP_messagingSenderId,
+    appId: import.meta.env.VITE_REACT_APP_appId,
+    measurementId: import.meta.env.VITE_REACT_APP_measurementId
 };
 
 // Inicialize o Firebase

@@ -79,7 +79,7 @@ const Inicio = () => {
           {
             x: ['Diário', 'Semanal', 'Mensal', 'Anual'],
             y: [pedidosCount.diario, pedidosCount.semanal, pedidosCount.mensal, pedidosCount.anual],
-            type: 'bar',
+            type: 'scatter',
             marker: {
               color: ['blue', 'orange', 'green', 'red'],
             },
