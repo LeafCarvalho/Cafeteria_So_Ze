@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../services/firebaseConfig';
 import { Tabs, Tab, Table } from 'react-bootstrap';
 import { FaCircle } from 'react-icons/fa';
+import './style.scss';
 
 const Pedidos = () => {
     const [pedidos, setPedidos] = useState([]);
@@ -68,14 +69,14 @@ const Pedidos = () => {
     const pedidosFiltrados = pedidos.filter(pedido => atualizarStatusPedido(pedido) === key);
 
     return (
-        <div>
+        <div className="pedidos-container">
             <div style={{ textAlign: 'right', marginRight: '20px' }}>{currentTime}</div>
             <h2>Pedidos</h2>
-            <Tabs activeKey={key} onSelect={(k) => setKey(k)}>
-                <Tab eventKey="Em Andamento" title={<span><FaCircle color="yellow" /> Em Andamento</span>}>
+            <Tabs activeKey={key} onSelect={(k) => setKey(k)} className="nav">
+                <Tab eventKey="Em Andamento" title={<span><FaCircle className="em-andamento" /> Em Andamento</span>} className="tab-content">
                     <Table striped bordered hover>
                         <thead>
-                            <tr>
+                            <tr className="em-andamento">
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>
@@ -88,10 +89,10 @@ const Pedidos = () => {
                         </tbody>
                     </Table>
                 </Tab>
-                <Tab eventKey="Finalizado" title={<span><FaCircle color="red" /> Pronto para Entrega</span>}>
+                <Tab eventKey="Finalizado" title={<span><FaCircle color="red" className="finalizado"/> Pronto para Entrega</span>}>
                     <Table striped bordered hover>
                         <thead>
-                            <tr>
+                            <tr className="finalizado">
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>
@@ -104,10 +105,10 @@ const Pedidos = () => {
                         </tbody>
                     </Table>
                 </Tab>
-                <Tab eventKey="Concluído" title={<span><FaCircle color="green" /> Concluído</span>}>
+                <Tab eventKey="Concluído" title={<span><FaCircle color="green" className="concluido"/> Concluído</span>}>
                     <Table striped bordered hover>
                         <thead>
-                            <tr>
+                            <tr className="concluido">
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Total</th>

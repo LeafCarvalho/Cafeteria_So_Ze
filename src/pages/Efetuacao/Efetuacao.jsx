@@ -15,7 +15,7 @@ const Efetuacao = () => {
         <div className="d-flex flex-column justify-content-center align-items-center">
           <h1>Bão demais, {lastOrder.nome_completo}! Seu pedido foi efetuado com sucesso.</h1>
         </div>
-          <p>A retirada deve ser feita em até 48 horas, você receberá um aviso quando estiver tudo pronto.</p>
+          <p>Tempo estimado de preparo 1 hora, mas fique tranquilo, você receberá um aviso quando seu pedido estiver pronto.</p>
           <p>No ato da retirada informe sua senha:</p>
           <h3>{lastOrder.senha}</h3>
         {lastOrder.produtos.map((item, index) => (

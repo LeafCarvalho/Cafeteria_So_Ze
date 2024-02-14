@@ -155,7 +155,7 @@ export const Produtos = () => {
                 </Col>
               ))}
               {filteredProducts.length > displayCount && (
-                <Col className="d-flex justify-content-center">
+                <Col className="d-flex justify-content-center" id="vermaisButton">
                   <DefaultButton onClick={handleViewMoreClick}>
                     Ver Mais
                   </DefaultButton>
@@ -185,21 +185,10 @@ export const Produtos = () => {
         </Modal>
         {isCartOpen && (
           <div className="cart-overlay"
-            // style={{
-            //   width: "650px",
-            //   padding: "1rem",
-            //   height: "100%",
-            //   top: 0,
-            //   zIndex: 9,
-            //   overflow: "auto",
-            //   position: "fixed",
-            //   background: "#F0ECE3",
-            //   right: "0",
-            // }}
           >
             <DefaultButton
               onClick={() => setIsCartOpen(false)}
-              style={{ position: "absolute", top: "10px", left: "10px" }}
+              customizarCSS="closeCartButton"
             >
               Fechar
             </DefaultButton>
@@ -271,10 +260,10 @@ export const Produtos = () => {
                       currency: "BRL",
                     })}
                 </p>
-                <DefaultButton onClick={emptyCart}>
+                <DefaultButton onClick={emptyCart} customizarCSS="esvaziarCarrinho">
                   Esvaziar Carrinho
                 </DefaultButton>
-                <Link to="/pedidos">Continuar</Link>
+                <Link to="/pedidos" className="continueButton">Continuar</Link>
               </>
             ) : (
               <p style={{ textAlign: "center" }}>

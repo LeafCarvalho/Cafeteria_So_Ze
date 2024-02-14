@@ -4,6 +4,8 @@ import { auth } from '../../services/firebaseConfig';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Alert, Form, Button, Container } from 'react-bootstrap';
+import { DefaultButton } from '../../Utils/Buttons/Buttons';
+import './style.scss';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -30,7 +32,7 @@ function Login() {
     }
 
     return (
-        <Container className="pt-5 pb-5 mt-5">
+        <Container>
             <Form onSubmit={handleSignIn}>
                 <Form.Group controlId="loginEmail">
                     <Form.Label>Email</Form.Label>
@@ -40,8 +42,8 @@ function Login() {
                     <Form.Label>Senha</Form.Label>
                     <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </Form.Group>
-                <Button variant="primary" type="submit" disabled={loading}>Login</Button>
-                <Button variant="link" onClick={handleForgotPassword}>Esqueceu a senha?</Button>
+                <DefaultButton customizarCSS="loginButton" type="submit" disabled={loading}>Login</DefaultButton>
+                <DefaultButton customizarCSS="esqueceuSenhaButton" onClick={handleForgotPassword}>Esqueceu a senha?</DefaultButton>
             </Form>
             {error && <Alert variant="danger" style={{ marginTop: '1rem' }}>{error.message}</Alert>}
         </Container>

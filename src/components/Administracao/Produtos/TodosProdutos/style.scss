@@ -1,80 +1,147 @@
-.product-item {
+/* style.scss */
+.my-col {
+  padding: 2rem;
+}
+
+.loading-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  background-color: #f4f4f4;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  padding: 2rem;
+}
 
-  .editable-field {
+.product-list {
+  .product-item {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #f3f0eb;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 
-    p {
-      padding-right: 1rem;
-    }
-  }
-
-  .editInput {
-    display: flex;
-    align-items: center;
-  }
-
-  .description-container {
-    display: flex;
-
-    p {
-      width: 70%;
-    }
-  }
-
-  .product-info {
-    display: flex;
-    align-items: center;
-    width: 100%;
-
-    img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 15px;
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .product-details {
+    .product-info {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 80px;
+      align-items: center;
+      margin-bottom: 1rem;
+      width: 100%;
 
-      p {
-        margin: 0;
-        &:nth-child(1) {
-          font-size: 1.2em;
-          font-weight: bold;
+      .image-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
-        &:nth-child(2), &:nth-child(3) {
-          font-size: 1em;
+      }
+
+      .product-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .editable-field {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.5rem;
+
+          p {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+            margin-bottom: 0;
+            margin-left: 0;
+          }
+        }
+
+        .editInput {
+          display: flex;
+          align-items: center;
         }
       }
     }
-  }
 
-  .product-description {
-    margin-top: 10px;
-    font-size: 0.9em;
-    width: 100%;
-  }
+    .description-container {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 1rem;
 
-  .fa-trash {
-    margin-top: 10px;
-    font-size: 1.5em;
-    color: #c0392b;
-    cursor: pointer;
-    &:hover {
-      color: #e74c3c;
+      p {
+        width: 80%;
+      }
     }
+
+    .action-icon {
+      margin-right: 0.5rem;
+    }
+
+    .delete-icon {
+      color: #c0392b;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #e74c3c;
+      }
+    }
+  }
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+
+  .page-item {
+    margin: 0 5px;
+
+    .page-link {
+      background-color: #fff3e0;
+      color: #cb6d51;
+      border-radius: 5px;
+      padding: 5px 10px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #ffe0cc;
+        text-decoration: none;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(203, 109, 81, 0.5);
+      }
+    }
+
+    &.active .page-link {
+      background-color: #cb6d51;
+      color: #fff;
+    }
+
+    &.disabled .page-link {
+      color: #e0e0e0;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Adicionando estilos globais para ícones do FontAwesome usados na paginação */
+.fa-chevron-left,
+.fa-chevron-right,
+.fa-step-backward,
+.fa-step-forward {
+  color: #cb6d51;
+  cursor: pointer;
+
+  &:hover {
+    color: #ff7043;
   }
 }

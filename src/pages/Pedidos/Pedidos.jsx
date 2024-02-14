@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../services/firebaseConfig';
 import './style.scss';
+import { DefaultButton } from '../../Utils/Buttons/Buttons';
 
 const Pedidos = () => {
   const { quantities, products, setQuantities, setLastOrder } = useCart();
@@ -90,7 +91,7 @@ const Pedidos = () => {
     <Container className="pedidos-page">
       <Row>
         <Col>
-          <Button variant="secondary" onClick={() => navigate(-1)}>Voltar</Button>
+          <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)}>Voltar</DefaultButton>
           <div className="pedido-form">
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formName">
@@ -101,7 +102,7 @@ const Pedidos = () => {
                 <Form.Label>Telefone</Form.Label>
                 <Form.Control type="tel" value={phone} onChange={handlePhoneChange} placeholder="(XX) XXXXX-XXXX" required />
               </Form.Group>
-              <Button variant="primary" type="submit">Finalizar Pedido</Button>
+              <Button style={{ marginTop: "1.5rem" }} type="submit">Finalizar Pedido</Button>
             </Form>
           </div>
         </Col>

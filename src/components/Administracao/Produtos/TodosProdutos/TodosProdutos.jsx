@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useProducts } from '../../../../Context/ProductProvider';
 import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../services/firebaseConfig';
-import { Col, Modal, Button, Form } from 'react-bootstrap';
+import { Col, Modal, Button, Form, Pagination } from 'react-bootstrap';
 import { FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import './style.scss';
+
 
 const TodosProdutos = () => {
     const { products, setProducts } = useProducts();
@@ -13,6 +14,14 @@ const TodosProdutos = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [editState, setEditState] = useState({ id: null, field: '' });
     const [editValue, setEditValue] = useState('');
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 3; // Você pode ajustar esse valor conforme necessário
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(products.length / productsPerPage);
+
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -62,14 +71,14 @@ const TodosProdutos = () => {
     };
 
     return (
-        <Col>
+        <Col className="my-col">
             {isLoading ? (
-                <div className="d-flex justify-content-center">
+                <div className="loading-container">
                     <p>Carregando...</p>
                 </div>
             ) : (
                 <div className="product-list">
-                    {products.map(product => (
+                    {currentProducts.map(product => (
                         <div key={product.id} className="product-item">
                             <div className="product-info">
                                 {editState.id === product.id && editState.field === 'imagem' ? (
@@ -106,6 +115,18 @@ const TodosProdutos = () => {
                             <FaTrash className="delete-icon" onClick={() => { setShowConfirmModal(true); setSelectedProduct(product); }} />
                         </div>
                     ))}
+                    <Pagination className="pagination-container">
+    <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
+    <Pagination.Prev onClick={() => setCurrentPage(prev => prev - 1)} disabled={currentPage === 1} />
+    {[...Array(totalPages).keys()].map(page => (
+        <Pagination.Item key={page + 1} active={page + 1 === currentPage} onClick={() => setCurrentPage(page + 1)}>
+            {page + 1}
+        </Pagination.Item>
+    ))}
+    <Pagination.Next onClick={() => setCurrentPage(prev => prev + 1)} disabled={currentPage === totalPages} />
+    <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
+</Pagination>
+
                 </div>
             )}
             <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>

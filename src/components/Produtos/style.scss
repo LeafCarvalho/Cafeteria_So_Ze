@@ -91,6 +91,34 @@
         }
     }
 }
+#vermaisButton > button {
+  margin-top: 1.5rem;
+}
+.continueButton {
+  background-color: #0D5C63 !important;
+    color: #F0ECE3 !important;
+    border: 2px solid #BC986A !important;
+    border-radius: 20px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s !important;
+
+    &:hover, &:focus {
+        background-color: darken(#0D5C63, 10%) !important;
+        color: #FFF !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+        outline: none !important;
+    }
+
+    &:disabled {
+        background-color: lighten(#0D5C63, 10%) !important;
+        border-color: lighten(#BC986A, 10%) !important;
+        color: lighten(#F0ECE3, 10%) !important;
+        cursor: not-allowed !important;
+    }
+}
 
 #root > div > div:nth-child(2) > div > div:nth-child(2) > div > div > div.d-flex.align-items-start.row > div > p:nth-child(1) {
   text-overflow: ellipsis;
@@ -102,7 +130,7 @@
 }
 
 .cart-container {
-    margin-bottom: 1rem;
+    margin: 1rem 0;
     padding: 1rem;
     background-color: #F0ECE3;
     border-radius: 8px;
@@ -371,6 +399,24 @@
         }
       }
             
+}
+
+.closeCartButton {
+  position: "absolute";
+  top: "10px";
+  left: "10px";
+}
+.esvaziarCarrinho {
+  background-color: transparent !important;
+  color: #888888 !important;
+  border: none !important;
+  text-transform: capitalize !important;
+
+  &:hover {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+  }
 }
 
 .cart-overlay {

@@ -43,7 +43,7 @@ export function Header() {
   };
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="w-100 position-fixed">
+    <Navbar collapseOnSelect expand="lg" className="w-100 position-sticky">
       <Container>
         <Navbar.Brand as={Link} to="/">
           Logo

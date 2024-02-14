@@ -33,7 +33,7 @@ const Administracao = () => {
     <Container fluid className="admin-container">
       <Row className="w-100">
         <Col xs={3} id="sidebar-wrapper">
-          <Nav className="flex-column sidebar-nav">
+          <Nav className="flex-column sidebar-nav h-100">
             <Nav.Link eventKey="inicio" onClick={() => setActiveKey("inicio")}>
               Início
             </Nav.Link>
