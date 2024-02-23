@@ -56,13 +56,21 @@ const Pedidos = () => {
         }).format(pedido.data_hora) : 'Indisponível';
 
         return (
-            <tr key={pedido.id}>
-                <td>{pedido.nome_completo}</td>
-                <td>{pedido.produtos.map(produto => `${produto.nome} (x${produto.quantidade})`).join(', ')}</td>
-                <td>R$ {pedido.total.toFixed(2)}</td>
-                <td>{dataHoraFormatada}</td>
-                <td>{statusPedido}</td>
-            </tr>
+          <tr key={pedido.id}>
+            <td>{pedido.nome_completo}</td>
+            <td>
+              <ul>
+                {pedido.produtos.map((produto, index) => (
+                  <li key={index}>
+                    {`${produto.nome} (x${produto.quantidade})`}
+                  </li>
+                ))}
+              </ul>
+            </td>
+            <td>R$ {pedido.total.toFixed(2)}</td>
+            <td>{dataHoraFormatada}</td>
+            <td>{statusPedido}</td>
+          </tr>
         );
     };
 

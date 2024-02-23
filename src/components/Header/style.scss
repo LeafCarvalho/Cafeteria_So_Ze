@@ -2,6 +2,10 @@ nav {
     background: linear-gradient(to right, #F0ECE3, #EDEBDE);
     z-index: 9;
     padding: 1rem 2rem;
+
+    .logoCafeteria {
+        width: 90px;
+    }
     
     .nav-link {
         color: #333333;
@@ -11,7 +15,8 @@ nav {
         cursor: pointer;
         text-decoration: none;
         padding: 0.5rem;
-        display: inline-block;
+        display: flex;
+        align-items: center;
     
         &:hover {
             font-weight: 600;

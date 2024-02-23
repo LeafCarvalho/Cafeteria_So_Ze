@@ -89,14 +89,14 @@ const TodosProdutos = () => {
                                         <FaEdit className="edit-icon" onClick={() => startEdit(product.id, 'imagem')} />
                                     </div>
                                 )}
-                                <div className="product-details">
+                                <div className="product-details w-100">
                                     {renderEditableField('nome', product)}
                                     {renderEditableField('tipo', product)}
                                     {renderEditableField('valor', product, true)}
                                 </div>
                             </div>
                             {editState.id === product.id && editState.field === 'descricao' ? (
-                                <div>
+                                <div className='w-100'>
                                     <Form.Control
                                         as="textarea"
                                         rows={3}

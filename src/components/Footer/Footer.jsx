@@ -47,7 +47,7 @@ export const Footer = () => {
               </a>
             </p>
             <p>
-              © {anoAtual} Cafeteria Sô Zé. Todos os direitos reservados. |
+              © 2023-{anoAtual} Cafeteria Sô Zé. Todos os direitos reservados. |
               Desenvolvido por Rafael Carvalho
             </p>
           </Row>

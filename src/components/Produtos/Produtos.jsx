@@ -125,7 +125,7 @@ export const Produtos = () => {
                         onClick={() => handleImageClick(product)}
                       />
                     </div>
-                    <Row className="d-flex align-items-start">
+                    <Row className="d-flex align-items-start m-1">
                       <Col>
                         <p>{product.nome}</p>
                         <p>

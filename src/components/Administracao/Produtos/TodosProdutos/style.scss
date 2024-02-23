@@ -56,7 +56,6 @@
           margin-bottom: 0.5rem;
 
           p {
-            flex-grow: 1;
             margin-right: 0.5rem;
             margin-bottom: 0;
             margin-left: 0;
@@ -81,13 +80,15 @@
     }
 
     .action-icon {
-      margin-right: 0.5rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
     }
 
     .delete-icon {
       color: #c0392b;
       cursor: pointer;
       transition: color 0.3s ease;
+      cursor: pointer;
 
       &:hover {
         color: #e74c3c;
@@ -144,4 +145,7 @@
   &:hover {
     color: #ff7043;
   }
+}
+.edit-icon {
+  cursor: pointer;
 }

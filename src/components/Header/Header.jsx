@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Link as ScrollLink, scroller } from 'react-scroll';
 import './style.scss';
 import { useCart } from '../../Context/CartContext';
+import logo from '../../assets/logoCafeteria.png'
 
 const ScrollOrRouteLink = ({ to, scroll, children, className, ...rest }) => {
   const { pathname } = useLocation();
@@ -46,7 +47,7 @@ export function Header() {
     <Navbar collapseOnSelect expand="lg" className="w-100 position-sticky">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          Logo
+          <img src={logo} alt="" className='logoCafeteria'/>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
