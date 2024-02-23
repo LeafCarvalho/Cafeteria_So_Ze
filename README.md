@@ -26,7 +26,7 @@ Bem-vindo ao repositório do projeto da **Cafeteria Só Zé**, a ideia deste pro
 ![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/809fa7db-3196-41c6-b747-46258eebac51)
 *Página de visualização dos produtos.*
 
-![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/60037bef-b9aa-467a-afc7-2e529062b234)
+![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/46099c8a-d79b-4fe3-924f-d65b149199ed)
 *Página de acompanhamento dos pedidos.*
 
 ## ⚙️ Instalação
