@@ -5,5 +5,5 @@ export default defineConfig({
   plugins: [
     react()
   ],
-  base: '/cafeteria_so_ze/'
+  base: '/Cafeteria_So_Ze/'
 })
