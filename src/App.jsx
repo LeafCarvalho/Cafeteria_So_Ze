@@ -1,5 +1,5 @@
 // Libs
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 
 // CSS
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,9 +10,9 @@ function App() {
   return (
     <>
       <CartProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Router />
-        </BrowserRouter>
+        </HashRouter>
       </CartProvider>
     </>
   );
