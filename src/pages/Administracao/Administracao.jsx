@@ -8,10 +8,12 @@ import Inicio from "../../components/Administracao/Inicio/Inicio";
 import TodosProdutos from "../../components/Administracao/Produtos/TodosProdutos/TodosProdutos";
 import Cadastro from "../../components/Administracao/Produtos/Cadastro/Cadastro";
 import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
+import { FiLogOut } from "react-icons/fi";
 
 const Administracao = () => {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState("inicio");
+  const [isSidebarVisible, setSidebarVisible] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -22,22 +24,40 @@ const Administracao = () => {
     }
   };
 
-  const handleSelect = (selectedKey) => {
-    setActiveKey(selectedKey);
-    if (selectedKey === "logout") {
-      handleLogout();
-    }
-  };
-
   return (
     <Container fluid className="admin-container">
+      <button
+        className="menu-toggle"
+        onClick={() => setSidebarVisible(!isSidebarVisible)}
+      >
+        <span>☰</span>
+      </button>
       <Row className="w-100">
-        <Col xs={3} id="sidebar-wrapper">
+        <Col
+          xs={3}
+          lg={3}
+          md={4}
+          sm={3}
+          id="sidebar-wrapper"
+          className={`sidebar-nav h-100 ${isSidebarVisible ? "active" : ""}`}
+        >
           <Nav className="flex-column sidebar-nav h-100">
-            <Nav.Link eventKey="inicio" onClick={() => setActiveKey("inicio")}>
+            <Nav.Link
+              eventKey="inicio"
+              onClick={() => {
+                setActiveKey("inicio");
+                setSidebarVisible(false);
+              }}
+            >
               Início
             </Nav.Link>
-            <Nav.Link eventKey="pedidos" onClick={() => setActiveKey("pedidos")}>
+            <Nav.Link
+              eventKey="pedidos"
+              onClick={() => {
+                setActiveKey("pedidos");
+                setSidebarVisible(false);
+              }}
+            >
               Pedidos
             </Nav.Link>
             <Accordion>
@@ -46,13 +66,19 @@ const Administracao = () => {
                 <Accordion.Body>
                   <Nav.Link
                     eventKey="todosProdutos"
-                    onClick={() => setActiveKey("todosProdutos")}
+                    onClick={() => {
+                      setActiveKey("todosProdutos");
+                      setSidebarVisible(false);
+                    }}
                   >
                     Todos os Produtos
                   </Nav.Link>
                   <Nav.Link
                     eventKey="cadastro"
-                    onClick={() => setActiveKey("cadastro")}
+                    onClick={() => {
+                      setActiveKey("cadastro");
+                      setSidebarVisible(false);
+                    }}
                   >
                     Cadastro
                   </Nav.Link>
@@ -60,12 +86,20 @@ const Administracao = () => {
               </Accordion.Item>
             </Accordion>
 
-            <Nav.Link eventKey="logout" onClick={handleLogout}>
+            <Nav.Link
+              eventKey="logout"
+              onClick={() => {
+                handleLogout();
+                setSidebarVisible(false);
+              }}
+              className="logout-link"
+            >
+              <FiLogOut className="me-2" />
               Logout
             </Nav.Link>
           </Nav>
         </Col>
-        <Col xs={9} id="page-content-wrapper">
+        <Col xs={9} lg={9} md={8} sm={7} id="page-content-wrapper">
           {activeKey === "inicio" && <Inicio />}
           {activeKey === "pedidos" && <Pedidos />}
           {activeKey === "todosProdutos" && <TodosProdutos />}

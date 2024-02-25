@@ -4,6 +4,13 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    text-align: left; // Garante alinhamento à esquerda para o texto
+    animation: fadeIn 2s ease-out;
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 
     &:before {
         content: '';
@@ -12,7 +19,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(240, 236, 227, 0.2);
+        background: rgba(155, 103, 60, 0.4); // Um tom mais terroso que combina com café
         z-index: 1;
     }
 
@@ -20,26 +27,52 @@
         position: absolute;
         top: 40%;
         left: 5%;
-        color: #DAA520;
+        color: #DAA520; // Uma cor terrosa mais suave para o texto
 
         h1 {
-            font-size: 5rem;
-            margin-bottom: 1rem;
+            font-size: 3rem; // Tamanho menor para melhor adaptação em dispositivos móveis
+            margin-bottom: 0.5rem;
         }
-        h3 {
-            font-size: 4rem;
-            font-weight: 400;
+        h2 {
+            font-size: 2.5rem; // Tamanho reduzido para h2
+            font-weight: 500; // Um pouco mais de peso para destacar
         }
     }
 
     .banner-principal-img {
         width: 100%;
-        height: 450px;
+        height: 450px; // Altura auto para se ajustar à largura e manter a proporção
         object-fit: cover;
-        object-position: bottom;
+        object-position: center; // Centralizado para dispositivos móveis
     }
 }
 
 button {
-    background-color: #0D5C63;
-  }
+    background-color: #8C7851; // Um marrom mais claro e suave para os botões
+    color: white; // Texto em branco para contraste
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px; // Bordas arredondadas para um toque mais suave
+    font-size: 1rem; // Tamanho de fonte adequado para dispositivos móveis
+    cursor: pointer;
+    transition: background-color 0.3s ease; // Transição suave para hover
+
+    &:hover {
+        background-color: #6D5844; // Escurece um pouco ao passar o mouse
+    }
+}
+
+// Responsividade para dispositivos móveis
+@media (max-width: 768px) {
+    #banner-principal div {
+        top: 30%; // Ajusta a posição para melhor visualização em dispositivos móveis
+        left: 10%; // Mais margem para evitar que o texto fique muito à margem
+        h1, h2 {
+            font-size: 2rem; // Diminui ainda mais o tamanho da fonte para caber em telas menores
+        }
+    }
+
+    .banner-principal-img {
+        height: 300px; // Altura fixa menor para telas menores
+    }
+}

@@ -1,67 +1,135 @@
+$sidebar-bg-color: #0D5C63;
+$sidebar-text-color: #333333;
+$sidebar-width: 250px;
+$link-color: #FFFFFF;
+$hover-bg-color: #F0ECE3;
+$hover-text-color: #0D5C63;
+$logout-link-color: #E53935;
+$logout-link-hover-color: #B71C1C;
+$logout-link-hover-bg: #FCE4EC;
+$accordion-border-color: #BC986A;
+$content-bg-color: #F0ECE3;
+
 .admin-container {
-    display: flex;
+  display: flex;
+
+  #sidebar-wrapper {
+    background-color: $sidebar-bg-color;
+    color: $sidebar-text-color;
+    min-height: 100vh;
+    width: $sidebar-width;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: left 1s;
+
+    .accordion-item {
+      background-color: transparent !important;
+      border: none !important;
+      margin-bottom: 1rem;
+    }
+
+    .nav-link {
+      color: $link-color;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      transition: all 0.2s ease-in-out;
+
+      &:hover, &.active {
+        color: $hover-text-color;
+        background-color: $hover-bg-color;
+        text-decoration: none;
+        transform: scale(1.05);
+      }
+    }
+
+    .logout-link {
+      @extend .nav-link;
+      color: $logout-link-color;
+      font-weight: bold;
+      margin-top: auto;
+
+      &:hover, &.active {
+        color: $logout-link-hover-color;
+        background-color: $logout-link-hover-bg;
+      }
+    }
+
+    .accordion-header {
+      cursor: pointer;
+      font-weight: bold;
+
+      .accordion-button {
+        background-color: transparent;
+        border: 2px solid $accordion-border-color;
+        box-shadow: none;
+        color: $link-color;
+
+        &:hover {
+          background-color: $hover-bg-color;
+          color: $sidebar-text-color;
+        }
+      }
+    }
+
+    .accordion-body {
+      background-color: lighten($content-bg-color, 5%);
+      border-radius: 0 0 5px 5px;
+
+      a {
+        color: $sidebar-text-color;
+      }
+    }
+  }
+
+  #page-content-wrapper {
+    flex-grow: 1;
+    padding: 2rem;
+    background-color: $content-bg-color;
+  }
+}
+
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 9;
+  cursor: pointer;
+  background-color: transparent;
+  font-size: 105px;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    flex-direction: column;
 
     #sidebar-wrapper {
-        background-color: #0D5C63;
-        color: #333333;
-        min-height: 100vh;
-        width: 250px;
-        padding: 1rem;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      min-height: 0;
+      height: auto;
+      position: fixed;
+      top: 0;
+      left: -100%;
+      z-index: 9;
+      opacity: 1;
 
-        .accordion-item {
-            background-color: transparent !important;
-            border: none !important;
-            margin-bottom: 1rem;
-        }
+      &.active {
+        left: 0;
+      }
 
-        .nav-link {
-            color: #333333;
-            margin-bottom: 0.5rem;
-            border-radius: 5px;
-            transition: all 0.2s ease-in-out;
-            margin-bottom: 1rem;
-
-            &:last-child {
-                margin-top: auto;
-            }
-
-            &:hover, &.active {
-                color: #0D5C63;
-                background-color: #F0ECE3;
-                text-decoration: none;
-                transform: scale(1.05);
-            }
-        }
-
-        .accordion-header {
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .accordion-body {
-            background-color: #F0F3F4;
-            color: #333333;
-            border-radius: 0 0 5px 5px;
-        }
+      .nav-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     #page-content-wrapper {
-        flex-grow: 1;
-        padding: 2rem;
-        background-color: #F0ECE3;
+      padding-top: 1rem;
     }
-}
-
-
-@media (max-width: 768px) {
-    .admin-container {
-        flex-direction: column;
-
-        #sidebar-wrapper {
-            width: 100%;
-            height: auto;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-    }
+  }
 }

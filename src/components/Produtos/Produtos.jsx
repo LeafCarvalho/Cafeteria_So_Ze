@@ -7,14 +7,21 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../Context/CartContext";
 import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import "./style.scss";
+import Skeleton from "react-loading-skeleton";
 
 export const Produtos = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState("Todos");
-  const { isCartOpen, setIsCartOpen } = useCart();
   const [displayCount, setDisplayCount] = useState(6);
-  const { products, setProducts, quantities, setQuantities } = useCart();
+  const {
+    isCartOpen,
+    setIsCartOpen,
+    products,
+    setProducts,
+    quantities,
+    setQuantities,
+  } = useCart();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,6 +43,10 @@ export const Produtos = () => {
 
   const handleViewMoreClick = () => {
     setDisplayCount(displayCount + 6);
+  };
+
+  const handleViewLessClick = () => {
+    setDisplayCount(6);
   };
 
   const addProduct = (id) => {
@@ -111,7 +122,7 @@ export const Produtos = () => {
         <Row>
           {isLoading ? (
             <Col className="d-flex justify-content-center">
-              <p>Carregando...</p>
+              <Skeleton count={6} height={100} width={200} />
             </Col>
           ) : filteredProducts.length > 0 ? (
             <>
@@ -139,7 +150,9 @@ export const Produtos = () => {
                         <Row>
                           <p>Quantidade: {quantities[product.id] || 0}</p>
                           <Col>
-                            <DefaultButton onClick={() => addProduct(product.id)}>
+                            <DefaultButton
+                              onClick={() => addProduct(product.id)}
+                            >
                               <FcPlus />
                             </DefaultButton>
                             <DefaultButton
@@ -154,13 +167,25 @@ export const Produtos = () => {
                   </div>
                 </Col>
               ))}
-              {filteredProducts.length > displayCount && (
-                <Col className="d-flex justify-content-center" id="vermaisButton">
-                  <DefaultButton onClick={handleViewMoreClick}>
+              <Col sm={12} className="d-flex justify-content-center">
+                {filteredProducts.length > displayCount && (
+                  <DefaultButton
+                    onClick={handleViewMoreClick}
+                    id="vermaisButton"
+                  >
                     Ver Mais
                   </DefaultButton>
-                </Col>
-              )}
+                )}
+                {displayCount > 6 &&
+                  filteredProducts.length <= displayCount && (
+                    <DefaultButton
+                      onClick={handleViewLessClick}
+                      id="vermenosButton"
+                    >
+                      Ver Menos
+                    </DefaultButton>
+                  )}
+              </Col>
             </>
           ) : (
             <Col className="d-flex justify-content-center">
@@ -183,9 +208,7 @@ export const Produtos = () => {
           </Modal.Body>
           <Modal.Footer></Modal.Footer>
         </Modal>
-        {isCartOpen && (
-          <div className="cart-overlay"
-          >
+        <div className={`cart-overlay ${isCartOpen ? 'open' : ''}`}>
             <DefaultButton
               onClick={() => setIsCartOpen(false)}
               customizarCSS="closeCartButton"
@@ -219,7 +242,9 @@ export const Produtos = () => {
                           <p>{product.nome}</p>
                           <p>Quantidade: {quantity}</p>
                           <Col>
-                            <DefaultButton onClick={() => addProduct(product.id)}>
+                            <DefaultButton
+                              onClick={() => addProduct(product.id)}
+                            >
                               <FcPlus />
                             </DefaultButton>
                             <DefaultButton
@@ -260,10 +285,15 @@ export const Produtos = () => {
                       currency: "BRL",
                     })}
                 </p>
-                <DefaultButton onClick={emptyCart} customizarCSS="esvaziarCarrinho">
+                <DefaultButton
+                  onClick={emptyCart}
+                  customizarCSS="esvaziarCarrinho"
+                >
                   Esvaziar Carrinho
                 </DefaultButton>
-                <Link to="/pedidos" className="continueButton">Continuar</Link>
+                <Link to="/pedidos" className="continueButton">
+                  Continuar
+                </Link>
               </>
             ) : (
               <p style={{ textAlign: "center" }}>
@@ -271,7 +301,7 @@ export const Produtos = () => {
               </p>
             )}
           </div>
-        )}
+        
       </Container>
     </>
   );

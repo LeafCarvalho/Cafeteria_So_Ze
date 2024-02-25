@@ -6,7 +6,7 @@ nav {
     .logoCafeteria {
         width: 90px;
     }
-    
+
     .nav-link {
         color: #333333;
         font-size: 18px;
@@ -17,11 +17,10 @@ nav {
         padding: 0.5rem;
         display: flex;
         align-items: center;
-    
+
         &:hover {
             font-weight: 600;
         }
-    
 
         &#carrinho {
             display: flex;
@@ -29,27 +28,34 @@ nav {
             align-items: center;
             justify-content: center;
             height: 100%;
-    
-            
+
             span {
                 display: inline-block;
                 margin: 0;
             }
-    
+
             &:hover {
                 text-decoration: underline;
             }
         }
     }
-    
+
+    @media (max-width: 768px) {
+        padding: 0.5rem 1rem;
+
+        .nav-link {
+            font-size: 16px;
+            margin-right: 0.5rem;
+        }
+    }
 }
 
-@media (max-width: 768px) {
-    nav {
-        padding: 0.5rem 1rem;
-    }
-    .nav-link {
-        font-size: 16px;
-        margin-right: 0.5rem;
-    }
+.navbar-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
 }
