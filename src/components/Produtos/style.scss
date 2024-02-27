@@ -413,28 +413,29 @@
 .cart-overlay {
   position: fixed;
   top: 0;
-  right: -400px; // Inicia fora da tela
+  right: -400px;
   width: 400px;
   height: 100vh;
   background-color: #f4f3ef;
   padding: 20px;
   overflow-y: auto;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
-  opacity: 0; // Inicia transparente
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; // Transições suaves
+  opacity: 0;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
   z-index: 100;
 
-  &.open { // Classe adicionada quando o cart-overlay estiver aberto
-    transform: translateX(-400px); // Desliza para dentro da tela
-    opacity: 1; // Torna-se opaco
+  &.open {
+    transform: translateX(-400px);
+    opacity: 1;
   }
 
   @media (max-width: 768px) {
     width: 100%;
-    right: -100vw; // Ajuste para dispositivos móveis
+    right: 0;
+    left: -100vw;
 
     &.open {
-      transform: translateX(-100vw);
+      transform: translateX(100vw);
     }
   }
 
@@ -543,6 +544,31 @@
   }
 }
 
+#addButton, #removeButton {
+  background-color: transparent !important;
+
+  svg {
+    circle {
+      fill: transparent;
+    }
+  }
+}
+
+#addButton {
+  svg {
+    g {
+      fill: #0D5C63;
+    }
+  }
+}
+
+#removeButton {
+  svg {
+    rect {
+      fill: #ff0000;
+    }
+  }
+}
   
   @media (max-width: 576px) {
     .modal-content {

@@ -12,6 +12,9 @@ const ScrollOrRouteLink = ({ to, scroll, children, className, ...rest }) => {
 
   const handleClick = () => {
     setClicked(true);
+    if (rest.onClick) {
+      rest.onClick();
+    }
   };
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export function Header() {
   const numItems = Object.keys(quantities).filter(
     (id) => quantities[id] > 0
   ).length;
+  const [expanded, setExpanded] = useState(false);
 
   const handleCartClick = () => {
     setIsCartOpen(!isCartOpen);
@@ -58,24 +62,30 @@ export function Header() {
     const handleScroll = () => {
       setSticky(window.scrollY > 0);
     };
-  
+
     window.addEventListener('scroll', handleScroll);
-  
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
+
+
+  const closeNavbar = () => {
+    setExpanded(false);
+  };
 
   return (
-<Navbar
-  collapseOnSelect
-  expand="lg"
-  bg="light"
-  className={`w-100 position-sticky ${sticky ? 'navbar-sticky' : ''}`}
->
+    <Navbar
+      collapseOnSelect
+      expand="lg"
+      bg="light"
+      className={`w-100 position-sticky ${sticky ? 'navbar-sticky' : ''}`}
+      expanded={expanded}
+      onToggle={() => setExpanded(!expanded)}
+    >
       <Container>
-        {pathname !== "/login" && ( // Renderiza condicionalmente baseado no caminho
+        {pathname !== "/login" && (
           <Nav.Link
             className="d-lg-none cart-icon-mobile"
             onClick={handleCartClick}
@@ -99,10 +109,10 @@ export function Header() {
 
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={ScrollOrRouteLink} to="home" scroll={true}>
+            <Nav.Link as={ScrollOrRouteLink} to="home" scroll={true} onClick={closeNavbar}>
               Início
             </Nav.Link>
-            <Nav.Link as={ScrollOrRouteLink} to="produtos" scroll={true}>
+            <Nav.Link as={ScrollOrRouteLink} to="produtos" scroll={true} onClick={closeNavbar}>
               Produtos
             </Nav.Link>
           </Nav>
@@ -110,7 +120,7 @@ export function Header() {
             <Nav.Link as={Link} to="/login">
               Entrar
             </Nav.Link>
-            {pathname !== "/login" && ( // Renderiza condicionalmente baseado no caminho
+            {pathname !== "/login" && (
               <Nav.Link className="cart-icon-desktop d-none d-lg-block" onClick={handleCartClick}>
                 <Container fluid>
                   <Row className="align-items-center">

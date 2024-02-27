@@ -151,11 +151,13 @@ export const Produtos = () => {
                           <p>Quantidade: {quantities[product.id] || 0}</p>
                           <Col>
                             <DefaultButton
+                            id="addButton"
                               onClick={() => addProduct(product.id)}
                             >
                               <FcPlus />
                             </DefaultButton>
                             <DefaultButton
+                            id="removeButton"
                               onClick={() => removeProduct(product.id)}
                             >
                               <FcMinus />
@@ -241,13 +243,15 @@ export const Produtos = () => {
                         <Col>
                           <p>{product.nome}</p>
                           <p>Quantidade: {quantity}</p>
-                          <Col>
+                          <Col className="pb-3">
                             <DefaultButton
+                            id="addButton"
                               onClick={() => addProduct(product.id)}
                             >
                               <FcPlus />
                             </DefaultButton>
                             <DefaultButton
+                            id="removeButton"
                               onClick={() => removeProduct(product.id)}
                             >
                               <FcMinus />
