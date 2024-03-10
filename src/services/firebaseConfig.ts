@@ -1,7 +1,19 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage"; // Importe getStorage
+// firebaseConfig.ts
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Auth, getAuth } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
+import { FirebaseStorage, getStorage } from 'firebase/storage';
+
+// Definindo a interface para a configuração do Firebase
+interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+}
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_REACT_APP_API_KEY,

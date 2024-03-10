@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "tsc": "tsc",
+    "lint": "eslint src --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --port 8080",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -32,8 +33,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@types/react": "^18.0.37",
-    "@types/react-dom": "^18.0.11",
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.63",
+    "@types/react-dom": "^18.2.20",
+    "@types/react-scroll": "^1.8.10",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react-swc": "^3.0.0",
     "dotenv": "^16.4.3",
     "eslint": "^8.38.0",
@@ -41,6 +47,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "gh-pages": "^6.1.1",
+    "typescript": "^5.3.3",
     "vite": "^4.3.9"
   }
 }

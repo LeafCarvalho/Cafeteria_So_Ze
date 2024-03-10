@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { DocumentData, QuerySnapshot, collection, getDocs } from "firebase/firestore";
 import { Container, Row, Col, Modal } from "react-bootstrap";
 import { FcPlus, FcMinus } from "react-icons/fc";
 import { db } from "../../services/firebaseConfig";
@@ -9,11 +9,20 @@ import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import "./style.scss";
 import Skeleton from "react-loading-skeleton";
 
+interface Product {
+  id: string;
+  nome: string;
+  tipo: string;
+  valor: number;
+  imagem: string;
+  descricao: string;
+}
+
 export const Produtos = () => {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [search, setSearch] = useState("");
-  const [selectedType, setSelectedType] = useState("Todos");
-  const [displayCount, setDisplayCount] = useState(6);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [search, setSearch] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("Todos");
+  const [displayCount, setDisplayCount] = useState<number>(6);
   const {
     isCartOpen,
     setIsCartOpen,
@@ -22,17 +31,17 @@ export const Produtos = () => {
     quantities,
     setQuantities,
   } = useCart();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const getProducts = async () => {
       setIsLoading(true);
       if (products.length === 0) {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const productsArray = querySnapshot.docs.map((doc) => ({
+        const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(collection(db, "products"));
+        const productsArray: Product[] = querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
-        }));
+        }) as Product);
         setProducts(productsArray);
       }
       setIsLoading(false);
@@ -49,17 +58,26 @@ export const Produtos = () => {
     setDisplayCount(6);
   };
 
-  const addProduct = (id) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
+
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedType(event.target.value);
+  };
+
+
+  const addProduct = (id: string) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [id]: (prevQuantities[id] || 0) + 1,
     }));
   };
 
-  const removeProduct = (id) => {
+  const removeProduct = (id: string) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [id]: prevQuantities[id] > 0 ? prevQuantities[id] - 1 : 0,
+      [id]: Math.max(0, prevQuantities[id] - 1),
     }));
   };
 
@@ -73,7 +91,7 @@ export const Produtos = () => {
     });
   };
 
-  const handleImageClick = (product) => {
+  const handleImageClick = (product: Product) => {
     setSelectedProduct(product);
   };
 
@@ -81,18 +99,10 @@ export const Produtos = () => {
     setSelectedProduct(null);
   };
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-  };
-
-  const handleTypeChange = (event) => {
-    setSelectedType(event.target.value);
-  };
-
   const filteredProducts = products.filter(
     (product) =>
       (selectedType === "Todos" || product.tipo === selectedType) &&
-      product.nome.toLowerCase().includes(search.toLowerCase())
+      (product.nome ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   const types = ["Todos", ...new Set(products.map((product) => product.tipo))];
@@ -133,7 +143,7 @@ export const Produtos = () => {
                       <img
                         src={product.imagem}
                         alt={product.nome}
-                        onClick={() => handleImageClick(product)}
+                        onClick={() => handleImageClick(product as Product)}
                       />
                     </div>
                     <Row className="d-flex align-items-start m-1">
@@ -148,17 +158,25 @@ export const Produtos = () => {
                       </Col>
                       <Col className="d-flex flex-column text-end">
                         <Row>
-                          <p>Quantidade: {quantities[product.id] || 0}</p>
+                          <p>Quantidade: {product.id != null ? quantities[product.id] ?? 0 : 0}</p>
                           <Col>
                             <DefaultButton
-                            id="addButton"
-                              onClick={() => addProduct(product.id)}
+                              id="addButton"
+                              onClick={() => {
+                                if (product.id != null) {
+                                  addProduct(product.id);
+                                }
+                              }}
                             >
                               <FcPlus />
                             </DefaultButton>
                             <DefaultButton
-                            id="removeButton"
-                              onClick={() => removeProduct(product.id)}
+                              id="removeButton"
+                              onClick={() => {
+                                if (product.id != null) {
+                                  removeProduct(product.id);
+                                }
+                              }}
                             >
                               <FcMinus />
                             </DefaultButton>
@@ -211,101 +229,109 @@ export const Produtos = () => {
           <Modal.Footer></Modal.Footer>
         </Modal>
         <div className={`cart-overlay ${isCartOpen ? 'open' : ''}`}>
-            <DefaultButton
-              onClick={() => setIsCartOpen(false)}
-              customizarCSS="closeCartButton"
-            >
-              Fechar
-            </DefaultButton>
-            {Object.entries(quantities).filter(([_, quantity]) => quantity > 0)
-              .length > 0 ? (
-              <>
+          <DefaultButton
+            onClick={() => setIsCartOpen(false)}
+            customizarCSS="closeCartButton"
+          >
+            Fechar
+          </DefaultButton>
+          {Object.entries(quantities).filter(([_, quantity]) => quantity > 0)
+            .length > 0 ? (
+            <>
+              {Object.entries(quantities)
+                .filter(([_, quantity]) => quantity > 0)
+                .map(([id, quantity]) => {
+                  const product = products.find(
+                    (product) => product.id === id
+                  );
+                  if (!product) return null;
+
+                  const valorUnitario = product.valor ?? 0;
+                  const valorTotalProduto = (product.valor ?? 0) * quantity;
+
+                  return (
+                    <Row key={id} className="mb-3 cart-container">
+                      <Col>
+                        <img
+                          src={product.imagem}
+                          alt={product.nome}
+                          style={{ width: "100%", height: "auto" }}
+                        />
+                      </Col>
+                      <Col>
+                        <p>{product.nome}</p>
+                        <p>Quantidade: {quantity}</p>
+                        <Col className="pb-3">
+                          <DefaultButton
+                            id="addButton"
+                            onClick={() => {
+                              if (product.id != null) {
+                                addProduct(product.id);
+                              }
+                            }}
+                          >
+                            <FcPlus />
+                          </DefaultButton>
+                          <DefaultButton
+                            id="removeButton"
+                            onClick={() => {
+                              if (product.id != null) {
+                                removeProduct(product.id);
+                              }
+                            }}
+                          >
+                            <FcMinus />
+                          </DefaultButton>
+                        </Col>
+                        <p>
+                          Valor Unitário:{" "}
+                          {valorUnitario.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </p>
+                        <p>
+                          Valor total:{" "}
+                          {valorTotalProduto.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </p>
+                      </Col>
+                    </Row>
+                  );
+                })}
+              <p>
+                Total a pagar:{" "}
                 {Object.entries(quantities)
-                  .filter(([_, quantity]) => quantity > 0)
-                  .map(([id, quantity]) => {
+                  .reduce((total, [id, quantity]) => {
                     const product = products.find(
                       (product) => product.id === id
                     );
-                    if (!product) return null;
-
-                    const valorUnitario = product.valor;
-                    const valorTotalProduto = product.valor * quantity;
-
-                    return (
-                      <Row key={id} className="mb-3 cart-container">
-                        <Col>
-                          <img
-                            src={product.imagem}
-                            alt={product.nome}
-                            style={{ width: "100%", height: "auto" }}
-                          />
-                        </Col>
-                        <Col>
-                          <p>{product.nome}</p>
-                          <p>Quantidade: {quantity}</p>
-                          <Col className="pb-3">
-                            <DefaultButton
-                            id="addButton"
-                              onClick={() => addProduct(product.id)}
-                            >
-                              <FcPlus />
-                            </DefaultButton>
-                            <DefaultButton
-                            id="removeButton"
-                              onClick={() => removeProduct(product.id)}
-                            >
-                              <FcMinus />
-                            </DefaultButton>
-                          </Col>
-                          <p>
-                            Valor Unitário:{" "}
-                            {valorUnitario.toLocaleString("pt-BR", {
-                              style: "currency",
-                              currency: "BRL",
-                            })}
-                          </p>
-                          <p>
-                            Valor total:{" "}
-                            {valorTotalProduto.toLocaleString("pt-BR", {
-                              style: "currency",
-                              currency: "BRL",
-                            })}
-                          </p>
-                        </Col>
-                      </Row>
-                    );
+                    return total + (product && product.valor != null ? product.valor * quantity : 0);
+                  }, 0)
+                  .toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
                   })}
-                <p>
-                  Total a pagar:{" "}
-                  {Object.entries(quantities)
-                    .reduce((total, [id, quantity]) => {
-                      const product = products.find(
-                        (product) => product.id === id
-                      );
-                      return total + (product ? product.valor * quantity : 0);
-                    }, 0)
-                    .toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                </p>
-                <DefaultButton
-                  onClick={emptyCart}
-                  customizarCSS="esvaziarCarrinho"
-                >
-                  Esvaziar Carrinho
-                </DefaultButton>
-                <Link to="/pedidos" className="continueButton">
-                  Continuar
-                </Link>
-              </>
-            ) : (
-              <p style={{ textAlign: "center" }}>
-                Nenhum produto adicionado à lista
               </p>
-            )}
-          </div>
-        
+              <DefaultButton
+                onClick={emptyCart}
+                customizarCSS="esvaziarCarrinho"
+              >
+                Esvaziar Carrinho
+              </DefaultButton>
+              <Link to="/pedidos" className="continueButton">
+                Continuar
+              </Link>
+            </>
+          ) : (
+            <p style={{ textAlign: "center" }}>
+              Nenhum produto adicionado à lista
+            </p>
+          )}
+        </div>
+
       </Container>
     </>
   );

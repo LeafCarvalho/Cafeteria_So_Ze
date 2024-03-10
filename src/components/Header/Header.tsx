@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { FunctionComponent, MouseEvent, useEffect, useState } from "react";
 import { Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 import { Link as ScrollLink, scroller } from "react-scroll";
@@ -6,14 +6,28 @@ import "./style.scss";
 import { useCart } from "../../Context/CartContext";
 import logo from "../../assets/logoCafeteria.png";
 
-const ScrollOrRouteLink = ({ to, scroll, children, className, ...rest }) => {
+interface HeaderProps {
+  to: string;
+  scroll: boolean;
+  children: React.ReactNode;
+  className?: string;
+  onClick?: (event?: React.MouseEvent<any> | undefined) => void;
+}
+
+const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
+  to,
+  scroll,
+  children,
+  className,
+  ...rest
+}) => {
   const { pathname } = useLocation();
   const [clicked, setClicked] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (event?: React.MouseEvent<any>) => {
     setClicked(true);
     if (rest.onClick) {
-      rest.onClick();
+      rest.onClick(event);
     }
   };
 

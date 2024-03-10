@@ -1,12 +1,13 @@
 // Libs
-import { BrowserRouter, HashRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
+import { FC } from "react";
 
 // CSS
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CartProvider } from "./Context/CartContext";
 import Router from "./Router/Router";
 
-function App() {
+const App: FC = () => {
   return (
     <>
       <CartProvider>

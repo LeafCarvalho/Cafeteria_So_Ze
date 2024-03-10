@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "target": "es2015",
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "module": "esnext",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "typeRoots": ["./types", "./node_modules/@types"],
+      "types": ["node"],
+      "jsx": "react-jsx"
+    },
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/vite-env.d.ts"],
+    "exclude": ["node_modules"]
+  }

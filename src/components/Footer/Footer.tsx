@@ -2,23 +2,27 @@ import { useState } from "react";
 import { Container, Row } from "react-bootstrap";
 import "./style.scss";
 
-export const Footer = () => {
-  const anoAtual = new Date().getFullYear();
-  const urlWpp =
-    "https://api.whatsapp.com/send?phone=5531999999999&text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20preciso%20falar%20sobre%20meu%20pedido.";
-  const email = "cafeteriasoze@gmail.com";
-  const [isCopied, setIsCopied] = useState(false);
+interface FormatPhoneNumber {
+  (phoneNumber: string): string | null;
+}
 
-  const formatPhoneNumber = (phoneNumber) => {
-    const cleaned = ("" + phoneNumber).replace(/\D/g, "");
-    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+export const Footer = () => {
+  const anoAtual: number = new Date().getFullYear();
+  const urlWpp: string =
+    "https://api.whatsapp.com/send?phone=5531999999999&text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20preciso%20falar%20sobre%20meu%20pedido.";
+  const email: string = "cafeteriasoze@gmail.com";
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+
+  const formatPhoneNumber: FormatPhoneNumber = (phoneNumber) => {
+    const cleaned: string = phoneNumber.replace(/\D/g, "");
+    const match: RegExpMatchArray | null = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
     if (match) {
       return "(" + match[1] + ") " + match[2] + "-" + match[3];
     }
     return null;
   };
 
-  const handleEmailClick = async () => {
+  const handleEmailClick = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(email);
       setIsCopied(true);
@@ -36,9 +40,9 @@ export const Footer = () => {
             <p onClick={handleEmailClick} style={{ cursor: "pointer" }}>
               {email}{" "}
               {isCopied && (
-                <div className={`copied-toast ${isCopied ? "visible" : ""}`}>
+                <span className={`copied-toast ${isCopied ? "visible" : ""}`}>
                   Copiado!
-                </div>
+                </span>
               )}
             </p>
             <p>

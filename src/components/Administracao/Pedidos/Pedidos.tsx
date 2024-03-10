@@ -5,19 +5,32 @@ import { Tabs, Tab, Table } from "react-bootstrap";
 import { FaCircle } from "react-icons/fa";
 import "./style.scss";
 
+interface Produto {
+  nome: string;
+  quantidade: number;
+}
+
+interface Pedido {
+  id: string;
+  nome_completo: string;
+  produtos: Produto[];
+  total: number;
+  data_hora: Date | null;
+}
+
 const Pedidos = () => {
-  const [pedidos, setPedidos] = useState([]);
-  const [key, setKey] = useState("Em Andamento");
-  const [currentTime, setCurrentTime] = useState("");
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [key, setKey] = useState<string>("Em Andamento");
+  const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
     const fetchPedidos = async () => {
       const querySnapshot = await getDocs(collection(db, "pedidos"));
-      const fetchedPedidos = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
+      const fetchedPedidos: Pedido[] = querySnapshot.docs.map((doc) => ({
         id: doc.id,
+        ...doc.data(),
         data_hora: doc.data().data_hora ? doc.data().data_hora.toDate() : null,
-      }));
+      }) as Pedido);
       setPedidos(fetchedPedidos);
     };
 
@@ -38,17 +51,17 @@ const Pedidos = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const atualizarStatusPedido = (pedido) => {
+  const atualizarStatusPedido = (pedido: Pedido): string => {
     const now = new Date();
-    const pedidoTime = new Date(pedido.data_hora);
-    const hoursDiff = (now - pedidoTime) / 3600000;
+    const pedidoTime = pedido.data_hora ? new Date(pedido.data_hora) : null;
+    const hoursDiff = pedidoTime ? (now.getTime() - pedidoTime.getTime()) / 3600000 : 0;
 
     if (hoursDiff < 1) return "Em Andamento";
     if (hoursDiff >= 1 && hoursDiff < 48) return "Finalizado";
     return "Concluído";
   };
 
-  const renderPedidoItem = (pedido) => {
+  const renderPedidoItem = (pedido: Pedido) => {
     const statusPedido = atualizarStatusPedido(pedido);
     const dataHoraFormatada = pedido.data_hora
       ? new Intl.DateTimeFormat("pt-BR", {
@@ -90,29 +103,18 @@ const Pedidos = () => {
         <p>Entenda os status dos pedidos:</p>
         <ul>
           <li>
-            <FaCircle className="em-andamento" style={{ color: "yellow" }} /> Em
-            Andamento: até 2 horas após o pedido.
+            <FaCircle className="em-andamento" style={{ color: "yellow" }} /> Em Andamento: até 2 horas após o pedido.
           </li>
           <li>
-            <FaCircle className="finalizado" style={{ color: "red" }} /> Pronto
-            para Entrega: de 2 a 48 horas após o pedido.
+            <FaCircle className="finalizado" style={{ color: "red" }} /> Pronto para Entrega: de 2 a 48 horas após o pedido.
           </li>
           <li>
-            <FaCircle className="concluido" style={{ color: "green" }} />{" "}
-            Concluído: após 48 horas do pedido.
+            <FaCircle className="concluido" style={{ color: "green" }} /> Concluído: após 48 horas do pedido.
           </li>
         </ul>
       </div>
-      <Tabs activeKey={key} onSelect={(k) => setKey(k)} className="nav">
-        <Tab
-          eventKey="Em Andamento"
-          title={
-            <span>
-              <FaCircle className="em-andamento" color="yellow" /> Em Andamento
-            </span>
-          }
-          className="tab-content"
-        >
+      <Tabs activeKey={key} onSelect={(k) => setKey(k as string)} className="nav">
+        <Tab eventKey="Em Andamento" title={<span><FaCircle className="em-andamento" color="yellow" /> Em Andamento</span>} className="tab-content">
           <Table striped bordered hover>
             <thead>
               <tr className="em-andamento">
@@ -126,15 +128,7 @@ const Pedidos = () => {
             <tbody>{pedidosFiltrados.map(renderPedidoItem)}</tbody>
           </Table>
         </Tab>
-        <Tab
-          eventKey="Finalizado"
-          title={
-            <span>
-              <FaCircle color="red" className="finalizado" /> Pronto para
-              Entrega
-            </span>
-          }
-        >
+        <Tab eventKey="Finalizado" title={<span><FaCircle color="red" className="finalizado" /> Pronto para Entrega</span>}>
           <Table striped bordered hover>
             <thead>
               <tr className="finalizado">
@@ -148,14 +142,7 @@ const Pedidos = () => {
             <tbody>{pedidosFiltrados.map(renderPedidoItem)}</tbody>
           </Table>
         </Tab>
-        <Tab
-          eventKey="Concluído"
-          title={
-            <span>
-              <FaCircle color="green" className="concluido" /> Concluído
-            </span>
-          }
-        >
+        <Tab eventKey="Concluído" title={<span><FaCircle color="green" className="concluido" /> Concluído</span>}>
           <Table striped bordered hover>
             <thead>
               <tr className="concluido">
