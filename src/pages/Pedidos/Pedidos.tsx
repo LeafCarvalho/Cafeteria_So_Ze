@@ -1,33 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useCart } from '../../Context/CartContext';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, DocumentReference } from 'firebase/firestore';
 import { db } from '../../services/firebaseConfig';
 import './style.scss';
 import { DefaultButton } from '../../Utils/Buttons/Buttons';
 
-const Pedidos = () => {
+interface Product {
+  id: string;
+  imagem: string;
+  nome: string;
+  tipo: string;
+  valor: number;
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+const Pedidos: React.FC = () => {
   const { quantities, products, setQuantities, setLastOrder } = useCart();
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
   const navigate = useNavigate();
 
-  const cartItems = Object.entries(quantities)
+  const cartItems: CartItem[] = Object.entries(quantities)
     .filter(([_, quantity]) => quantity > 0)
     .map(([id, quantity]) => {
-      const product = products.find(product => product.id === id);
+      const product = products.find((product): product is Product => Boolean(product.id) && product.id === id);
       return product ? { ...product, quantity } : null;
     })
-    .filter(Boolean);
+    .filter(Boolean) as CartItem[];
+
 
   const totalValue = cartItems.reduce((total, item) => total + item.valor * item.quantity, 0);
 
   const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const handleNameChange = (event) => setName(event.target.value);
-  const handlePhoneChange = (event) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => setName(event.target.value);
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value.replace(/\D/g, '');
     let formattedValue = '';
 
@@ -45,19 +58,15 @@ const Pedidos = () => {
     setPhone(formattedValue);
   };
 
-  function generateRandomPassword() {
+  const generateRandomPassword = (): string => {
     const timestamp = new Date().getTime();
     return `${timestamp}-${Math.floor(1000 + Math.random() * 9000)}`;
-  }
+  };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const telefone = phone;
-    console.log("telefone:", telefone);
-    const senha = generateRandomPassword();
-    console.log("senha:", senha);
 
-    if (telefone && cartItems.length > 0) {
+    if (phone && cartItems.length > 0) {
       const pedido = {
         produtos: cartItems.map(item => ({
           imagem: item.imagem,
@@ -68,14 +77,14 @@ const Pedidos = () => {
         })),
         total: totalValue,
         nome_completo: name,
-        telefone: telefone,
-        senha: senha,
+        telefone: phone,
+        senha: generateRandomPassword(),
         data_hora: new Date(),
         status: "Em Andamento",
       };
       try {
-        const docRef = await addDoc(collection(db, "pedidos"), pedido);
-        setLastOrder({ ...pedido, senha, docId: docRef.id });
+        const docRef: DocumentReference = await addDoc(collection(db, "pedidos"), pedido);
+        setLastOrder({ ...pedido, docId: docRef.id });
         setQuantities({});
         navigate('/efetuacao');
       } catch (error) {
@@ -109,7 +118,7 @@ const Pedidos = () => {
         <Col>
           <div className="pedido-resumo">
             <h2>Seu Pedido</h2>
-            {cartItems.map((item) => (
+            {cartItems.map((item: CartItem) => (
               <div key={item.id} className="item">
                 <img src={item.imagem} alt={item.nome} />
                 <div className="info">

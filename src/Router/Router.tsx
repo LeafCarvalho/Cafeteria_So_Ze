@@ -20,7 +20,6 @@ const Router = () => {
           <Route path="/efetuacao" element={<Efetuacao />} />
         </Route>
         <Route element={<PrivateRoute />}>
-          {/* Usar React.Fragment para envolver o ProductProvider e o Route */}
           <React.Fragment>
             <Route
               path="/administracao"

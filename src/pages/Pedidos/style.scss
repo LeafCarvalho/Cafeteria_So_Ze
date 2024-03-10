@@ -1,6 +1,13 @@
 .pedidos-page {
     //padding-top: 100px;
 
+    > div {
+      @media screen and (max-width: 992px) {
+          display: flex;
+          flex-direction: column;
+      }
+    }
+
     .pedido-info {
         background-color: #f9f9f9;
         border-radius: 8px;

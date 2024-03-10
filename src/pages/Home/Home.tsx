@@ -1,8 +1,6 @@
-import { Footer } from "../../components/Footer/Footer";
-import { Header } from "../../components/Header/Header";
 import BannerHome from "../../assets/Home/cafe-principal1.jpg";
 import "./style.scss";
-import { Produtos } from "../../components/Produtos/Produtos.tsx";
+import { Produtos } from "../../components/Produtos/Produtos";
 import { Element } from "react-scroll";
 import { Container } from "react-bootstrap";
 
