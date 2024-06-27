@@ -1,50 +1,78 @@
-# Cafeteria Só Zé
+## Cafeteria Sô Zé
+O Projeto Cafeteria Sô Zé foi desenvolvido utilizando React, TypeScript e Firebase. Este projeto é uma loja online para uma cafeteria gourmet, onde os clientes podem fazer seus pedidos e retirá-los utilizando uma senha. A ideia deste projeto foi praticar meus conhecimentos em React e aprender mais sobre TypeScript e Firebase.
 
-Bem-vindo ao repositório do projeto da **Cafeteria Só Zé**, a ideia deste projeto foi criar uma cafeteria gourmet inspirada no povo mineiro, mostrando toda sua hospitalidade, seus dotes e um aconchego especial de Minas Gerais. Vem conhecer, uai!
+## Pré-visualização da experiência do usuário
 
-![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/b96576c6-53e6-47ba-a659-3d6eb1e93964)
+![Design sem nome (2)](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/0dc7105c-ec0f-4d2c-afa6-f685f0b7f755)
 
-## 🚀 Funcionalidades
+## Tecnologias Utilizadas
 
-- **Catálogo de Produtos**: Visualize um belo catálogo com imagens, preços e descrições dos produtos.
-- **Gestão de Pedidos**: Acompanhe os pedidos com informações detalhadas e atualizações de status em tempo real.
-- **Gráficos Interativos**: Analise as tendências de pedidos com gráficos dinâmicos e exporte os dados para Excel.
-- **Interface Amigável**: Desfrute de uma experiência de usuário agradável com uma interface limpa e moderna.
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react" width="40" height="40"/>
+      <br>
+      <strong>React</strong>
+    </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/>
+      <br>
+      <strong>TypeScript</strong>
+    </td>
+    <td align="center">
+      <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" alt="firebase" width="40" height="40"/>
+      <br>
+      <strong>Firebase</strong>
+    </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-plain.svg" alt="react-bootstrap" width="40" height="40"/>
+      <br>
+      <strong>React Bootstrap</strong>
+    </td>
+    <td align="center">
+      <img src="https://www.chartjs.org/media/logo-title.svg" alt="chartjs" width="40" height="40"/>
+      <br>
+      <strong>Chart.js</strong>
+    </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/sass/sass-original.svg" alt="sass" width="40" height="40"/>
+      <br>
+      <strong>Sass</strong>
+    </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react-router-dom" width="40" height="40"/>
+      <br>
+      <strong>react-router-dom</strong>
+    </td>
+    <td align="center">
+      <img src="https://img.icons8.com/fluency/48/000000/ms-excel.png" alt="xlsx" width="40" height="40"/>
+      <br>
+      <strong>xlsx</strong>
+    </td>
+  </tr>
+</table>
 
-## 🛠️ Construído com
 
-- [React](https://reactjs.org/) - A biblioteca de UI para construir interfaces de usuário com componentes reutilizáveis.
-- [React Bootstrap](https://react-bootstrap.github.io/) - Integração do Bootstrap com React para um design responsivo.
-- [Sass](https://sass-lang.com/) - Pré-processador CSS poderoso para escrever estilos de forma eficiente e com facilidade.
-- [React Router Dom](https://reactrouter.com/web/guides/quick-start) - Mantenha a interface do usuário em sincronia com a URL.
-- [Toastify](https://fkhadra.github.io/react-toastify/) - Para exibir notificações mais belas e atraentes.
-- [File Saver & XLSX](https://sheetjs.com/) - Exporte dados para o Excel diretamente do navegador, dados gráficos disponíveis de forma rápida para uma apresentação.
-- [Firebase](https://firebase.google.com/) - Plataforma desenvolvida pelo Google para a criação de aplicativos web e móveis, o foco aqui é o uso de um armazenador de mídias (storage), bem como um banco de dados.
+## Objetivo do Projeto
+A ideia deste projeto é demonstrar uma boa capacidade de uso das ferramentas, proporcionando aos usuários e administradores:
 
-## 📸 Screenshots
+- Facilidade de uso
+- Personalização conforme necessário
+- Responsividade, permitindo acesso tanto via web quanto mobile
+- Boa performance e SEO, utilizando Firebase para backend e autenticação
+- Autenticação via email e senha, feita pelo Firebase para que o usuário monitore pedidos, cadastre produtos, altere as informações dos produtos existentes, monitore o rendimento diário, semanal, mensal e anual da empresa em relação a pedidos, acompanhe os pedidos em andamento, pronto para entrega, e concluído
+Instalação
+Para configurar o projeto localmente e utilizar o tema criado, siga os passos abaixo:
 
-![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/809fa7db-3196-41c6-b747-46258eebac51)
-*Página de visualização dos produtos.*
+## Clone o repositório:
 
-![image](https://github.com/LeafCarvalho/Cafeteria_So_Ze/assets/79648062/46099c8a-d79b-4fe3-924f-d65b149199ed)
-*Página de acompanhamento dos pedidos.*
-
-## ⚙️ Instalação
-
+```bash
+// Clone e acesse a diretório
 git clone https://github.com/seu-usuario/cafeteria-so-ze.git
-
 cd cafeteria-so-ze
 
+// Instale as dependências:
 npm install
 
+//Inicie o projeto:
 npm run dev
-
-
-## 🏆 Desafios
-
-Esse foi meu primeiro contato com o Firebase, então eu precisei estudá-lo, compreendê-lo, para só assim seguir com o projeto. Descobrir a sua versatilidade me auxiliou a focar em partes mais críticas do projeto.
-Além disso, aprendizados em relação ao React Router Dom e as bibliotecas File Saver e XLSX tornaram meu projeto mais robusto, melhor navegável e focando em resolver questões administrativas da empresa, como relatórios e facilitando o processo de obter dados do negócio.
-
-## ✍️ Autor
-
-Rafael Carvalho - Desenvolvedor de Software - [Vamos conversar! Clique aqui e se conecte comigo :blush:.](https://www.linkedin.com/in/rafaelcarvalhosl/)
