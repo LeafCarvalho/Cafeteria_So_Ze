@@ -1,5 +1,7 @@
 # Cafeteria Sô Zé
 O Projeto Cafeteria Sô Zé foi desenvolvido utilizando React, TypeScript e Firebase. Este projeto é uma loja online para uma cafeteria gourmet, onde os clientes podem fazer seus pedidos e retirá-los utilizando uma senha. A ideia deste projeto foi praticar meus conhecimentos em React e aprender mais sobre TypeScript e Firebase.
+<br>
+<a href="https://leafcarvalho.github.io/Cafeteria_So_Ze/" target="_blank">CLIQUE AQUI</a> para navegar pelo projeto.
 
 ## Pré-visualização da experiência do usuário
 
