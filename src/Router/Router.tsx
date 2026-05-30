@@ -6,7 +6,7 @@ import DefaultLayout from "../Layout/DefaultLayout";
 import Efetuacao from "../pages/Efetuacao/Efetuacao";
 import PrivateRoute from "./PrivateRoute";
 import Administracao from "../pages/Administracao/Administracao";
-import { ProductProvider } from "../Context/ProductProvider";
+import { ProductProvider } from "../Context/ProdutosProvider";
 import React from "react";
 
 const Router = () => {
