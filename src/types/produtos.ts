@@ -1,11 +1,15 @@
 export interface Produto {
   id: string;
+  created_at?: string;
+  updated_at?: string;
   nome: string;
   tipo: string;
   valor: number;
   descricao: string;
   imagem: string;
 }
+
+export type CriarProdutoDTO = Omit<Produto, "id" | "created_at" | "updated_at">;
 
 export type AtualizarProdutoDTO = Partial<Pick<
   Produto,
