@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../../services/firebaseConfig";
-import { signOut } from "firebase/auth";
-import { Container, Row, Col, Nav, Accordion } from "react-bootstrap";
-import "./style.scss";
-import Inicio from "../../components/Administracao/Inicio/Inicio";
-import TodosProdutos from "../../components/Administracao/Produtos/TodosProdutos/TodosProdutos";
-import Cadastro from "../../components/Administracao/Produtos/Cadastro/Cadastro";
-import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
+import { Accordion, Col, Container, Nav, Row } from "react-bootstrap";
 import { FiLogOut } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import Inicio from "../../components/Administracao/Inicio/Inicio";
+import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
+import Cadastro from "../../components/Administracao/Produtos/Cadastro/Cadastro";
+import TodosProdutos from "../../components/Administracao/Produtos/TodosProdutos/TodosProdutos";
+import { authService } from "../../services/authService";
+import "./style.scss";
 
 const Administracao = () => {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ const Administracao = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await authService.logout();
       navigate("/login");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
@@ -111,3 +110,4 @@ const Administracao = () => {
 };
 
 export default Administracao;
+
