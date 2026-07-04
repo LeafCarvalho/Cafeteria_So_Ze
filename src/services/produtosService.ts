@@ -1,4 +1,4 @@
-import { AtualizarProdutoDTO, Produto } from "../types/produtos";
+import { AtualizarProdutoDTO, CriarProdutoDTO, Produto } from "../types/produtos";
 import { supabase } from "../Utils/supabase";
 
 export const produtosService = {
@@ -26,6 +26,18 @@ export const produtosService = {
     }
 
     return data;
+  },
+
+  async criarProduto(data: CriarProdutoDTO): Promise<Produto> {
+    const { data: produtoCriado, error } = await supabase
+      .from("produtos")
+      .insert(data)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    return produtoCriado;
   },
 
   async atualizarProdutoPorId(
