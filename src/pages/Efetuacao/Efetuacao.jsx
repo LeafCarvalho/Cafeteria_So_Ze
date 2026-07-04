@@ -12,20 +12,19 @@ const Efetuacao = () => {
     <div className="efetuacao-container">
       <div className="container">
         <div className="d-flex flex-column justify-content-center align-items-center">
-          <h1>Bão demais, {lastOrder.nome_completo}! Seu pedido foi efetuado com sucesso.</h1>
+          <h1>Bão demais, {lastOrder.nome_cliente}! Seu pedido foi efetuado com sucesso.</h1>
         </div>
-          <p>Tempo estimado de preparo 1 hora, mas fique tranquilo, você receberá um aviso quando seu pedido estiver pronto.</p>
-          <p>No ato da retirada informe sua senha:</p>
-          <h3>{lastOrder.senha}</h3>
-        {lastOrder.produtos.map((item, index) => (
-          <div key={index} className="pedido-item">
+        <p>Estimativa de preparo: 30 a 60 minutos.</p>
+        <p>Apresente este código no balcão para retirar seu pedido:</p>
+        <h3>{lastOrder.senha_retirar_ped}</h3>
+        {lastOrder.produtos.map((item) => (
+          <div key={item.id} className="pedido-item">
             <img src={item.imagem} alt={item.nome} />
             <div>
               <p>Nome: {item.nome}</p>
               <p>Quantidade: {item.quantidade}</p>
               <p>Valor Unitário: {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
             </div>
-
           </div>
         ))}
         <p>Total: {lastOrder.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
@@ -35,3 +34,4 @@ const Efetuacao = () => {
 };
 
 export default Efetuacao;
+

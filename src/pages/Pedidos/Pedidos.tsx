@@ -1,48 +1,46 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { useCart } from '../../Context/CartContext';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { addDoc, collection, DocumentReference } from 'firebase/firestore';
-import { db } from '../../services/firebaseConfig';
-import './style.scss';
-import { DefaultButton } from '../../Utils/Buttons/Buttons';
+import React, { ChangeEvent, FormEvent, useState } from "react";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../../Context/CartContext";
+import { pedidosService } from "../../services/pedidosService";
+import { PedidoResumoItem } from "../../types/pedidos";
+import { Produto } from "../../types/produtos";
+import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import "./style.scss";
 
-interface Product {
-  id: string;
-  imagem: string;
-  nome: string;
-  tipo: string;
-  valor: number;
-}
-
-interface CartItem extends Product {
+interface CartItem extends Produto {
   quantity: number;
 }
 
 const Pedidos: React.FC = () => {
   const { quantities, products, setQuantities, setLastOrder } = useCart();
-
-  const [name, setName] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
 
   const cartItems: CartItem[] = Object.entries(quantities)
-    .filter(([_, quantity]) => quantity > 0)
+    .filter(([, quantity]) => quantity > 0)
     .map(([id, quantity]) => {
-      const product = products.find((product): product is Product => Boolean(product.id) && product.id === id);
+      const product = products.find((item) => item.id === id);
       return product ? { ...product, quantity } : null;
     })
-    .filter(Boolean) as CartItem[];
+    .filter((item): item is CartItem => Boolean(item));
 
+  const totalValue = cartItems.reduce(
+    (total, item) => total + item.valor * item.quantity,
+    0,
+  );
 
-  const totalValue = cartItems.reduce((total, item) => total + item.valor * item.quantity, 0);
+  const formattedTotalValue = totalValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
-  const formattedTotalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => setName(event.target.value);
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value.replace(/\D/g, '');
-    let formattedValue = '';
+    let value = event.target.value.replace(/\D/g, "");
+    let formattedValue = "";
 
     if (value.length > 2) {
       formattedValue += `(${value.substring(0, 2)}) `;
@@ -58,41 +56,64 @@ const Pedidos: React.FC = () => {
     setPhone(formattedValue);
   };
 
-  const generateRandomPassword = (): string => {
-    const timestamp = new Date().getTime();
-    return `${timestamp}-${Math.floor(1000 + Math.random() * 9000)}`;
-  };
+  const generateWithdrawalCode = (): string =>
+    Math.floor(1000 + Math.random() * 9000).toString();
+
+  const buildResumoProdutos = (): PedidoResumoItem[] =>
+    cartItems.map((item) => ({
+      id: item.id,
+      nome: item.nome,
+      tipo: item.tipo,
+      imagem: item.imagem,
+      valor: item.valor,
+      quantidade: item.quantity,
+    }));
+
+  const buildPedidosPayload = (senhaRetirada: string) =>
+    cartItems.flatMap((item) =>
+      Array.from({ length: item.quantity }, () => ({
+        nome_cliente: name,
+        produto_id: item.id,
+        senha_retirar_ped: senhaRetirada,
+        telefone: phone,
+        total: item.valor,
+      })),
+    );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (phone && cartItems.length > 0) {
-      const pedido = {
-        produtos: cartItems.map(item => ({
-          imagem: item.imagem,
-          nome: item.nome,
-          tipo: item.tipo,
-          valor: item.valor,
-          quantidade: item.quantity,
-        })),
-        total: totalValue,
-        nome_completo: name,
+    if (enviando) return;
+
+    if (!phone || cartItems.length === 0) {
+      setErro("Informe um telefone válido e adicione pelo menos um produto.");
+      return;
+    }
+
+    try {
+      setEnviando(true);
+      setErro(null);
+
+      const senhaRetirada = generateWithdrawalCode();
+      const pedidosCriados = await pedidosService.criarPedidos(
+        buildPedidosPayload(senhaRetirada),
+      );
+
+      setLastOrder({
+        ids: pedidosCriados.map((pedido) => pedido.id),
+        nome_cliente: name,
         telefone: phone,
-        senha: generateRandomPassword(),
-        data_hora: new Date(),
-        status: "Em Andamento",
-      };
-      try {
-        const docRef: DocumentReference = await addDoc(collection(db, "pedidos"), pedido);
-        setLastOrder({ ...pedido, docId: docRef.id });
-        setQuantities({});
-        navigate('/efetuacao');
-      } catch (error) {
-        console.error("Erro ao enviar o pedido:", error);
-        alert("Erro ao enviar o pedido.");
-      }
-    } else {
-      alert("Número de telefone inválido ou carrinho vazio.");
+        senha_retirar_ped: senhaRetirada,
+        total: totalValue,
+        produtos: buildResumoProdutos(),
+      });
+      setQuantities({});
+      navigate("/efetuacao");
+    } catch (error) {
+      console.error("Erro ao enviar o pedido:", error);
+      setErro("Erro ao enviar o pedido. Tente novamente.");
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -100,31 +121,55 @@ const Pedidos: React.FC = () => {
     <Container className="pedidos-page">
       <Row>
         <Col>
-          <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)}>Voltar</DefaultButton>
+          <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)}>
+            Voltar
+          </DefaultButton>
           <div className="pedido-form">
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formName">
                 <Form.Label>Nome completo</Form.Label>
-                <Form.Control type="text" value={name} onChange={handleNameChange} required />
+                <Form.Control
+                  type="text"
+                  value={name}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setName(event.target.value)
+                  }
+                  required
+                />
               </Form.Group>
               <Form.Group controlId="formPhone">
                 <Form.Label>Telefone</Form.Label>
-                <Form.Control type="tel" value={phone} onChange={handlePhoneChange} placeholder="(XX) XXXXX-XXXX" required />
+                <Form.Control
+                  type="tel"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  placeholder="(XX) XXXXX-XXXX"
+                  required
+                />
               </Form.Group>
-              <Button style={{ marginTop: "1.5rem" }} type="submit">Finalizar Pedido</Button>
+              {erro && <p className="mt-3 text-danger">{erro}</p>}
+              <Button style={{ marginTop: "1.5rem" }} type="submit" disabled={enviando}>
+                {enviando ? "Enviando..." : "Finalizar Pedido"}
+              </Button>
             </Form>
           </div>
         </Col>
         <Col>
           <div className="pedido-resumo">
             <h2>Seu Pedido</h2>
-            {cartItems.map((item: CartItem) => (
+            {cartItems.map((item) => (
               <div key={item.id} className="item">
                 <img src={item.imagem} alt={item.nome} />
                 <div className="info">
                   <h3>{item.nome}</h3>
                   <p>Quantidade: {item.quantity}</p>
-                  <p>Preço: {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                  <p>
+                    Preço:{" "}
+                    {item.valor.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </p>
                 </div>
               </div>
             ))}
@@ -137,3 +182,4 @@ const Pedidos: React.FC = () => {
 };
 
 export default Pedidos;
+
