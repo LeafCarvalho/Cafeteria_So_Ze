@@ -6,7 +6,7 @@ import DefaultLayout from "../Layout/DefaultLayout";
 import Efetuacao from "../pages/Efetuacao/Efetuacao";
 import PrivateRoute from "./PrivateRoute";
 import Administracao from "../pages/Administracao/Administracao";
-import { ProductProvider } from "../Context/ProductProvider";
+import { ProdutosProvider } from "../Context/ProdutosProvider";
 import React from "react";
 
 const Router = () => {
@@ -24,9 +24,9 @@ const Router = () => {
             <Route
               path="/administracao"
               element={
-                <ProductProvider>
+                <ProdutosProvider>
                   <Administracao />
-                </ProductProvider>
+                </ProdutosProvider>
               }
             />
           </React.Fragment>
