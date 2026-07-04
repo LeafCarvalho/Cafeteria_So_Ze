@@ -8,7 +8,6 @@ import {
 import { Col, Modal, Button, Form, Pagination } from "react-bootstrap";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 import "./style.scss";
-import { useProdutos } from "../../../../hooks/useProdutos";
 
 const TodosProdutos = () => {
   const { produtos, loading, erro, atualizarProduto, deletarProduto } =
@@ -29,8 +28,6 @@ const TodosProdutos = () => {
     indexOfLastProduct,
   );
   const totalPages = Math.ceil(produtos.length / productsPerPage);
-
-  console.log(produtos);
 
   const handleDelete = async () => {
     if (!selectedProduct) return;
@@ -69,14 +66,6 @@ const TodosProdutos = () => {
     cancelEdit();
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files[0]) {
-      const fileURL = URL.createObjectURL(files[0]);
-      setEditValue(fileURL);
-    }
-  };
-
   if (loading) return <p>Carregando...</p>;
   if (erro) return <p>{erro}</p>;
 
@@ -87,7 +76,14 @@ const TodosProdutos = () => {
           <div key={product.id} className="product-item">
             <div className="product-info">
               {editState.id === product.id && editState.field === "imagem" ? (
-                <Form.Control type="file" onChange={handleFileChange} />
+                <Form.Control
+                  type="text"
+                  value={editValue}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setEditValue(e.target.value)
+                  }
+                  placeholder="URL da imagem"
+                />
               ) : (
                 <div className="image-container">
                   <img src={product.imagem} alt={product.nome} />

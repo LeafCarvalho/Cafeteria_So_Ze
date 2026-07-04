@@ -1,76 +1,90 @@
-import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../../../services/firebaseConfig';
-import { Button, Form } from 'react-bootstrap';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './style.scss';
+import React, { ChangeEvent, FormEvent, useState } from "react";
+import { Button, Form } from "react-bootstrap";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { produtosService } from "../../../../services/produtosService";
+import { CriarProdutoDTO } from "../../../../types/produtos";
+import "./style.scss";
 
-interface FormFields {
-  nome: string;
-  tipo: string;
-  valor: string;
-  descricao: string;
-}
+type FormFields = Record<keyof CriarProdutoDTO, string>;
+
+const initialFormFields: FormFields = {
+  nome: "",
+  tipo: "",
+  valor: "",
+  descricao: "",
+  imagem: "",
+};
+
+const labels: Record<keyof CriarProdutoDTO, string> = {
+  nome: "Nome",
+  tipo: "Tipo",
+  valor: "Valor",
+  descricao: "Descrição",
+  imagem: "URL da imagem",
+};
 
 const Cadastro = () => {
-  const [formFields, setFormFields] = useState<FormFields>({ nome: '', tipo: '', valor: '', descricao: '' });
-  const [imagem, setImagem] = useState<File | null>(null);
-  const imagemInputRef = useRef<HTMLInputElement>(null);
+  const [formFields, setFormFields] = useState<FormFields>(initialFormFields);
+  const [salvando, setSalvando] = useState(false);
 
-  const updateField = (field: keyof FormFields, value: string) => {
-    setFormFields({ ...formFields, [field]: value });
-  };
-
-  const uploadImage = async (imageFile: File) => {
-    if (!imageFile) return null;
-    const fileRef = ref(storage, `images/${imageFile.name}`);
-    await uploadBytes(fileRef, imageFile);
-    return getDownloadURL(fileRef);
+  const updateField = (field: keyof CriarProdutoDTO, value: string) => {
+    setFormFields((fields) => ({ ...fields, [field]: value }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     try {
-      // Inicializa imageUrl como null
-      let imageUrl = null;
-  
-      // Verifica se 'imagem' é um File antes de chamar 'uploadImage'
-      if (imagem instanceof File) {
-        imageUrl = await uploadImage(imagem);
-      }
-  
-      await addDoc(collection(db, "products"), { ...formFields, valor: Number(formFields.valor), imagem: imageUrl });
-  
-      toast.success(`Produto '${formFields.nome}' cadastrado com sucesso!`, { position: "top-right", autoClose: 5000 });
-      setFormFields({ nome: '', tipo: '', valor: '', descricao: '' });
-      setImagem(null);
-      if (imagemInputRef.current) imagemInputRef.current.value = "";
+      setSalvando(true);
+
+      await produtosService.criarProduto({
+        ...formFields,
+        valor: Number(formFields.valor),
+      });
+
+      toast.success(`Produto '${formFields.nome}' cadastrado com sucesso!`, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setFormFields(initialFormFields);
     } catch (error) {
       console.error("Erro ao cadastrar produto:", error);
-      toast.error('Erro ao cadastrar produto.', { position: "top-right", autoClose: 5000 });
+      toast.error("Erro ao cadastrar produto.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setSalvando(false);
     }
   };
-  
 
   return (
     <div className="cadastro-container">
       <ToastContainer />
       <h2>Cadastrar Novo Produto</h2>
       <Form onSubmit={handleSubmit}>
-        {Object.entries(formFields).map(([field, value]) => (
-          <Form.Group className="mb-3" key={field}>
-            <Form.Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Form.Label>
-            <Form.Control type={field === 'descricao' ? 'textarea' : 'text'} value={value} onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => updateField(field as keyof FormFields, e.target.value)} required={field !== 'descricao'} />
-          </Form.Group>
-        ))}
-        <Form.Group className="mb-3">
-          <Form.Label>Imagem</Form.Label>
-          <Form.Control type="file" ref={imagemInputRef} onChange={(e: ChangeEvent<HTMLInputElement>) => setImagem(e.target.files ? e.target.files[0] : null)} accept="image/png, image/jpeg" />
-        </Form.Group>
-        <Button variant="primary" type="submit">Cadastrar</Button>
+        {Object.entries(formFields).map(([field, value]) => {
+          const typedField = field as keyof CriarProdutoDTO;
+
+          return (
+            <Form.Group className="mb-3" key={field}>
+              <Form.Label>{labels[typedField]}</Form.Label>
+              <Form.Control
+                as={typedField === "descricao" ? "textarea" : "input"}
+                type={typedField === "valor" ? "number" : "text"}
+                value={value}
+                onChange={(
+                  event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+                ) => updateField(typedField, event.target.value)}
+                required={typedField !== "descricao"}
+              />
+            </Form.Group>
+          );
+        })}
+        <Button variant="primary" type="submit" disabled={salvando}>
+          {salvando ? "Cadastrando..." : "Cadastrar"}
+        </Button>
       </Form>
     </div>
   );
