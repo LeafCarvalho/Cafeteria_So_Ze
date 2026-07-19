@@ -9,10 +9,12 @@ lerna-debug.log*
 
 node_modules
 .env
+anotacoes.md
 dist
 dist-ssr
 *.local
 anotacao.md
+docs/
 
 # Editor directories and files
 .vscode/*
