@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Dispatch, ReactNode, SetStateAction } from "react";
-import { UltimoPedido } from "../types/pedidos";
+import { DadosAcessoConfirmacao, UltimoPedido } from "../types/pedidos";
 import { Produto } from "../types/produtos";
 
 export interface ScrollOrRouteLinkProps {
@@ -20,6 +20,10 @@ export interface CartContextData {
   setIsCartOpen: Dispatch<SetStateAction<boolean>>;
   lastOrder: UltimoPedido | null;
   setLastOrder: Dispatch<SetStateAction<UltimoPedido | null>>;
+  dadosAcessoConfirmacao: DadosAcessoConfirmacao | null;
+  setDadosAcessoConfirmacao: Dispatch<
+    SetStateAction<DadosAcessoConfirmacao | null>
+  >;
 }
 
 export interface CartProviderProps {
@@ -27,6 +31,16 @@ export interface CartProviderProps {
 }
 
 const CartContext = createContext<CartContextData | undefined>(undefined);
+const CONFIRMACAO_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
+
+const recuperarDadosAcesso = (): DadosAcessoConfirmacao | null => {
+  try {
+    const dados = sessionStorage.getItem(CONFIRMACAO_STORAGE_KEY);
+    return dados ? (JSON.parse(dados) as DadosAcessoConfirmacao) : null;
+  } catch {
+    return null;
+  }
+};
 
 export const useCart = (): CartContextData => {
   const context = useContext(CartContext);
@@ -44,6 +58,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [total, setTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [lastOrder, setLastOrder] = useState<UltimoPedido | null>(null);
+  const [dadosAcessoConfirmacao, setDadosAcessoConfirmacao] =
+    useState<DadosAcessoConfirmacao | null>(recuperarDadosAcesso);
 
   useEffect(() => {
     const newTotal = products.reduce((acc, product) => {
@@ -53,6 +69,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     setTotal(newTotal);
   }, [products, quantities]);
+
+  useEffect(() => {
+    if (dadosAcessoConfirmacao) {
+      sessionStorage.setItem(
+        CONFIRMACAO_STORAGE_KEY,
+        JSON.stringify(dadosAcessoConfirmacao),
+      );
+      return;
+    }
+
+    sessionStorage.removeItem(CONFIRMACAO_STORAGE_KEY);
+  }, [dadosAcessoConfirmacao]);
 
   return (
     <CartContext.Provider
@@ -66,10 +94,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setIsCartOpen,
         lastOrder,
         setLastOrder,
+        dadosAcessoConfirmacao,
+        setDadosAcessoConfirmacao,
       }}
     >
       {children}
     </CartContext.Provider>
   );
 };
-

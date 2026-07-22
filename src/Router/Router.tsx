@@ -18,6 +18,7 @@ const Router = () => {
           <Route path="/pedidos" element={<Pedidos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/efetuacao" element={<Efetuacao />} />
+          <Route path="/efetuacao/:confirmacaoId" element={<Efetuacao />} />
         </Route>
         <Route element={<PrivateRoute />}>
           <React.Fragment>
