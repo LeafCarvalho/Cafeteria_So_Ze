@@ -23,6 +23,29 @@ export interface CriarPedidoDTO {
   total: number;
 }
 
+export interface ItemCriarPedidoConfirmadoDTO {
+  produto_id: string;
+  quantidade: number;
+}
+
+export interface CriarPedidoConfirmadoDTO {
+  nome_cliente: string;
+  telefone: string;
+  itens: ItemCriarPedidoConfirmadoDTO[];
+}
+
+export interface ConfirmacaoCriada {
+  confirmacao_id: string;
+  codigo_retirada: string;
+  expira_em: string;
+  total: number;
+}
+
+export interface DadosAcessoConfirmacao {
+  confirmacaoId: string;
+  codigoRetirada: string;
+}
+
 export type AtualizarPedidoDTO = Partial<Pick<Pedido, "status">>;
 
 export interface PedidoResumoItem {
@@ -35,10 +58,10 @@ export interface PedidoResumoItem {
 }
 
 export interface UltimoPedido {
-  ids: string[];
+  confirmacao_id: string;
   nome_cliente: string;
-  telefone: string;
   senha_retirar_ped: string;
+  expira_em: string;
   total: number;
   produtos: PedidoResumoItem[];
 }
@@ -49,4 +72,3 @@ export interface PedidosCount {
   mensal: number;
   anual: number;
 }
-

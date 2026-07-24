@@ -13,7 +13,13 @@ interface CartItem extends Produto {
 }
 
 const Pedidos: React.FC = () => {
-  const { quantities, products, setQuantities, setLastOrder } = useCart();
+  const {
+    quantities,
+    products,
+    setQuantities,
+    setLastOrder,
+    setDadosAcessoConfirmacao,
+  } = useCart();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [erro, setErro] = useState<string | null>(null);
@@ -56,9 +62,6 @@ const Pedidos: React.FC = () => {
     setPhone(formattedValue);
   };
 
-  const generateWithdrawalCode = (): string =>
-    Math.floor(1000 + Math.random() * 9000).toString();
-
   const buildResumoProdutos = (): PedidoResumoItem[] =>
     cartItems.map((item) => ({
       id: item.id,
@@ -69,16 +72,11 @@ const Pedidos: React.FC = () => {
       quantidade: item.quantity,
     }));
 
-  const buildPedidosPayload = (senhaRetirada: string) =>
-    cartItems.flatMap((item) =>
-      Array.from({ length: item.quantity }, () => ({
-        nome_cliente: name,
-        produto_id: item.id,
-        senha_retirar_ped: senhaRetirada,
-        telefone: phone,
-        total: item.valor,
-      })),
-    );
+  const buildItensPedido = () =>
+    cartItems.map((item) => ({
+      produto_id: item.id,
+      quantidade: item.quantity,
+    }));
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -94,21 +92,26 @@ const Pedidos: React.FC = () => {
       setEnviando(true);
       setErro(null);
 
-      const senhaRetirada = generateWithdrawalCode();
-      const pedidosCriados = await pedidosService.criarPedidos(
-        buildPedidosPayload(senhaRetirada),
-      );
-
-      setLastOrder({
-        ids: pedidosCriados.map((pedido) => pedido.id),
+      const confirmacao = await pedidosService.criarPedidoConfirmado({
         nome_cliente: name,
         telefone: phone,
-        senha_retirar_ped: senhaRetirada,
-        total: totalValue,
+        itens: buildItensPedido(),
+      });
+
+      setLastOrder({
+        confirmacao_id: confirmacao.confirmacao_id,
+        nome_cliente: name,
+        senha_retirar_ped: confirmacao.codigo_retirada,
+        expira_em: confirmacao.expira_em,
+        total: confirmacao.total,
         produtos: buildResumoProdutos(),
       });
+      setDadosAcessoConfirmacao({
+        confirmacaoId: confirmacao.confirmacao_id,
+        codigoRetirada: confirmacao.codigo_retirada,
+      });
       setQuantities({});
-      navigate("/efetuacao");
+      navigate(`/efetuacao/${confirmacao.confirmacao_id}`);
     } catch (error) {
       console.error("Erro ao enviar o pedido:", error);
       setErro("Erro ao enviar o pedido. Tente novamente.");
@@ -182,4 +185,3 @@ const Pedidos: React.FC = () => {
 };
 
 export default Pedidos;
-

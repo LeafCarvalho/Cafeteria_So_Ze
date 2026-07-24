@@ -1,9 +1,12 @@
 import { supabase } from "../Utils/supabase";
 import {
   AtualizarPedidoDTO,
+  ConfirmacaoCriada,
+  CriarPedidoConfirmadoDTO,
   CriarPedidoDTO,
   Pedido,
   PedidosCount,
+  UltimoPedido,
 } from "../types/pedidos";
 import { Produto } from "../types/produtos";
 
@@ -36,6 +39,75 @@ async function anexarProdutos(pedidos: Pedido[]): Promise<Pedido[]> {
 }
 
 export const pedidosService = {
+  async criarPedidoConfirmado(
+    pedido: CriarPedidoConfirmadoDTO,
+  ): Promise<ConfirmacaoCriada> {
+    const { data, error } = await supabase.rpc("criar_pedido_confirmado", {
+      p_nome_cliente: pedido.nome_cliente,
+      p_telefone: pedido.telefone,
+      p_itens: pedido.itens,
+    });
+
+    if (error) throw error;
+
+    const confirmacao = (data ?? [])[0] as ConfirmacaoCriada | undefined;
+
+    if (!confirmacao) {
+      throw new Error("O pedido foi criado sem uma confirmação válida.");
+    }
+
+    return {
+      ...confirmacao,
+      total: Number(confirmacao.total),
+    };
+  },
+
+  async recuperarConfirmacao(
+    confirmacaoId: string,
+    codigoRetirada: string,
+  ): Promise<UltimoPedido | null> {
+    const { data, error } = await supabase.rpc("recuperar_confirmacao_pedido", {
+      p_confirmacao_id: confirmacaoId,
+      p_codigo_retirada: codigoRetirada,
+    });
+
+    if (error) throw error;
+
+    const confirmacao = (data ?? [])[0] as
+      | {
+          confirmacao_id: string;
+          nome_cliente: string;
+          codigo_retirada: string;
+          expira_em: string;
+          total: number;
+          itens: Array<{
+            produto_id: string;
+            nome: string;
+            imagem: string;
+            quantidade: number;
+            valor_unitario: number;
+          }>;
+        }
+      | undefined;
+
+    if (!confirmacao) return null;
+
+    return {
+      confirmacao_id: confirmacao.confirmacao_id,
+      nome_cliente: confirmacao.nome_cliente,
+      senha_retirar_ped: confirmacao.codigo_retirada,
+      expira_em: confirmacao.expira_em,
+      total: Number(confirmacao.total),
+      produtos: (confirmacao.itens ?? []).map((item) => ({
+        id: item.produto_id,
+        nome: item.nome,
+        imagem: item.imagem,
+        valor: Number(item.valor_unitario),
+        quantidade: Number(item.quantidade),
+      })),
+    };
+  },
+
   async listarPedidos(): Promise<Pedido[]> {
     const { data, error } = await supabase
       .from("pedidos")
@@ -100,4 +172,3 @@ export const pedidosService = {
     );
   },
 };
-
