@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Table } from "react-bootstrap";
 import { FaCircle } from "react-icons/fa";
 import { usePedidos } from "../../../hooks/usePedidos";
@@ -10,14 +11,6 @@ const statusLabels: Record<PedidoStatus, string> = {
   pronto: "Pronto para retirada",
   finalizado: "Retirado",
   cancelado: "Cancelado",
-};
-
-const statusColors: Record<PedidoStatus, string> = {
-  criado: "#f4c542",
-  em_preparo: "#3182ce",
-  pronto: "#38a169",
-  finalizado: "#718096",
-  cancelado: "#e53e3e",
 };
 
 const formatarData = (data: string) =>
@@ -34,77 +27,117 @@ const formatarMoeda = (valor: number) =>
 
 const Pedidos = () => {
   const { pedidos, loading, erro, atualizarPedido, carregarPedidos } = usePedidos();
+  const [pedidoEmAtualizacao, setPedidoEmAtualizacao] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
-  const renderPedidoItem = (pedido: Pedido) => (
-    <tr key={pedido.id}>
-      <td>{pedido.nome_cliente}</td>
-      <td>{pedido.telefone}</td>
-      <td>{pedido.senha_retirar_ped}</td>
-      <td>{pedido.produto?.nome ?? pedido.produto_id}</td>
-      <td>{formatarMoeda(pedido.total)}</td>
-      <td>{formatarData(pedido.created_at)}</td>
-      <td>
-        <select
-          value={pedido.status}
-          onChange={(event) =>
-            atualizarPedido(pedido.id, {
-              status: event.target.value as PedidoStatus,
-            })
-          }
-        >
-          {Object.entries(statusLabels).map(([status, label]) => (
-            <option key={status} value={status}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </td>
-    </tr>
-  );
+  const atualizarStatus = async (pedido: Pedido, status: PedidoStatus) => {
+    if (status === pedido.status) return;
+
+    setPedidoEmAtualizacao(pedido.id);
+    setFeedback(null);
+    const atualizou = await atualizarPedido(pedido.id, { status });
+
+    setFeedback(
+      atualizou
+        ? `Status do pedido de ${pedido.nome_cliente} atualizado para ${statusLabels[status]}.`
+        : `Não foi possível atualizar o status do pedido de ${pedido.nome_cliente}. O status anterior foi mantido.`,
+    );
+    setPedidoEmAtualizacao(null);
+  };
+
+  const renderPedidoItem = (pedido: Pedido) => {
+    const selectId = `status-pedido-${pedido.id}`;
+    const atualizando = pedidoEmAtualizacao === pedido.id;
+
+    return (
+      <tr key={pedido.id}>
+        <td data-label="Cliente">{pedido.nome_cliente}</td>
+        <td data-label="Telefone">{pedido.telefone}</td>
+        <td data-label="Código">{pedido.senha_retirar_ped}</td>
+        <td data-label="Produto">{pedido.produto?.nome ?? pedido.produto_id}</td>
+        <td data-label="Total">{formatarMoeda(pedido.total)}</td>
+        <td data-label="Data e hora">{formatarData(pedido.created_at)}</td>
+        <td data-label="Status">
+          <label className="visually-hidden" htmlFor={selectId}>
+            Status do pedido de {pedido.nome_cliente}
+          </label>
+          <select
+            aria-describedby={atualizando ? "atualizacao-status" : undefined}
+            disabled={atualizando}
+            id={selectId}
+            value={pedido.status}
+            onChange={(event) =>
+              void atualizarStatus(pedido, event.target.value as PedidoStatus)
+            }
+          >
+            {Object.entries(statusLabels).map(([status, label]) => (
+              <option key={status} value={status}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </td>
+      </tr>
+    );
+  };
 
   return (
-    <div className="pedidos-container">
-      <h2>Pedidos</h2>
-      <div className="legenda-status">
-        <p>Status dos pedidos:</p>
+    <section aria-labelledby="pedidos-titulo" className="pedidos-container">
+      <div className="pedidos-container__heading">
+        <p className="pedidos-container__eyebrow">Administração</p>
+        <h2 id="pedidos-titulo">Pedidos</h2>
+      </div>
+
+      <div aria-label="Legenda de status dos pedidos" className="legenda-status">
+        <p>Status dos pedidos</p>
         <ul>
           {Object.entries(statusLabels).map(([status, label]) => (
             <li key={status}>
-              <FaCircle style={{ color: statusColors[status as PedidoStatus] }} />{" "}
+              <FaCircle
+                aria-hidden="true"
+                className={`legenda-status__icon legenda-status__icon--${status}`}
+              />
               {label}
             </li>
           ))}
         </ul>
       </div>
 
-      {loading && <p>Carregando pedidos...</p>}
-      {erro && (
-        <p>
-          {erro}. <button onClick={carregarPedidos}>Tentar novamente</button>
-        </p>
+      <p aria-atomic="true" aria-live="polite" className="pedidos-feedback" id="atualizacao-status" role="status">
+        {pedidoEmAtualizacao ? "Atualizando status do pedido..." : feedback}
+      </p>
+
+      {loading && <p className="pedidos-state" role="status">Carregando pedidos...</p>}
+      {erro && !loading && (
+        <div className="pedidos-state pedidos-state--error" role="alert">
+          <p>{erro}.</p>
+          <button onClick={() => void carregarPedidos()} type="button">Tentar novamente</button>
+        </div>
       )}
       {!loading && !erro && pedidos.length === 0 && (
-        <p>Nenhum pedido encontrado.</p>
+        <p className="pedidos-state">Nenhum pedido encontrado.</p>
       )}
       {!loading && !erro && pedidos.length > 0 && (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Telefone</th>
-              <th>Código</th>
-              <th>Produto</th>
-              <th>Total</th>
-              <th>Data e Hora</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>{pedidos.map(renderPedidoItem)}</tbody>
-        </Table>
+        <div className="pedidos-table-wrapper" tabIndex={0}>
+          <Table className="pedidos-table" hover responsive={false}>
+            <caption>Lista de pedidos recebidos</caption>
+            <thead>
+              <tr>
+                <th scope="col">Cliente</th>
+                <th scope="col">Telefone</th>
+                <th scope="col">Código</th>
+                <th scope="col">Produto</th>
+                <th scope="col">Total</th>
+                <th scope="col">Data e hora</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>{pedidos.map(renderPedidoItem)}</tbody>
+          </Table>
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 
 export default Pedidos;
-

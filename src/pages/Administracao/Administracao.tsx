@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Accordion, Col, Container, Nav, Row } from "react-bootstrap";
-import { FiLogOut } from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
+import { Accordion, Nav } from "react-bootstrap";
+import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Inicio from "../../components/Administracao/Inicio/Inicio";
 import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
@@ -13,6 +13,33 @@ const Administracao = () => {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState("inicio");
   const [isSidebarVisible, setSidebarVisible] = useState(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const wasSidebarVisible = useRef(false);
+
+  const closeSidebar = () => setSidebarVisible(false);
+
+  useEffect(() => {
+    if (!isSidebarVisible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeSidebar();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isSidebarVisible]);
+
+  useEffect(() => {
+    if (wasSidebarVisible.current && !isSidebarVisible) menuToggleRef.current?.focus();
+    if (isSidebarVisible) sidebarRef.current?.querySelector<HTMLElement>("a, button")?.focus();
+    wasSidebarVisible.current = isSidebarVisible;
+  }, [isSidebarVisible]);
+
+  const selectPage = (page: string) => {
+    setActiveKey(page);
+    closeSidebar();
+  };
 
   const handleLogout = async () => {
     try {
@@ -20,94 +47,71 @@ const Administracao = () => {
       navigate("/login");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
+    } finally {
+      closeSidebar();
     }
   };
 
   return (
-    <Container fluid className="admin-container">
+    <div className="admin-container">
       <button
+        ref={menuToggleRef}
+        type="button"
         className="menu-toggle"
-        onClick={() => setSidebarVisible(!isSidebarVisible)}
+        aria-controls="admin-navigation"
+        aria-expanded={isSidebarVisible}
+        aria-label={isSidebarVisible ? "Fechar menu administrativo" : "Abrir menu administrativo"}
+        onClick={() => setSidebarVisible((visible) => !visible)}
       >
-        <span>☰</span>
+        {isSidebarVisible ? <FiX aria-hidden="true" /> : <FiMenu aria-hidden="true" />}
+        <span>Menu</span>
       </button>
-      <Row className="w-100">
-        <Col
-          xs={3}
-          lg={3}
-          md={4}
-          sm={3}
-          id="sidebar-wrapper"
-          className={`sidebar-nav h-100 ${isSidebarVisible ? "active" : ""}`}
-        >
-          <Nav className="flex-column sidebar-nav h-100">
-            <Nav.Link
-              eventKey="inicio"
-              onClick={() => {
-                setActiveKey("inicio");
-                setSidebarVisible(false);
-              }}
-            >
-              Início
-            </Nav.Link>
-            <Nav.Link
-              eventKey="pedidos"
-              onClick={() => {
-                setActiveKey("pedidos");
-                setSidebarVisible(false);
-              }}
-            >
-              Pedidos
-            </Nav.Link>
-            <Accordion>
-              <Accordion.Item eventKey="0">
-                <Accordion.Header>Produtos</Accordion.Header>
-                <Accordion.Body>
-                  <Nav.Link
-                    eventKey="todosProdutos"
-                    onClick={() => {
-                      setActiveKey("todosProdutos");
-                      setSidebarVisible(false);
-                    }}
-                  >
-                    Todos os Produtos
-                  </Nav.Link>
-                  <Nav.Link
-                    eventKey="cadastro"
-                    onClick={() => {
-                      setActiveKey("cadastro");
-                      setSidebarVisible(false);
-                    }}
-                  >
-                    Cadastro
-                  </Nav.Link>
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
 
-            <Nav.Link
-              eventKey="logout"
-              onClick={() => {
-                handleLogout();
-                setSidebarVisible(false);
-              }}
-              className="logout-link"
-            >
-              <FiLogOut className="me-2" />
-              Logout
-            </Nav.Link>
-          </Nav>
-        </Col>
-        <Col xs={9} lg={9} md={8} sm={7} id="page-content-wrapper">
-          {activeKey === "inicio" && <Inicio />}
-          {activeKey === "pedidos" && <Pedidos />}
-          {activeKey === "todosProdutos" && <TodosProdutos />}
-          {activeKey === "cadastro" && <Cadastro />}
-        </Col>
-      </Row>
-    </Container>
+      <button
+        type="button"
+        className={`admin-backdrop ${isSidebarVisible ? "is-visible" : ""}`}
+        aria-label="Fechar menu administrativo"
+        tabIndex={isSidebarVisible ? 0 : -1}
+        onClick={closeSidebar}
+      />
+
+      <aside
+        ref={sidebarRef}
+        id="admin-navigation"
+        className={`sidebar-nav ${isSidebarVisible ? "is-open" : ""}`}
+        aria-label="Navegação administrativa"
+      >
+        <div className="admin-brand">
+          <span>So Zé</span>
+          <strong>Administração</strong>
+        </div>
+        <Nav className="flex-column" activeKey={activeKey}>
+          <Nav.Link eventKey="inicio" onClick={() => selectPage("inicio")}>Início</Nav.Link>
+          <Nav.Link eventKey="pedidos" onClick={() => selectPage("pedidos")}>Pedidos</Nav.Link>
+          <Accordion className="admin-products-nav">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Produtos</Accordion.Header>
+              <Accordion.Body>
+                <Nav.Link eventKey="todosProdutos" onClick={() => selectPage("todosProdutos")}>Todos os produtos</Nav.Link>
+                <Nav.Link eventKey="cadastro" onClick={() => selectPage("cadastro")}>Cadastrar produto</Nav.Link>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <button type="button" onClick={handleLogout} className="logout-link">
+            <FiLogOut aria-hidden="true" />
+            Sair
+          </button>
+        </Nav>
+      </aside>
+
+      <main id="page-content-wrapper" className="admin-content">
+        {activeKey === "inicio" && <Inicio />}
+        {activeKey === "pedidos" && <Pedidos />}
+        {activeKey === "todosProdutos" && <TodosProdutos />}
+        {activeKey === "cadastro" && <Cadastro />}
+      </main>
+    </div>
   );
 };
 
 export default Administracao;
-

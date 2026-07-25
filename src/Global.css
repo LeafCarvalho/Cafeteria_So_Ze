@@ -13,8 +13,15 @@
   --color-link: #7adbd1;
   --color-border: #31403b;
   --color-danger: #ffb4ab;
+  --color-on-danger: #3b0d0a;
   --color-success: #8be0b9;
   --color-warning: #ffd28a;
+  --color-info: #a9c7ff;
+  --color-danger-surface: rgb(255 180 171 / 10%);
+  --color-success-surface: rgb(139 224 185 / 10%);
+  --color-warning-surface: rgb(255 210 138 / 10%);
+  --color-info-surface: rgb(169 199 255 / 10%);
+  --color-disabled: #73807b;
   --color-focus-outer: #111716;
   --color-focus-inner: #7adbd1;
 
@@ -102,6 +109,10 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
 }
 
 :focus-visible {

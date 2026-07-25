@@ -1,85 +1,30 @@
-.admin-panel {
-  background-color: #f5f5f5;
-  padding: 20px;
+.admin-panel { max-width: 76rem; margin: 0 auto; }
+.admin-panel__header { margin-bottom: var(--space-6); }
+.admin-panel__header p { margin: 0 0 var(--space-2); color: var(--color-secondary); font-size: var(--font-size-2); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.admin-panel__header h1 { margin: 0; }
 
-  .resumo-pedidos-header {
-    color: #6d4c41;
-    margin-bottom: 30px;
-    text-align: center;
-  }
+.admin-feedback { padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-raised); }
+.admin-feedback--error { border-color: var(--color-danger); color: var(--color-danger); }
 
-  .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
+.cards-container { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); margin-bottom: var(--space-5); }
+.summary-card { border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised); box-shadow: var(--shadow-sm); }
+.summary-card .card-body { padding: var(--space-5); }
+.summary-card .card-title { margin: 0 0 var(--space-2); color: var(--color-text-muted); font-family: var(--font-sans); font-size: var(--font-size-2); font-weight: 700; }
+.summary-card .card-text { margin: 0; color: var(--color-primary); font-size: var(--font-size-6); font-weight: 700; line-height: 1; }
+.summary-card .card-text span { color: var(--color-text-muted); font-size: var(--font-size-2); font-weight: 400; white-space: nowrap; }
 
-    .card {
-      flex: 0 1 calc(25% - 20px);
-      background-color: #ffffff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.chart-container { padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised); box-shadow: var(--shadow-sm); }
+.chart-container__heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+.chart-container__heading h2 { margin: 0; }
+.chart-container button { padding: var(--space-2) var(--space-4); border: 1px solid var(--color-primary); border-radius: var(--radius-pill); background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; white-space: nowrap; }
+.chart-container button:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.chart-canvas { position: relative; min-height: 20rem; }
 
-      @media (max-width: 992px) { // Tablets
-        flex: 0 1 calc(50% - 20px);
-      }
-
-      @media (max-width: 576px) { // Celulares
-        flex: 0 1 100%;
-      }
-
-      .card-body {
-        .card-title {
-          color: #795548;
-          font-weight: bold;
-        }
-
-        .card-text {
-          font-size: 1.5rem;
-          color: #6d4c41;
-        }
-      }
-    }
-  }
-
-  .chart-container {
-    background-color: #ffffff;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-
-    button {
-      float: right;
-      color: #ffffff;
-      background-color: #6B2D05;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      border: none;
-      border-radius: 6px;
-      padding: 10px 20px;
-      font-weight: 600;
-      transition: background-color 0.3s ease, color 0.3s ease;
-
-      &:hover {
-        color: #6B2D05;
-        background-color: #F4E8C1;
-      }
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    @media (max-width: 768px) {
-      button {
-        float: none;
-        display: block;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      canvas {
-        display: none !important;
-      }
-    }
-  }
+@media (max-width: 900px) { .cards-container { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  .cards-container { grid-template-columns: 1fr; }
+  .chart-container { padding: var(--space-4); }
+  .chart-container__heading { align-items: stretch; flex-direction: column; }
+  .chart-container button { width: 100%; }
+  .chart-canvas { min-height: 17rem; }
 }
