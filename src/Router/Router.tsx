@@ -8,6 +8,7 @@ import PrivateRoute from "./PrivateRoute";
 import Administracao from "../pages/Administracao/Administracao";
 import { ProdutosProvider } from "../Context/ProdutosProvider";
 import React from "react";
+import RedefinirSenha from "../pages/RedefinirSenha/RedefinirSenha";
 
 const Router = () => {
   return (
@@ -20,6 +21,7 @@ const Router = () => {
           <Route path="/efetuacao" element={<Efetuacao />} />
           <Route path="/efetuacao/:confirmacaoId" element={<Efetuacao />} />
         </Route>
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<PrivateRoute />}>
           <React.Fragment>
             <Route

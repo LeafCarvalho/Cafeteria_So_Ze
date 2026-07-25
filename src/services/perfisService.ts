@@ -5,11 +5,7 @@ import { Perfil } from "../types/perfis";
 const perfilEhAdmin = (perfil: Perfil | null): boolean => {
   if (!perfil) return false;
 
-  return (
-    perfil.admin === true ||
-    perfil.role === "admin" ||
-    perfil.tipo === "admin"
-  );
+  return perfil.papel === "admin";
 };
 
 export const perfisService = {
@@ -18,7 +14,7 @@ export const perfisService = {
 
     const { data, error } = await supabase
       .from("perfis")
-      .select("*")
+      .select("id, papel")
       .eq("id", user.id)
       .maybeSingle();
 

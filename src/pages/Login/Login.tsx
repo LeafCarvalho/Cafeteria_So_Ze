@@ -32,6 +32,9 @@ const Login: React.FC = () => {
       }
 
       navigate("/administracao");
+    } catch (signInError) {
+      console.error("Erro inesperado ao entrar:", signInError);
+      setError("Não foi possível entrar agora. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -51,14 +54,22 @@ const Login: React.FC = () => {
       return;
     }
 
-    const { error: resetError } = await authService.recuperarSenha(loginState.email);
+    try {
+      setLoading(true);
+      const { error: resetError } = await authService.recuperarSenha(loginState.email);
 
-    if (resetError) {
-      setError(resetError.message);
-      return;
+      if (resetError) {
+        setError("Não foi possível enviar o link de redefinição. Tente novamente.");
+        return;
+      }
+
+      setMessage("Se o e-mail estiver cadastrado, enviaremos um link de redefinição.");
+    } catch (resetError) {
+      console.error("Erro ao solicitar redefinição de senha:", resetError);
+      setError("Não foi possível enviar o link de redefinição. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
-
-    setMessage("Enviamos um link de redefinição para o seu e-mail.");
   };
 
   return (
@@ -80,8 +91,8 @@ const Login: React.FC = () => {
             <DefaultButton customizarCSS="loginButton" disabled={loading} type="submit">
               {loading ? "Entrando..." : "Entrar"}
             </DefaultButton>
-            <button className="forgot-password" onClick={() => void handleForgotPassword()} type="button">
-              Esqueceu a senha?
+            <button className="forgot-password" disabled={loading} onClick={() => void handleForgotPassword()} type="button">
+              {loading ? "Enviando link..." : "Esqueceu a senha?"}
             </button>
           </Form>
           {error && <Alert className="login-feedback" role="alert" variant="danger">{error}</Alert>}
