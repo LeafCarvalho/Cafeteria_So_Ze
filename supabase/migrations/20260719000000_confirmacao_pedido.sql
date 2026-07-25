@@ -1,4 +1,4 @@
--- Confirmação de pedido autoritativa para a Cafeteria Só Zé.
+-- Confirmação de pedido autoritativa para a Cafeteria Sô Zé.
 -- Aplicar primeiro em um projeto Supabase de teste.
 
 create table if not exists public.confirmacoes_pedido (

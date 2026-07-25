@@ -38,7 +38,7 @@ export const Footer = () => {
               (31) 99999-9999 <span aria-hidden="true">↗</span>
             </a>
           </p>
-          <p>© 2023-{anoAtual} Cafeteria Só Zé. Todos os direitos reservados. | Desenvolvido por Rafael Carvalho</p>
+          <p>© 2023-{anoAtual} Cafeteria Sô Zé. Todos os direitos reservados. | Desenvolvido por Rafael Carvalho</p>
         </Row>
       </Container>
       <p aria-live="polite" className="visually-hidden" id="copy-status" role="status">{copyStatus}</p>

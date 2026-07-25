@@ -1,6 +1,6 @@
-# Cafeteria Só Zé
+# Cafeteria Sô Zé
 
-O projeto Cafeteria Só Zé é uma loja online para uma cafeteria gourmet. Foi desenvolvido para demonstrar conhecimentos em React, TypeScript, responsividade, transições e integração com Supabase.
+O projeto Cafeteria Sô Zé é uma loja online para uma cafeteria gourmet. Foi desenvolvido para demonstrar conhecimentos em React, TypeScript, responsividade, transições e integração com Supabase.
 <br>
 <a href="https://leafcarvalho.github.io/Cafeteria_So_Ze/" target="_blank">CLIQUE AQUI</a> para navegar pelo projeto.
 
