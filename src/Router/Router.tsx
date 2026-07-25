@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "../pages/Home/Home";
-import Pedidos from "../pages/Pedidos/Pedidos";
-import Login from "../pages/Login/Login";
-import DefaultLayout from "../Layout/DefaultLayout";
-import Efetuacao from "../pages/Efetuacao/Efetuacao";
+import Home from "@/pages/Home/Home";
+import Pedidos from "@/pages/Pedidos/Pedidos";
+import Login from "@/pages/Login/Login";
+import DefaultLayout from "@/Layout/DefaultLayout";
+import Efetuacao from "@/pages/Efetuacao/Efetuacao";
 import PrivateRoute from "./PrivateRoute";
-import Administracao from "../pages/Administracao/Administracao";
-import { ProdutosProvider } from "../Context/ProdutosProvider";
+import Administracao from "@/pages/Administracao/Administracao";
+import { ProdutosProvider } from "@/Context/ProdutosProvider";
 import React from "react";
 
 const Router = () => {

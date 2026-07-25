@@ -1,4 +1,4 @@
-import { supabase } from "../Utils/supabase";
+import { supabase } from "@/Utils/supabase";
 import {
   AtualizarStatusPedidoAdminDTO,
   ConfirmacaoCriada,
@@ -6,8 +6,8 @@ import {
   Pedido,
   PedidosCount,
   UltimoPedido,
-} from "../types/pedidos";
-import { Produto } from "../types/produtos";
+} from "@/types/pedidos";
+import { Produto } from "@/types/produtos";
 
 const mapProdutosPorId = (produtos: Produto[]) =>
   produtos.reduce<Record<string, Produto>>((acc, produto) => {

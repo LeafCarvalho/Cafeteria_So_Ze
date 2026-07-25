@@ -1,8 +1,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Col, Form, Modal, Pagination } from "react-bootstrap";
 import { FaCheck, FaEdit, FaTimes, FaTrash } from "react-icons/fa";
-import { useProdutosContext } from "../../../../Context/ProdutosProvider";
-import { AtualizarProdutoDTO, EditState, Produto } from "../../../../types/produtos";
+import { useProdutosContext } from "@/Context/ProdutosProvider";
+import { AtualizarProdutoDTO, EditState, Produto } from "@/types/produtos";
 import "./style.scss";
 
 const PRODUCTS_PER_PAGE = 3;

@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from "react";
-import { ProdutoContextData } from "../types/produtos";
-import { useProdutos } from "../hooks/useProdutos";
+import { ProdutoContextData } from "@/types/produtos";
+import { useProdutos } from "@/hooks/useProdutos";
 
 const ProdutosContext = createContext<ProdutoContextData | null>(null);
 

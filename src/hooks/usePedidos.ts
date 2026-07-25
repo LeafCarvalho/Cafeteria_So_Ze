@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { pedidosService } from "../services/pedidosService";
+import { pedidosService } from "@/services/pedidosService";
 import {
   AtualizarStatusPedidoAdminDTO,
   Pedido,
   ResultadoAtualizacaoStatusPedido,
-} from "../types/pedidos";
+} from "@/types/pedidos";
 
 export function usePedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);

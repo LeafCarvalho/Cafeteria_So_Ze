@@ -1,6 +1,6 @@
 import { User } from "@supabase/supabase-js";
-import { supabase } from "../Utils/supabase";
-import { Perfil } from "../types/perfis";
+import { supabase } from "@/Utils/supabase";
+import { Perfil } from "@/types/perfis";
 
 const perfilEhAdmin = (perfil: Perfil | null): boolean => {
   if (!perfil) return false;

@@ -1,5 +1,5 @@
-import { AtualizarProdutoDTO, CriarProdutoDTO, Produto } from "../types/produtos";
-import { supabase } from "../Utils/supabase";
+import { AtualizarProdutoDTO, CriarProdutoDTO, Produto } from "@/types/produtos";
+import { supabase } from "@/Utils/supabase";
 
 export const produtosService = {
   async listarProdutos(): Promise<Produto[]> {

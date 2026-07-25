@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Accordion, Nav } from "react-bootstrap";
 import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import Inicio from "../../components/Administracao/Inicio/Inicio";
-import Pedidos from "../../components/Administracao/Pedidos/Pedidos";
-import Cadastro from "../../components/Administracao/Produtos/Cadastro/Cadastro";
-import TodosProdutos from "../../components/Administracao/Produtos/TodosProdutos/TodosProdutos";
-import { authService } from "../../services/authService";
+import Inicio from "@/components/Administracao/Inicio/Inicio";
+import Pedidos from "@/components/Administracao/Pedidos/Pedidos";
+import Cadastro from "@/components/Administracao/Produtos/Cadastro/Cadastro";
+import TodosProdutos from "@/components/Administracao/Produtos/TodosProdutos/TodosProdutos";
+import { authService } from "@/services/authService";
 import "./style.scss";
 
 const Administracao = () => {

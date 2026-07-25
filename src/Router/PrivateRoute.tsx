@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { authService } from "../services/authService";
-import { perfisService } from "../services/perfisService";
+import { authService } from "@/services/authService";
+import { perfisService } from "@/services/perfisService";
 import "./style.scss";
 
 const PrivateRoute = () => {

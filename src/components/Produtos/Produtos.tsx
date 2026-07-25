@@ -3,10 +3,10 @@ import { Col, Container, Modal, Row } from "react-bootstrap";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
-import { useCart } from "../../Context/CartContext";
-import { produtosService } from "../../services/produtosService";
-import { Produto } from "../../types/produtos";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { useCart } from "@/Context/CartContext";
+import { produtosService } from "@/services/produtosService";
+import { Produto } from "@/types/produtos";
+import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
 
 const getInitialDisplayCount = () =>

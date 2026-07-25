@@ -3,8 +3,8 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import { FiShoppingBag } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
 import { Link as ScrollLink, scroller } from "react-scroll";
-import { useCart } from "../../Context/CartContext";
-import logo from "../../assets/logoCafeteria-v2.png";
+import { useCart } from "@/Context/CartContext";
+import logo from "@/assets/logoCafeteria-v2.png";
 import "./style.scss";
 
 interface HeaderProps {
