@@ -1,5 +1,6 @@
-# Cafeteria Sô Zé
-O Projeto Cafeteria Sô Zé foi desenvolvido utilizando React, TypeScript e Firebase. Este projeto é uma loja online para uma cafeteria gourmet, onde os clientes podem fazer seus pedidos e retirá-los utilizando uma senha. A ideia deste projeto foi praticar meus conhecimentos em React e aprender mais sobre TypeScript e Firebase.
+# Cafeteria Só Zé
+
+O projeto Cafeteria Só Zé é uma loja online para uma cafeteria gourmet. Foi desenvolvido para demonstrar conhecimentos em React, TypeScript, responsividade, transições e integração com Supabase.
 <br>
 <a href="https://leafcarvalho.github.io/Cafeteria_So_Ze/" target="_blank">CLIQUE AQUI</a> para navegar pelo projeto.
 
@@ -22,9 +23,9 @@ O Projeto Cafeteria Sô Zé foi desenvolvido utilizando React, TypeScript e Fire
       <strong>TypeScript</strong>
     </td>
     <td align="center">
-      <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" alt="firebase" width="40" height="40"/>
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/supabase/supabase-original.svg" alt="supabase" width="40" height="40"/>
       <br>
-      <strong>Firebase</strong>
+      <strong>Supabase</strong>
     </td>
     <td align="center">
       <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/bootstrap/bootstrap-plain.svg" alt="react-bootstrap" width="40" height="40"/>
@@ -44,37 +45,69 @@ O Projeto Cafeteria Sô Zé foi desenvolvido utilizando React, TypeScript e Fire
     <td align="center">
       <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="react-router-dom" width="40" height="40"/>
       <br>
-      <strong>react-router-dom</strong>
+      <strong>React Router</strong>
     </td>
     <td align="center">
       <img src="https://img.icons8.com/fluency/48/000000/ms-excel.png" alt="xlsx" width="40" height="40"/>
       <br>
-      <strong>xlsx</strong>
+      <strong>XLSX</strong>
     </td>
   </tr>
 </table>
 
-
 ## Objetivo do Projeto
-A ideia deste projeto é demonstrar uma boa capacidade de uso das ferramentas, proporcionando aos usuários e administradores:
 
-- Facilidade de uso
-- Personalização conforme necessário
-- Responsividade, permitindo acesso tanto via web quanto mobile
-- Boa performance e SEO, utilizando Firebase para backend e autenticação
-- Autenticação via email e senha, feita pelo Firebase para que o usuário monitore pedidos, cadastre produtos, altere as informações dos produtos existentes, monitore o rendimento diário, semanal, mensal e anual da empresa em relação a pedidos, acompanhe os pedidos em andamento, pronto para entrega, e concluído
-Instalação
-Para configurar o projeto localmente e utilizar o tema criado, siga os passos abaixo:
+A ideia é demonstrar capacidade de uso das ferramentas e cuidado com a experiência de clientes e administradores:
 
-## Clone o repositório:
+- Interface dark gourmet, responsiva e acessível;
+- Catálogo com busca, filtros, carrinho e confirmação de pedido;
+- Área administrativa para produtos, pedidos e indicadores;
+- Autenticação por e-mail e senha com Supabase;
+- Persistência segura de pedidos, recuperação por código e proteção contra duplicidade de envio;
+- Publicação estática pelo GitHub Pages.
+
+## Instalação
+
+Para configurar o projeto localmente:
 
 ```bash
-// Clone e acesse a diretório
-git clone https://github.com/seu-usuario/cafeteria-so-ze.git
-cd cafeteria-so-ze
-
-// Instale as dependências:
+git clone https://github.com/LeafCarvalho/Cafeteria_So_Ze.git
+cd Cafeteria_So_Ze
 npm install
+```
 
-//Inicie o projeto:
+Crie o arquivo `.env` na raiz:
+
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
+```
+
+Em seguida, inicie o projeto:
+
+```bash
 npm run dev
+```
+
+## Configuração do Supabase
+
+As migrations em [`supabase/migrations`](supabase/migrations) devem ser aplicadas no SQL Editor do Supabase nesta ordem:
+
+1. `20260719000000_confirmacao_pedido.sql`
+2. `20260724000000_rls_operacao_administrativa.sql`
+3. `20260724000001_idempotencia_e_status_pedido.sql`
+
+Pedidos públicos usam RPCs; preços, códigos de retirada e total são definidos pelo banco. RLS restringe a área administrativa a perfis com `perfis.papel = 'admin'`.
+
+> A última migration altera a RPC de criação de pedidos. Aplique-a junto à publicação do frontend correspondente.
+
+## Comandos úteis
+
+```bash
+npm run tsc
+npm run build
+npm run preview
+npm run deploy
+```
+
+Não publique arquivos `.env`, chaves `service_role`, senhas ou tokens administrativos.
