@@ -55,7 +55,7 @@ const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
 export function Header() {
   const {
     total,
-    quantities,
+    itemQuantities,
     isCartOpen,
     setIsCartOpen,
     setCartTriggerId,
@@ -63,7 +63,7 @@ export function Header() {
   const [sticky, setSticky] = useState(false);
   const { pathname } = useLocation();
   const [expanded, setExpanded] = useState(false);
-  const numItems = Object.values(quantities).filter((quantity) => quantity > 0).length;
+  const cartItemCount = Object.values(itemQuantities).filter((quantity) => quantity > 0).length;
 
   const handleCartClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setCartTriggerId(event.currentTarget.id);
@@ -87,7 +87,7 @@ export function Header() {
     <button
       aria-controls="cart-drawer"
       aria-expanded={isCartOpen}
-      aria-label={`Abrir carrinho: ${numItems} ${numItems === 1 ? "item" : "itens"}, total ${totalFormatado}`}
+      aria-label={`Abrir carrinho: ${cartItemCount} ${cartItemCount === 1 ? "item" : "itens"}, total ${totalFormatado}`}
       className={className}
       id={id}
       onClick={handleCartClick}
@@ -95,7 +95,7 @@ export function Header() {
     >
       <FiShoppingBag aria-hidden="true" />
       <span className="cart-trigger__details">
-        <span>{numItems} {numItems === 1 ? "item" : "itens"}</span>
+        <span>{cartItemCount} {cartItemCount === 1 ? "item" : "itens"}</span>
         <strong>{totalFormatado}</strong>
       </span>
     </button>

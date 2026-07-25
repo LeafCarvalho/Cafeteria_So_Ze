@@ -26,10 +26,10 @@ export const Produtos = () => {
     isCartOpen,
     setIsCartOpen,
     cartTriggerId,
-    products,
-    setProducts,
-    quantities,
-    setQuantities,
+    cartProducts,
+    setCartProducts,
+    itemQuantities,
+    setItemQuantities,
     total,
   } = useCart();
 
@@ -38,23 +38,23 @@ export const Produtos = () => {
       setIsLoading(true);
       setErro(null);
       const produtos = await produtosService.listarProdutos();
-      setProducts(produtos);
+      setCartProducts(produtos);
     } catch (error) {
       console.error(error);
       setErro("Não foi possível carregar os produtos.");
     } finally {
       setIsLoading(false);
     }
-  }, [setProducts]);
+  }, [setCartProducts]);
 
   useEffect(() => {
-    if (products.length === 0) {
+    if (cartProducts.length === 0) {
       void carregarProdutos();
       return;
     }
 
     setIsLoading(false);
-  }, [carregarProdutos, products.length]);
+  }, [carregarProdutos, cartProducts.length]);
 
   useEffect(() => {
     if (!isCartOpen) return;
@@ -98,25 +98,25 @@ export const Produtos = () => {
     };
   }, [isCartOpen, setIsCartOpen]);
 
-  const cartItems = Object.entries(quantities)
+  const cartItems = Object.entries(itemQuantities)
     .filter(([, quantity]) => quantity > 0)
     .map(([id, quantity]) => {
-      const product = products.find((item) => item.id === id);
+      const product = cartProducts.find((item) => item.id === id);
       return product ? { product, quantity } : null;
     })
     .filter((item): item is { product: Produto; quantity: number } => Boolean(item));
 
   const totalItems = cartItems.reduce((count, item) => count + item.quantity, 0);
-  const filteredProducts = products.filter(
+  const filteredProducts = cartProducts.filter(
     (product) =>
       (selectedType === "Todos" || product.tipo === selectedType) &&
       product.nome.toLowerCase().includes(search.toLowerCase()),
   );
-  const types = ["Todos", ...new Set(products.map((product) => product.tipo))];
+  const types = ["Todos", ...new Set(cartProducts.map((product) => product.tipo))];
 
   const addProduct = (product: Produto) => {
-    const nextQuantity = (quantities[product.id] || 0) + 1;
-    setQuantities((prevQuantities) => ({
+    const nextQuantity = (itemQuantities[product.id] || 0) + 1;
+    setItemQuantities((prevQuantities) => ({
       ...prevQuantities,
       [product.id]: nextQuantity,
     }));
@@ -124,8 +124,8 @@ export const Produtos = () => {
   };
 
   const removeProduct = (product: Produto) => {
-    const nextQuantity = Math.max(0, (quantities[product.id] || 0) - 1);
-    setQuantities((prevQuantities) => ({ ...prevQuantities, [product.id]: nextQuantity }));
+    const nextQuantity = Math.max(0, (itemQuantities[product.id] || 0) - 1);
+    setItemQuantities((prevQuantities) => ({ ...prevQuantities, [product.id]: nextQuantity }));
     setAnnouncement(
       nextQuantity > 0
         ? `${product.nome}: ${nextQuantity} unidades no carrinho.`
@@ -212,7 +212,7 @@ export const Produtos = () => {
             </Col>
           ) : filteredProducts.length > 0 ? (
             filteredProducts.slice(0, displayCount).map((product) => {
-              const quantity = quantities[product.id] ?? 0;
+              const quantity = itemQuantities[product.id] ?? 0;
               return (
                 <Col key={product.id} lg={4} md={6} sm={12} xl={4}>
                   <article className="product-card">
@@ -329,7 +329,7 @@ export const Produtos = () => {
             <div className="cart-overlay__footer">
               <p>Total: <strong>{formatCurrency(total)}</strong></p>
               <Link className="continueButton" onClick={() => setIsCartOpen(false)} to="/pedidos">Ir para finalizar pedido</Link>
-              <button className="empty-cart" onClick={() => { setQuantities({}); setAnnouncement("Carrinho esvaziado."); }} type="button">Esvaziar carrinho</button>
+              <button className="empty-cart" onClick={() => { setItemQuantities({}); setAnnouncement("Carrinho esvaziado."); }} type="button">Esvaziar carrinho</button>
             </div>
           </>
         ) : (
