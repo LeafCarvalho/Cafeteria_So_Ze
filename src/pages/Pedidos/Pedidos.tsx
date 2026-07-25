@@ -7,11 +7,11 @@ import React, {
 } from "react";
 import { Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../Context/CartContext";
-import { pedidosService } from "../../services/pedidosService";
-import { PedidoResumoItem } from "../../types/pedidos";
-import { Produto } from "../../types/produtos";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { useCart } from "@/Context/CartContext";
+import { pedidosService } from "@/services/pedidosService";
+import { PedidoResumoItem } from "@/types/pedidos";
+import { Produto } from "@/types/produtos";
+import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
 
 interface CartItem extends Produto {

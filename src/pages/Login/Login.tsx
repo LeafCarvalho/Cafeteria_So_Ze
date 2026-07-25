@@ -1,8 +1,8 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/authService";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { authService } from "@/services/authService";
+import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
 
 interface LoginState {

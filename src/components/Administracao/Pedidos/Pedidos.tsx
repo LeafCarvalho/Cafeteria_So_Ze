@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Table } from "react-bootstrap";
 import { FaCircle } from "react-icons/fa";
-import { usePedidos } from "../../../hooks/usePedidos";
-import { Pedido, PedidoStatus } from "../../../types/pedidos";
+import { usePedidos } from "@/hooks/usePedidos";
+import { Pedido, PedidoStatus } from "@/types/pedidos";
 import "./style.scss";
 
 const statusLabels: Record<PedidoStatus, string> = {

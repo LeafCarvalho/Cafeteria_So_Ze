@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { Element, scroller } from "react-scroll";
 import { useLocation } from "react-router-dom";
-import BannerHome from "../../assets/Home/hero.webp";
-import { Produtos } from "../../components/Produtos/Produtos";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import BannerHome from "@/assets/Home/hero.webp";
+import { Produtos } from "@/components/Produtos/Produtos";
+import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
 
 const scrollToProducts = () => {

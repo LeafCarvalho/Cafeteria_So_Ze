@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Dispatch, ReactNode, SetStateAction } from "react";
-import { DadosAcessoConfirmacao, UltimoPedido } from "../types/pedidos";
-import { Produto } from "../types/produtos";
+import { DadosAcessoConfirmacao, UltimoPedido } from "@/types/pedidos";
+import { Produto } from "@/types/produtos";
 
 export interface ScrollOrRouteLinkProps {
   to: string;

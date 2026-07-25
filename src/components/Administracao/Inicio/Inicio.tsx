@@ -13,8 +13,8 @@ import {
 } from "chart.js";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import { pedidosService } from "../../../services/pedidosService";
-import { PedidosCount } from "../../../types/pedidos";
+import { pedidosService } from "@/services/pedidosService";
+import { PedidosCount } from "@/types/pedidos";
 import "./style.scss";
 
 interface ChartDataFormat {

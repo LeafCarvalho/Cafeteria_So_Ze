@@ -1,10 +1,10 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Container, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { useCart } from "../../Context/CartContext";
-import { pedidosService } from "../../services/pedidosService";
-import { UltimoPedido } from "../../types/pedidos";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { useCart } from "@/Context/CartContext";
+import { pedidosService } from "@/services/pedidosService";
+import { UltimoPedido } from "@/types/pedidos";
+import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
 
 const formatCurrency = (value: number) =>

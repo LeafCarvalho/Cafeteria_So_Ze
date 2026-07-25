@@ -1,4 +1,4 @@
-import { supabase } from "../Utils/supabase";
+import { supabase } from "@/Utils/supabase";
 
 const obterUrlRedefinicaoSenha = () =>
   `${window.location.origin}${import.meta.env.BASE_URL}#/redefinir-senha`;

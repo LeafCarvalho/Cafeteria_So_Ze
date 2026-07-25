@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { produtosService } from "../services/produtosService";
-import { AtualizarProdutoDTO, Produto } from "../types/produtos";
+import { produtosService } from "@/services/produtosService";
+import { AtualizarProdutoDTO, Produto } from "@/types/produtos";
 
 export function useProdutos() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
