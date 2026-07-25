@@ -11,19 +11,19 @@ export interface ScrollOrRouteLinkProps {
 }
 
 export interface CartContextData {
-  products: Produto[];
-  setProducts: Dispatch<SetStateAction<Produto[]>>;
-  quantities: Record<string, number>;
-  setQuantities: Dispatch<SetStateAction<Record<string, number>>>;
+  cartProducts: Produto[];
+  setCartProducts: Dispatch<SetStateAction<Produto[]>>;
+  itemQuantities: Record<string, number>;
+  setItemQuantities: Dispatch<SetStateAction<Record<string, number>>>;
   total: number;
   isCartOpen: boolean;
   setIsCartOpen: Dispatch<SetStateAction<boolean>>;
   cartTriggerId: string | null;
   setCartTriggerId: Dispatch<SetStateAction<string | null>>;
-  lastOrder: UltimoPedido | null;
-  setLastOrder: Dispatch<SetStateAction<UltimoPedido | null>>;
-  dadosAcessoConfirmacao: DadosAcessoConfirmacao | null;
-  setDadosAcessoConfirmacao: Dispatch<
+  lastOrderConfirmation: UltimoPedido | null;
+  setLastOrderConfirmation: Dispatch<SetStateAction<UltimoPedido | null>>;
+  confirmationAccessData: DadosAcessoConfirmacao | null;
+  setConfirmationAccessData: Dispatch<
     SetStateAction<DadosAcessoConfirmacao | null>
   >;
 }
@@ -33,12 +33,12 @@ export interface CartProviderProps {
 }
 
 const CartContext = createContext<CartContextData | undefined>(undefined);
-const CONFIRMACAO_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
+const CONFIRMATION_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
 
-const recuperarDadosAcesso = (): DadosAcessoConfirmacao | null => {
+const getStoredConfirmationAccessData = (): DadosAcessoConfirmacao | null => {
   try {
-    const dados = sessionStorage.getItem(CONFIRMACAO_STORAGE_KEY);
-    return dados ? (JSON.parse(dados) as DadosAcessoConfirmacao) : null;
+    const storedData = sessionStorage.getItem(CONFIRMATION_STORAGE_KEY);
+    return storedData ? (JSON.parse(storedData) as DadosAcessoConfirmacao) : null;
   } catch {
     return null;
   }
@@ -55,52 +55,52 @@ export const useCart = (): CartContextData => {
 };
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [products, setProducts] = useState<Produto[]>([]);
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [cartProducts, setCartProducts] = useState<Produto[]>([]);
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
   const [total, setTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartTriggerId, setCartTriggerId] = useState<string | null>(null);
-  const [lastOrder, setLastOrder] = useState<UltimoPedido | null>(null);
-  const [dadosAcessoConfirmacao, setDadosAcessoConfirmacao] =
-    useState<DadosAcessoConfirmacao | null>(recuperarDadosAcesso);
+  const [lastOrderConfirmation, setLastOrderConfirmation] = useState<UltimoPedido | null>(null);
+  const [confirmationAccessData, setConfirmationAccessData] =
+    useState<DadosAcessoConfirmacao | null>(getStoredConfirmationAccessData);
 
   useEffect(() => {
-    const newTotal = products.reduce((acc, product) => {
-      const quantity = quantities[product.id] ?? 0;
+    const newTotal = cartProducts.reduce((acc, product) => {
+      const quantity = itemQuantities[product.id] ?? 0;
       return acc + product.valor * quantity;
     }, 0);
 
     setTotal(newTotal);
-  }, [products, quantities]);
+  }, [cartProducts, itemQuantities]);
 
   useEffect(() => {
-    if (dadosAcessoConfirmacao) {
+    if (confirmationAccessData) {
       sessionStorage.setItem(
-        CONFIRMACAO_STORAGE_KEY,
-        JSON.stringify(dadosAcessoConfirmacao),
+        CONFIRMATION_STORAGE_KEY,
+        JSON.stringify(confirmationAccessData),
       );
       return;
     }
 
-    sessionStorage.removeItem(CONFIRMACAO_STORAGE_KEY);
-  }, [dadosAcessoConfirmacao]);
+    sessionStorage.removeItem(CONFIRMATION_STORAGE_KEY);
+  }, [confirmationAccessData]);
 
   return (
     <CartContext.Provider
       value={{
-        products,
-        setProducts,
-        quantities,
-        setQuantities,
+        cartProducts,
+        setCartProducts,
+        itemQuantities,
+        setItemQuantities,
         total,
         isCartOpen,
         setIsCartOpen,
         cartTriggerId,
         setCartTriggerId,
-        lastOrder,
-        setLastOrder,
-        dadosAcessoConfirmacao,
-        setDadosAcessoConfirmacao,
+        lastOrderConfirmation,
+        setLastOrderConfirmation,
+        confirmationAccessData,
+        setConfirmationAccessData,
       }}
     >
       {children}

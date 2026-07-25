@@ -21,49 +21,49 @@ interface CartItem extends Produto {
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CHAVE_IDEMPOTENCIA_STORAGE_KEY = "cafeteria:pedido:chave-idempotencia";
+const IDEMPOTENCY_STORAGE_KEY = "cafeteria:pedido:chave-idempotencia";
 
-const criarChaveIdempotencia = () => {
+const createIdempotencyKey = () => {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
 
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (caractere) => {
-    const aleatorio = Math.floor(Math.random() * 16);
-    const valor = caractere === "x" ? aleatorio : (aleatorio & 0x3) | 0x8;
-    return valor.toString(16);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
+    const randomValue = Math.floor(Math.random() * 16);
+    const hexadecimalValue = character === "x" ? randomValue : (randomValue & 0x3) | 0x8;
+    return hexadecimalValue.toString(16);
   });
 };
 
 const Pedidos: React.FC = () => {
   const {
-    quantities,
-    products,
-    setQuantities,
-    setLastOrder,
-    setDadosAcessoConfirmacao,
+    itemQuantities,
+    cartProducts,
+    setItemQuantities,
+    setLastOrderConfirmation,
+    setConfirmationAccessData,
   } = useCart();
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [erro, setErro] = useState<string | null>(null);
-  const [enviando, setEnviando] = useState(false);
-  const [tentouEnviar, setTentouEnviar] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
   const cartSignatureRef = useRef<string | null>(null);
   const navigate = useNavigate();
 
-  const cartItems: CartItem[] = Object.entries(quantities)
+  const cartItems: CartItem[] = Object.entries(itemQuantities)
     .filter(([, quantity]) => quantity > 0)
     .map(([id, quantity]) => {
-      const product = products.find((item) => item.id === id);
+      const product = cartProducts.find((item) => item.id === id);
       return product ? { ...product, quantity } : null;
     })
     .filter((item): item is CartItem => Boolean(item));
 
-  const phoneDigits = phone.replace(/\D/g, "");
-  const nomeInvalido = tentouEnviar && name.trim().length < 2;
-  const telefoneInvalido =
-    tentouEnviar && phoneDigits.length !== 10 && phoneDigits.length !== 11;
+  const phoneDigits = phoneNumber.replace(/\D/g, "");
+  const isCustomerNameInvalid = hasAttemptedSubmit && customerName.trim().length < 2;
+  const isPhoneNumberInvalid =
+    hasAttemptedSubmit && phoneDigits.length !== 10 && phoneDigits.length !== 11;
   const totalValue = cartItems.reduce(
     (total, item) => total + item.valor * item.quantity,
     0,
@@ -74,43 +74,44 @@ const Pedidos: React.FC = () => {
     .join("|");
 
   useEffect(() => {
-    if (erro) feedbackRef.current?.focus();
-  }, [erro]);
+    if (errorMessage) feedbackRef.current?.focus();
+  }, [errorMessage]);
 
   useEffect(() => {
     if (
       cartSignatureRef.current !== null &&
       cartSignatureRef.current !== cartSignature
     ) {
-      sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+      // A different cart must receive a new key, so a previous retry cannot be reused.
+      sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
     }
 
     cartSignatureRef.current = cartSignature;
   }, [cartSignature]);
 
-  const reiniciarTentativa = () => {
-    sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+  const resetCheckoutAttempt = () => {
+    sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
   };
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const digits = event.target.value.replace(/\D/g, "").slice(0, 11);
 
     if (digits.length <= 2) {
-      reiniciarTentativa();
-      setPhone(digits);
+      resetCheckoutAttempt();
+      setPhoneNumber(digits);
     } else if (digits.length <= 6) {
-      reiniciarTentativa();
-      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
+      resetCheckoutAttempt();
+      setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
     } else if (digits.length <= 10) {
-      reiniciarTentativa();
-      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
+      resetCheckoutAttempt();
+      setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
     } else {
-      reiniciarTentativa();
-      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`);
+      resetCheckoutAttempt();
+      setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`);
     }
   };
 
-  const buildResumoProdutos = (): PedidoResumoItem[] =>
+  const buildOrderSummary = (): PedidoResumoItem[] =>
     cartItems.map((item) => ({
       id: item.id,
       nome: item.nome,
@@ -120,63 +121,64 @@ const Pedidos: React.FC = () => {
       quantidade: item.quantity,
     }));
 
-  const obterChaveIdempotencia = () => {
-    const chaveExistente = sessionStorage.getItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
-    if (chaveExistente) return chaveExistente;
+  const getIdempotencyKey = () => {
+    const existingKey = sessionStorage.getItem(IDEMPOTENCY_STORAGE_KEY);
+    if (existingKey) return existingKey;
 
-    const novaChave = criarChaveIdempotencia();
-    sessionStorage.setItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY, novaChave);
-    return novaChave;
+    // Reusing this key on a retry lets the RPC return the original confirmation.
+    const newKey = createIdempotencyKey();
+    sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, newKey);
+    return newKey;
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (enviando) return;
+    if (isSubmitting) return;
 
-    setTentouEnviar(true);
-    if (name.trim().length < 2 || ![10, 11].includes(phoneDigits.length)) {
-      setErro("Revise os campos destacados para continuar.");
+    setHasAttemptedSubmit(true);
+    if (customerName.trim().length < 2 || ![10, 11].includes(phoneDigits.length)) {
+      setErrorMessage("Revise os campos destacados para continuar.");
       return;
     }
 
     if (cartItems.length === 0) {
-      setErro("Seu carrinho está vazio. Escolha ao menos um item para finalizar.");
+      setErrorMessage("Seu carrinho está vazio. Escolha ao menos um item para finalizar.");
       return;
     }
 
     try {
-      setEnviando(true);
-      setErro(null);
+      setIsSubmitting(true);
+      setErrorMessage(null);
       const confirmacao = await pedidosService.criarPedidoConfirmado({
-        nome_cliente: name.trim(),
-        telefone: phone,
-        chave_idempotencia: obterChaveIdempotencia(),
+        nome_cliente: customerName.trim(),
+        telefone: phoneNumber,
+        chave_idempotencia: getIdempotencyKey(),
         itens: cartItems.map((item) => ({
           produto_id: item.id,
           quantidade: item.quantity,
         })),
       });
 
-      setLastOrder({
+      setLastOrderConfirmation({
         confirmacao_id: confirmacao.confirmacao_id,
-        nome_cliente: name.trim(),
+        nome_cliente: customerName.trim(),
         senha_retirar_ped: confirmacao.codigo_retirada,
         expira_em: confirmacao.expira_em,
         total: confirmacao.total,
-        produtos: buildResumoProdutos(),
+        produtos: buildOrderSummary(),
       });
-      setDadosAcessoConfirmacao({
+      setConfirmationAccessData({
         confirmacaoId: confirmacao.confirmacao_id,
         codigoRetirada: confirmacao.codigo_retirada,
       });
-      setQuantities({});
-      sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+      setItemQuantities({});
+      sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
       navigate(`/efetuacao/${confirmacao.confirmacao_id}`);
     } catch (error) {
       console.error("Erro ao enviar o pedido:", error);
-      setErro("Não foi possível enviar o pedido. Tente novamente.");
+      setErrorMessage("Não foi possível enviar o pedido. Tente novamente.");
     } finally {
-      setEnviando(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -209,40 +211,40 @@ const Pedidos: React.FC = () => {
                 <Form.Group controlId="formName">
                   <Form.Label>Nome completo</Form.Label>
                   <Form.Control
-                    aria-describedby={nomeInvalido ? "erro-nome" : undefined}
+                    aria-describedby={isCustomerNameInvalid ? "erro-nome" : undefined}
                     autoComplete="name"
-                    isInvalid={nomeInvalido}
+                    isInvalid={isCustomerNameInvalid}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      reiniciarTentativa();
-                      setName(event.target.value);
+                      resetCheckoutAttempt();
+                      setCustomerName(event.target.value);
                     }}
                     required
                     type="text"
-                    value={name}
+                    value={customerName}
                   />
-                  {nomeInvalido && <p className="field-error" id="erro-nome">Informe seu nome completo.</p>}
+                  {isCustomerNameInvalid && <p className="field-error" id="erro-nome">Informe seu nome completo.</p>}
                 </Form.Group>
                 <Form.Group controlId="formPhone">
                   <Form.Label>Telefone</Form.Label>
                   <Form.Control
-                    aria-describedby={telefoneInvalido ? "erro-telefone" : "ajuda-telefone"}
+                    aria-describedby={isPhoneNumberInvalid ? "erro-telefone" : "ajuda-telefone"}
                     autoComplete="tel"
                     inputMode="tel"
-                    isInvalid={telefoneInvalido}
+                    isInvalid={isPhoneNumberInvalid}
                     maxLength={15}
                     onChange={handlePhoneChange}
                     placeholder="(00) 00000-0000"
                     required
                     type="tel"
-                    value={phone}
+                    value={phoneNumber}
                   />
-                  {telefoneInvalido ? (
+                  {isPhoneNumberInvalid ? (
                     <p className="field-error" id="erro-telefone">Informe um telefone com DDD.</p>
                   ) : <p className="field-hint" id="ajuda-telefone">Usaremos este número caso precisemos falar com você.</p>}
                 </Form.Group>
-                {erro && <div className="pedido-feedback" ref={feedbackRef} role="alert" tabIndex={-1}>{erro}</div>}
-                <DefaultButton aria-busy={enviando} customizarCSS="pedido-submit" disabled={enviando} type="submit">
-                  {enviando ? "Enviando pedido..." : "Finalizar pedido"}
+                {errorMessage && <div className="pedido-feedback" ref={feedbackRef} role="alert" tabIndex={-1}>{errorMessage}</div>}
+                <DefaultButton aria-busy={isSubmitting} customizarCSS="pedido-submit" disabled={isSubmitting} type="submit">
+                  {isSubmitting ? "Enviando pedido..." : "Finalizar pedido"}
                 </DefaultButton>
               </Form>
             </section>
