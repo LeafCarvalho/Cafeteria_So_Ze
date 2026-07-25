@@ -1,212 +1,146 @@
+import { ChangeEvent, useEffect, useState } from "react";
+import { Button, Col, Form, Modal, Pagination } from "react-bootstrap";
+import { FaCheck, FaEdit, FaTimes, FaTrash } from "react-icons/fa";
 import { useProdutosContext } from "../../../../Context/ProdutosProvider";
-import { useState, ChangeEvent } from "react";
-import {
-  AtualizarProdutoDTO,
-  EditState,
-  Produto,
-} from "../../../../types/produtos";
-import { Col, Modal, Button, Form, Pagination } from "react-bootstrap";
-import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
+import { AtualizarProdutoDTO, EditState, Produto } from "../../../../types/produtos";
 import "./style.scss";
 
+const PRODUCTS_PER_PAGE = 3;
+
 const TodosProdutos = () => {
-  const { produtos, loading, erro, atualizarProduto, deletarProduto } =
-    useProdutosContext();
+  const { produtos, loading, erro, atualizarProduto, deletarProduto } = useProdutosContext();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
-  const [editState, setEditState] = useState<EditState>({
-    id: null,
-    field: "",
-  });
-  const [editValue, setEditValue] = useState<string>("");
+  const [editState, setEditState] = useState<EditState>({ id: null, field: "" });
+  const [editValue, setEditValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 3;
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const totalPages = Math.ceil(produtos.length / PRODUCTS_PER_PAGE);
+  const safePage = totalPages ? Math.min(currentPage, totalPages) : 1;
   const currentProducts = produtos.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct,
+    (safePage - 1) * PRODUCTS_PER_PAGE,
+    safePage * PRODUCTS_PER_PAGE,
   );
-  const totalPages = Math.ceil(produtos.length / productsPerPage);
 
-  const handleDelete = async () => {
-    if (!selectedProduct) return;
+  useEffect(() => {
+    if (currentPage !== safePage) setCurrentPage(safePage);
+  }, [currentPage, safePage]);
 
-    const deletou = await deletarProduto(selectedProduct.id);
-    if (!deletou) return;
-
+  const closeModal = () => {
     setShowConfirmModal(false);
     setSelectedProduct(null);
   };
 
-  const startEdit = (productId: string, field: keyof Produto) => {
-    setEditState({ id: productId, field });
-    const product = produtos.find((p) => p.id === productId);
-    if (product) setEditValue(String(product[field]));
+  const handleDelete = async () => {
+    if (!selectedProduct) return;
+    setActionError(null);
+    const deleted = await deletarProduto(selectedProduct.id);
+    if (!deleted) {
+      setActionError("Não foi possível excluir o produto. Tente novamente.");
+      return;
+    }
+    closeModal();
+  };
+
+  const startEdit = (product: Produto, field: keyof AtualizarProdutoDTO) => {
+    setActionError(null);
+    setEditState({ id: product.id, field });
+    setEditValue(String(product[field]));
   };
 
   const cancelEdit = () => {
     setEditState({ id: null, field: "" });
     setEditValue("");
+    setActionError(null);
   };
 
   const saveEdit = async () => {
-    if (!editState.id || editState.field === "") return;
-
+    if (!editState.id || !editState.field) return;
+    if (editState.field === "valor" && (!editValue || Number.isNaN(Number(editValue)))) {
+      setActionError("Informe um preço válido.");
+      return;
+    }
     const field = editState.field as keyof AtualizarProdutoDTO;
-
-    const data: AtualizarProdutoDTO = {
+    const updated = await atualizarProduto(editState.id, {
       [field]: field === "valor" ? Number(editValue) : editValue,
-    };
-
-    const atualizou = await atualizarProduto(editState.id, data);
-
-    if (!atualizou) return;
-
+    });
+    if (!updated) {
+      setActionError("Não foi possível salvar a alteração. Tente novamente.");
+      return;
+    }
     cancelEdit();
   };
 
-  if (loading) return <p>Carregando...</p>;
-  if (erro) return <p>{erro}</p>;
+  if (loading) return <Col className="my-col"><p className="product-feedback" role="status">Carregando produtos…</p></Col>;
+  if (erro) return <Col className="my-col"><p className="product-feedback product-feedback--error" role="alert">{erro}</p></Col>;
 
-  return (
-    <Col className="my-col">
-      <div className="product-list">
-        {currentProducts.map((product) => (
-          <div key={product.id} className="product-item">
-            <div className="product-info">
-              {editState.id === product.id && editState.field === "imagem" ? (
-                <Form.Control
-                  type="text"
-                  value={editValue}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setEditValue(e.target.value)
-                  }
-                  placeholder="URL da imagem"
-                />
-              ) : (
-                <div className="image-container">
-                  <img src={product.imagem} alt={product.nome} />
-                  <FaEdit
-                    className="edit-icon"
-                    onClick={() => startEdit(String(product.id), "imagem")}
-                  />
-                </div>
-              )}
-              <div className="product-details w-100">
-                {renderEditableField("nome", product as Produto)}
-                {renderEditableField("tipo", product as Produto)}
-                {renderEditableField("valor", product as Produto, true)}
-              </div>
-            </div>
-            {editState.id === product.id && editState.field === "descricao" ? (
-              <div className="w-100">
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={editValue}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                    setEditValue(e.target.value)
-                  }
-                />
-                <FaCheck className="action-icon" onClick={saveEdit} />
-                <FaTimes className="action-icon" onClick={cancelEdit} />
-              </div>
-            ) : (
-              <div className="description-container">
-                <p>{product.descricao}</p>
-                <FaEdit
-                  className="edit-icon"
-                  onClick={() => startEdit(String(product.id), "descricao")}
-                />
-              </div>
-            )}
-            <FaTrash
-              className="delete-icon"
-              onClick={() => {
-                setShowConfirmModal(true);
-                setSelectedProduct(product as Produto);
-              }}
-            />
-          </div>
-        ))}
-        <Pagination className="pagination-container">
-          <Pagination.First
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          />
-          <Pagination.Prev
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            disabled={currentPage === 1}
-          />
-          {[...Array(totalPages).keys()].map((page) => (
-            <Pagination.Item
-              key={page + 1}
-              active={page + 1 === currentPage}
-              onClick={() => setCurrentPage(page + 1)}
-            >
-              {page + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={currentPage === totalPages}
-          />
-          <Pagination.Last
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
-      </div>
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmação</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Tem certeza de que deseja excluir {selectedProduct?.nome}?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
-          >
-            Cancelar
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            Excluir
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Col>
+  const renderEditorActions = () => (
+    <div className="inline-actions">
+      <button className="icon-button icon-button--confirm" type="button" onClick={saveEdit} aria-label="Salvar alteração">
+        <FaCheck aria-hidden="true" />
+      </button>
+      <button className="icon-button" type="button" onClick={cancelEdit} aria-label="Cancelar edição">
+        <FaTimes aria-hidden="true" />
+      </button>
+    </div>
   );
 
-  function renderEditableField(
-    field: keyof Produto,
-    product: Produto,
-    isNumber: boolean = false,
-  ) {
-    return editState.id === product.id && editState.field === field ? (
-      <div className="editInput">
-        <Form.Control
-          type={isNumber ? "number" : "text"}
-          value={editValue}
-          onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-            setEditValue(e.target.value)
-          }
-        />
-        <FaCheck className="action-icon" onClick={saveEdit} />
-        <FaTimes className="action-icon" onClick={cancelEdit} />
+  const renderEditableField = (field: keyof AtualizarProdutoDTO, product: Produto, isNumber = false) => {
+    const isEditing = editState.id === product.id && editState.field === field;
+    const fieldName = field === "valor" ? "preço" : field;
+    return isEditing ? (
+      <div className="edit-input">
+        <Form.Control aria-label={`Editar ${fieldName} de ${product.nome}`} type={isNumber ? "number" : "text"} min={isNumber ? "0" : undefined} step={isNumber ? "0.01" : undefined} value={editValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setEditValue(event.target.value)} autoFocus />
+        {renderEditorActions()}
       </div>
     ) : (
       <div className="editable-field">
-        <p>{product[field]}</p>
-        <FaEdit
-          className="edit-icon"
-          onClick={() => startEdit(product.id, field)}
-        />
+        <p>{field === "valor" ? `R$ ${Number(product.valor).toFixed(2).replace(".", ",")}` : product[field]}</p>
+        <button className="icon-button" type="button" onClick={() => startEdit(product, field)} aria-label={`Editar ${fieldName} de ${product.nome}`}>
+          <FaEdit aria-hidden="true" />
+        </button>
       </div>
     );
-  }
+  };
+
+  return (
+    <Col className="my-col">
+      <div className="product-list" aria-live="polite">
+        {actionError && <p className="product-feedback product-feedback--error" role="alert">{actionError}</p>}
+        {!currentProducts.length ? <p className="product-feedback">Nenhum produto cadastrado.</p> : currentProducts.map((product) => (
+          <article key={product.id} className="product-item">
+            <div className="product-info">
+              {editState.id === product.id && editState.field === "imagem" ? (
+                <div className="image-editor"><Form.Control aria-label={`Editar URL da imagem de ${product.nome}`} value={editValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setEditValue(event.target.value)} autoFocus />{renderEditorActions()}</div>
+              ) : (
+                <div className="image-container"><img src={product.imagem} alt={product.nome} /><button className="icon-button image-edit-button" type="button" onClick={() => startEdit(product, "imagem")} aria-label={`Editar imagem de ${product.nome}`}><FaEdit aria-hidden="true" /></button></div>
+              )}
+              <div className="product-details">{renderEditableField("nome", product)}{renderEditableField("tipo", product)}{renderEditableField("valor", product, true)}</div>
+            </div>
+            {editState.id === product.id && editState.field === "descricao" ? (
+              <div className="description-editor"><Form.Control as="textarea" rows={3} aria-label={`Editar descrição de ${product.nome}`} value={editValue} onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setEditValue(event.target.value)} autoFocus />{renderEditorActions()}</div>
+            ) : (
+              <div className="description-container"><p>{product.descricao || "Sem descrição."}</p><button className="icon-button" type="button" onClick={() => startEdit(product, "descricao")} aria-label={`Editar descrição de ${product.nome}`}><FaEdit aria-hidden="true" /></button></div>
+            )}
+            <button className="icon-button icon-button--delete" type="button" onClick={() => { setActionError(null); setSelectedProduct(product); setShowConfirmModal(true); }} aria-label={`Excluir ${product.nome}`}><FaTrash aria-hidden="true" /></button>
+          </article>
+        ))}
+        {totalPages > 1 && <Pagination className="pagination-container" aria-label="Paginação de produtos">
+          <Pagination.First onClick={() => setCurrentPage(1)} disabled={safePage === 1} aria-label="Primeira página" />
+          <Pagination.Prev onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={safePage === 1} aria-label="Página anterior" />
+          {Array.from({ length: totalPages }, (_, index) => <Pagination.Item key={index + 1} active={index + 1 === safePage} onClick={() => setCurrentPage(index + 1)} aria-label={`Página ${index + 1}`}>{index + 1}</Pagination.Item>)}
+          <Pagination.Next onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} disabled={safePage === totalPages} aria-label="Próxima página" />
+          <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={safePage === totalPages} aria-label="Última página" />
+        </Pagination>}
+      </div>
+      <Modal className="product-modal" show={showConfirmModal} onHide={closeModal} centered aria-labelledby="delete-product-title">
+        <Modal.Header closeButton><Modal.Title id="delete-product-title">Excluir produto</Modal.Title></Modal.Header>
+        <Modal.Body>Deseja realmente excluir <strong>{selectedProduct?.nome}</strong>? Esta ação não pode ser desfeita.</Modal.Body>
+        <Modal.Footer><Button className="button-secondary" onClick={closeModal}>Cancelar</Button><Button className="button-danger" onClick={handleDelete}>Excluir produto</Button></Modal.Footer>
+      </Modal>
+    </Col>
+  );
 };
 
 export default TodosProdutos;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { authService } from "../services/authService";
 import { perfisService } from "../services/perfisService";
+import "./style.scss";
 
 const PrivateRoute = () => {
   const [loading, setLoading] = useState(true);
@@ -29,11 +30,15 @@ const PrivateRoute = () => {
   }, []);
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <main className="route-loading" role="status">
+        <span aria-hidden="true" />
+        <p>Carregando área administrativa...</p>
+      </main>
+    );
   }
 
   return autorizado ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;
-
