@@ -15,14 +15,6 @@ export interface Pedido {
   produto?: Produto | null;
 }
 
-export interface CriarPedidoDTO {
-  nome_cliente: string;
-  produto_id: string;
-  senha_retirar_ped: string;
-  telefone: string;
-  total: number;
-}
-
 export interface ItemCriarPedidoConfirmadoDTO {
   produto_id: string;
   quantidade: number;
@@ -32,6 +24,7 @@ export interface CriarPedidoConfirmadoDTO {
   nome_cliente: string;
   telefone: string;
   itens: ItemCriarPedidoConfirmadoDTO[];
+  chave_idempotencia: string;
 }
 
 export interface ConfirmacaoCriada {
@@ -46,7 +39,13 @@ export interface DadosAcessoConfirmacao {
   codigoRetirada: string;
 }
 
-export type AtualizarPedidoDTO = Partial<Pick<Pedido, "status">>;
+export interface AtualizarStatusPedidoAdminDTO {
+  pedido_id: string;
+  status_atual: PedidoStatus;
+  novo_status: PedidoStatus;
+}
+
+export type ResultadoAtualizacaoStatusPedido = "atualizado" | "conflito" | "erro";
 
 export interface PedidoResumoItem {
   id: string;
