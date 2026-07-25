@@ -29,7 +29,7 @@ const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     scroller.scrollTo(to, {
-      duration: reducedMotion ? 0 : 300,
+      duration: reducedMotion ? 0 : 550,
       smooth: reducedMotion ? false : "easeInOutQuart",
       offset: -88,
     });
@@ -110,15 +110,24 @@ export function Header() {
       onToggle={setExpanded}
     >
       <Container>
-        {pathname !== "/login" && (
-          <CartTrigger className="cart-trigger cart-trigger--mobile d-lg-none" id="cart-trigger-mobile" />
-        )}
+        <button
+          aria-controls="responsive-navbar-nav"
+          aria-expanded={expanded}
+          aria-label={expanded ? "Fechar menu principal" : "Abrir menu principal"}
+          className="navbar-toggler navbar-toggler--mobile"
+          onClick={() => setExpanded(!expanded)}
+          type="button"
+        >
+          <span aria-hidden="true" className="navbar-toggler__icon" />
+        </button>
 
         <Navbar.Brand as={Link} to="/">
           <img alt="Cafeteria Sô Zé" className="logoCafeteria" src={logo} />
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        {pathname !== "/login" && (
+          <CartTrigger className="cart-trigger cart-trigger--mobile d-lg-none" id="cart-trigger-mobile" />
+        )}
 
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
