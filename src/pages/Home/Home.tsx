@@ -11,7 +11,7 @@ const scrollToProducts = () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   scroller.scrollTo("produtos", {
-    duration: reducedMotion ? 0 : 300,
+    duration: reducedMotion ? 0 : 550,
     smooth: reducedMotion ? false : "easeInOutQuart",
     offset: -88,
   });

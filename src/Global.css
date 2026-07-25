@@ -56,6 +56,11 @@
     0 0 0 4px var(--color-focus-inner);
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
 *,
 *::before,
 *::after {
