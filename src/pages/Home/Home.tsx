@@ -35,7 +35,7 @@ const Home = () => {
           <img src={BannerHome} alt="" className="banner-principal-img" />
           <Container className="banner-principal__content">
             <p className="banner-principal__eyebrow">Café especial, feito para você</p>
-            <h1 id="titulo-principal">Cafeteria Só Zé</h1>
+            <h1 id="titulo-principal">Cafeteria Sô Zé</h1>
             <p>Sabores artesanais para tornar sua pausa ainda melhor.</p>
             <DefaultButton onClick={scrollToProducts} type="button">
               Ver cardápio

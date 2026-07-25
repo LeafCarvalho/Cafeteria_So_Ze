@@ -115,7 +115,7 @@ export function Header() {
         )}
 
         <Navbar.Brand as={Link} to="/">
-          <img alt="Cafeteria Só Zé" className="logoCafeteria" src={logo} />
+          <img alt="Cafeteria Sô Zé" className="logoCafeteria" src={logo} />
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
