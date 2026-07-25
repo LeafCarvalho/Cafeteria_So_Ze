@@ -1,284 +1,346 @@
-import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Modal } from "react-bootstrap";
-import { FcPlus, FcMinus } from "react-icons/fc";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Col, Container, Modal, Row } from "react-bootstrap";
+import { FiMinus, FiPlus } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import { useCart } from "../../Context/CartContext";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import { produtosService } from "../../services/produtosService";
 import { Produto } from "../../types/produtos";
+import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import "./style.scss";
+
+const getInitialDisplayCount = () =>
+  window.matchMedia("(max-width: 576px)").matches ? 3 : 6;
 
 export const Produtos = () => {
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState("Todos");
-  const [displayCount, setDisplayCount] = useState(6);
+  const [displayCount, setDisplayCount] = useState(getInitialDisplayCount);
   const [isLoading, setIsLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState("");
+  const cartRef = useRef<HTMLDivElement>(null);
+  const closeCartButtonRef = useRef<HTMLButtonElement>(null);
   const {
     isCartOpen,
     setIsCartOpen,
+    cartTriggerId,
     products,
     setProducts,
     quantities,
     setQuantities,
+    total,
   } = useCart();
 
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        setIsLoading(true);
-        setErro(null);
+  const carregarProdutos = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setErro(null);
+      const produtos = await produtosService.listarProdutos();
+      setProducts(produtos);
+    } catch (error) {
+      console.error(error);
+      setErro("Não foi possível carregar os produtos.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setProducts]);
 
-        if (products.length === 0) {
-          const produtos = await produtosService.listarProdutos();
-          setProducts(produtos);
-        }
-      } catch (error) {
-        console.error(error);
-        setErro("Não foi possível carregar os produtos.");
-      } finally {
-        setIsLoading(false);
+  useEffect(() => {
+    if (products.length === 0) {
+      void carregarProdutos();
+      return;
+    }
+
+    setIsLoading(false);
+  }, [carregarProdutos, products.length]);
+
+  useEffect(() => {
+    if (!isCartOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsCartOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !cartRef.current) return;
+
+      const focusableElements = Array.from(
+        cartRef.current.querySelectorAll<HTMLElement>(focusableSelector),
+      );
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
-    getProducts();
-  }, [products.length, setProducts]);
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    window.setTimeout(() => closeCartButtonRef.current?.focus(), 0);
 
-  const addProduct = (id: string) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: (prevQuantities[id] || 0) + 1,
-    }));
-  };
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isCartOpen, setIsCartOpen]);
 
-  const removeProduct = (id: string) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [id]: Math.max(0, (prevQuantities[id] || 0) - 1),
-    }));
-  };
+  const cartItems = Object.entries(quantities)
+    .filter(([, quantity]) => quantity > 0)
+    .map(([id, quantity]) => {
+      const product = products.find((item) => item.id === id);
+      return product ? { product, quantity } : null;
+    })
+    .filter((item): item is { product: Produto; quantity: number } => Boolean(item));
 
-  const emptyCart = () => {
-    setQuantities({});
-  };
-
+  const totalItems = cartItems.reduce((count, item) => count + item.quantity, 0);
   const filteredProducts = products.filter(
     (product) =>
       (selectedType === "Todos" || product.tipo === selectedType) &&
       product.nome.toLowerCase().includes(search.toLowerCase()),
   );
-
   const types = ["Todos", ...new Set(products.map((product) => product.tipo))];
 
+  const addProduct = (product: Produto) => {
+    const nextQuantity = (quantities[product.id] || 0) + 1;
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [product.id]: nextQuantity,
+    }));
+    setAnnouncement(`${product.nome}: ${nextQuantity} ${nextQuantity === 1 ? "unidade" : "unidades"} no carrinho.`);
+  };
+
+  const removeProduct = (product: Produto) => {
+    const nextQuantity = Math.max(0, (quantities[product.id] || 0) - 1);
+    setQuantities((prevQuantities) => ({ ...prevQuantities, [product.id]: nextQuantity }));
+    setAnnouncement(
+      nextQuantity > 0
+        ? `${product.nome}: ${nextQuantity} unidades no carrinho.`
+        : `${product.nome} removido do carrinho.`,
+    );
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setSelectedType("Todos");
+    setDisplayCount(getInitialDisplayCount());
+  };
+
+  const handleFilterChange = (callback: () => void) => {
+    callback();
+    setDisplayCount(getInitialDisplayCount());
+  };
+
+  const closeCart = () => {
+    setIsCartOpen(false);
+    window.setTimeout(() => {
+      if (cartTriggerId) document.getElementById(cartTriggerId)?.focus();
+    }, 0);
+  };
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
   return (
-    <Container className="mt-5 mb-5">
-      <Row className="mb-5">
-        <div className="d-flex align-items-center justify-content-start search-and-filter">
-          <div className="d-flex flex-column">
+    <section aria-labelledby="produtos-titulo" className="produtos-section">
+      <Container className="py-5">
+        <div className="produtos-section__heading">
+          <p className="produtos-section__eyebrow">Escolha o seu favorito</p>
+          <h2 id="produtos-titulo">Cardápio</h2>
+          <p>Produtos preparados para acompanhar os seus melhores momentos.</p>
+        </div>
+
+        <div className="search-and-filter">
+          <div className="field-group">
+            <label htmlFor="pesquisa-produtos">Buscar no cardápio</label>
             <input
-              type="text"
+              id="pesquisa-produtos"
+              onChange={(event) => handleFilterChange(() => setSearch(event.target.value))}
+              placeholder="Ex.: cappuccino"
+              type="search"
               value={search}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setSearch(event.target.value)
-              }
-              placeholder="Pesquisar..."
             />
+          </div>
+          <div className="field-group">
+            <label htmlFor="filtro-categoria">Categoria</label>
             <select
+              id="filtro-categoria"
+              onChange={(event) => handleFilterChange(() => setSelectedType(event.target.value))}
               value={selectedType}
-              onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                setSelectedType(event.target.value)
-              }
             >
               {types.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
           </div>
+          {(search || selectedType !== "Todos") && (
+            <button className="clear-filters" onClick={clearFilters} type="button">
+              Limpar filtros
+            </button>
+          )}
         </div>
-      </Row>
-      <Row>
-        {isLoading ? (
-          <Col className="d-flex justify-content-center">
-            <Skeleton count={6} height={100} width={200} />
-          </Col>
-        ) : erro ? (
-          <Col className="d-flex justify-content-center">
-            <h1>{erro}</h1>
-          </Col>
-        ) : filteredProducts.length > 0 ? (
-          <>
-            {filteredProducts.slice(0, displayCount).map((product) => (
-              <Col sm={12} md={6} lg={4} xl={4} key={product.id}>
-                <div className="product-card">
-                  <div id="imgProdutoHome">
-                    <img
-                      src={product.imagem}
-                      alt={product.nome}
-                      onClick={() => setSelectedProduct(product)}
-                    />
-                  </div>
-                  <Row className="d-flex align-items-start m-1">
-                    <Col>
-                      <p>{product.nome}</p>
-                      <p>
-                        {product.valor.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </p>
-                    </Col>
-                    <Col className="d-flex flex-column text-end">
-                      <Row>
-                        <p>Quantidade: {quantities[product.id] ?? 0}</p>
-                        <Col>
-                          <DefaultButton
-                            id="addButton"
-                            onClick={() => addProduct(product.id)}
-                          >
-                            <FcPlus />
-                          </DefaultButton>
-                          <DefaultButton
-                            id="removeButton"
-                            onClick={() => removeProduct(product.id)}
-                          >
-                            <FcMinus />
-                          </DefaultButton>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </div>
-              </Col>
-            ))}
-            <Col sm={12} className="d-flex justify-content-center">
-              {filteredProducts.length > displayCount && (
-                <DefaultButton
-                  onClick={() => setDisplayCount(displayCount + 6)}
-                  id="vermaisButton"
-                >
-                  Ver Mais
-                </DefaultButton>
-              )}
-              {displayCount > 6 && filteredProducts.length <= displayCount && (
-                <DefaultButton
-                  onClick={() => setDisplayCount(6)}
-                  id="vermenosButton"
-                >
-                  Ver Menos
-                </DefaultButton>
-              )}
-            </Col>
-          </>
-        ) : (
-          <Col className="d-flex justify-content-center">
-            <h1>Nenhum produto foi encontrado.</h1>
-          </Col>
-        )}
-      </Row>
 
-      <Modal show={selectedProduct !== null} onHide={() => setSelectedProduct(null)}>
+        <p aria-live="polite" className="results-summary">
+          {isLoading ? "Carregando produtos…" : `${filteredProducts.length} ${filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}.`}
+        </p>
+        <p aria-live="polite" className="visually-hidden">{announcement}</p>
+
+        <Row className="g-4">
+          {isLoading ? (
+            <Col className="d-flex justify-content-center" role="status">
+              <Skeleton count={6} height={100} width={200} />
+              <span className="visually-hidden">Carregando produtos…</span>
+            </Col>
+          ) : erro ? (
+            <Col className="catalog-feedback" role="alert">
+              <h3>Não foi possível carregar o cardápio</h3>
+              <p>Tente novamente em instantes.</p>
+              <DefaultButton onClick={() => void carregarProdutos()} type="button">Tentar novamente</DefaultButton>
+            </Col>
+          ) : filteredProducts.length > 0 ? (
+            filteredProducts.slice(0, displayCount).map((product) => {
+              const quantity = quantities[product.id] ?? 0;
+              return (
+                <Col key={product.id} lg={4} md={6} sm={12} xl={4}>
+                  <article className="product-card">
+                    <button
+                      aria-haspopup="dialog"
+                      aria-label={`Ver detalhes de ${product.nome}`}
+                      className="product-card__details"
+                      onClick={() => setSelectedProduct(product)}
+                      type="button"
+                    >
+                      <img alt="" src={product.imagem} />
+                      <span>Ver detalhes</span>
+                    </button>
+                    <div className="product-card__content">
+                      <div>
+                        <h3>{product.nome}</h3>
+                        <p className="product-card__type">{product.tipo}</p>
+                        <p className="product-card__price">{formatCurrency(product.valor)}</p>
+                      </div>
+                      <div aria-label={`Quantidade de ${product.nome}`} className="quantity-control" role="group">
+                        <button
+                          aria-label={`Remover uma unidade de ${product.nome}`}
+                          disabled={quantity === 0}
+                          onClick={() => removeProduct(product)}
+                          type="button"
+                        >
+                          <FiMinus aria-hidden="true" />
+                        </button>
+                        <output aria-live="polite" className="quantity-control__value">{quantity}</output>
+                        <button
+                          aria-label={`Adicionar uma unidade de ${product.nome}`}
+                          onClick={() => addProduct(product)}
+                          type="button"
+                        >
+                          <FiPlus aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </Col>
+              );
+            })
+          ) : (
+            <Col className="catalog-feedback" role="status">
+              <h3>Nenhum produto encontrado</h3>
+              <p>Experimente outra busca ou categoria.</p>
+              <DefaultButton onClick={clearFilters} type="button">Limpar filtros</DefaultButton>
+            </Col>
+          )}
+        </Row>
+
+        {filteredProducts.length > getInitialDisplayCount() && (
+          <div className="catalog-pagination">
+            {filteredProducts.length > displayCount ? (
+              <DefaultButton onClick={() => setDisplayCount((count) => count + getInitialDisplayCount())} type="button">Ver mais produtos</DefaultButton>
+            ) : (
+              <DefaultButton onClick={() => setDisplayCount(getInitialDisplayCount())} type="button">Ver menos</DefaultButton>
+            )}
+          </div>
+        )}
+      </Container>
+
+      <Modal centered onHide={() => setSelectedProduct(null)} show={selectedProduct !== null}>
         <Modal.Header closeButton>
           <Modal.Title>{selectedProduct?.nome}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <img
-            src={selectedProduct?.imagem}
-            alt={selectedProduct?.nome}
-            style={{ width: "100%" }}
-          />
-          <p className="mt-3 mb-3">{selectedProduct?.descricao}</p>
+          <img alt="" className="product-modal__image" src={selectedProduct?.imagem} />
+          <p className="mt-3">{selectedProduct?.descricao}</p>
+          {selectedProduct && (
+            <DefaultButton onClick={() => addProduct(selectedProduct)} type="button">
+              Adicionar ao carrinho
+            </DefaultButton>
+          )}
         </Modal.Body>
       </Modal>
 
-      <div className={`cart-overlay ${isCartOpen ? "open" : ""}`}>
-        <DefaultButton
-          onClick={() => setIsCartOpen(false)}
-          customizarCSS="closeCartButton"
-        >
-          Fechar
-        </DefaultButton>
-        {Object.entries(quantities).some(([, quantity]) => quantity > 0) ? (
+      <button aria-label="Fechar carrinho" className={`cart-backdrop ${isCartOpen ? "open" : ""}`} onClick={closeCart} type="button" />
+      <aside
+        aria-hidden={!isCartOpen}
+        aria-labelledby="cart-title"
+        aria-modal="true"
+        className={`cart-overlay ${isCartOpen ? "open" : ""}`}
+        id="cart-drawer"
+        ref={cartRef}
+        role="dialog"
+      >
+        <div className="cart-overlay__header">
+          <div>
+            <p className="cart-overlay__eyebrow">Seu pedido</p>
+            <h2 id="cart-title">Carrinho</h2>
+          </div>
+          <button aria-label="Fechar carrinho" className="cart-close" onClick={closeCart} ref={closeCartButtonRef} type="button">×</button>
+        </div>
+        {cartItems.length > 0 ? (
           <>
-            {Object.entries(quantities)
-              .filter(([, quantity]) => quantity > 0)
-              .map(([id, quantity]) => {
-                const product = products.find((item) => item.id === id);
-                if (!product) return null;
-
-                const valorTotalProduto = product.valor * quantity;
-
-                return (
-                  <Row key={id} className="mb-3 cart-container">
-                    <Col>
-                      <img
-                        src={product.imagem}
-                        alt={product.nome}
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                    </Col>
-                    <Col>
-                      <p>{product.nome}</p>
-                      <p>Quantidade: {quantity}</p>
-                      <Col className="pb-3">
-                        <DefaultButton
-                          id="addButton"
-                          onClick={() => addProduct(product.id)}
-                        >
-                          <FcPlus />
-                        </DefaultButton>
-                        <DefaultButton
-                          id="removeButton"
-                          onClick={() => removeProduct(product.id)}
-                        >
-                          <FcMinus />
-                        </DefaultButton>
-                      </Col>
-                      <p>
-                        Valor Unitário:{" "}
-                        {product.valor.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </p>
-                      <p>
-                        Valor total:{" "}
-                        {valorTotalProduto.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </p>
-                    </Col>
-                  </Row>
-                );
-              })}
-            <p>
-              Total a pagar:{" "}
-              {Object.entries(quantities)
-                .reduce((total, [id, quantity]) => {
-                  const product = products.find((item) => item.id === id);
-                  return total + (product ? product.valor * quantity : 0);
-                }, 0)
-                .toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-            </p>
-            <DefaultButton onClick={emptyCart} customizarCSS="esvaziarCarrinho">
-              Esvaziar Carrinho
-            </DefaultButton>
-            <Link to="/pedidos" className="continueButton">
-              Continuar
-            </Link>
+            <p className="cart-summary" aria-live="polite">{totalItems} {totalItems === 1 ? "item" : "itens"} · {formatCurrency(total)}</p>
+            <div className="cart-items">
+              {cartItems.map(({ product, quantity }) => (
+                <article className="cart-item" key={product.id}>
+                  <img alt="" src={product.imagem} />
+                  <div className="cart-item__content">
+                    <h3>{product.nome}</h3>
+                    <p>{formatCurrency(product.valor)}</p>
+                    <div aria-label={`Quantidade de ${product.nome} no carrinho`} className="quantity-control" role="group">
+                      <button aria-label={`Remover uma unidade de ${product.nome}`} onClick={() => removeProduct(product)} type="button"><FiMinus aria-hidden="true" /></button>
+                      <output>{quantity}</output>
+                      <button aria-label={`Adicionar uma unidade de ${product.nome}`} onClick={() => addProduct(product)} type="button"><FiPlus aria-hidden="true" /></button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="cart-overlay__footer">
+              <p>Total: <strong>{formatCurrency(total)}</strong></p>
+              <Link className="continueButton" onClick={() => setIsCartOpen(false)} to="/pedidos">Ir para finalizar pedido</Link>
+              <button className="empty-cart" onClick={() => { setQuantities({}); setAnnouncement("Carrinho esvaziado."); }} type="button">Esvaziar carrinho</button>
+            </div>
           </>
         ) : (
-          <p style={{ textAlign: "center" }}>Nenhum produto adicionado à lista</p>
+          <div className="cart-empty">
+            <p>Seu carrinho está vazio.</p>
+            <DefaultButton customizarCSS="cart-empty__action" onClick={closeCart} type="button">
+              Ver produtos
+            </DefaultButton>
+          </div>
         )}
-      </div>
-    </Container>
+      </aside>
+    </section>
   );
 };
-

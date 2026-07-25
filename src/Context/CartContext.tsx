@@ -18,6 +18,8 @@ export interface CartContextData {
   total: number;
   isCartOpen: boolean;
   setIsCartOpen: Dispatch<SetStateAction<boolean>>;
+  cartTriggerId: string | null;
+  setCartTriggerId: Dispatch<SetStateAction<string | null>>;
   lastOrder: UltimoPedido | null;
   setLastOrder: Dispatch<SetStateAction<UltimoPedido | null>>;
   dadosAcessoConfirmacao: DadosAcessoConfirmacao | null;
@@ -57,6 +59,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [total, setTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartTriggerId, setCartTriggerId] = useState<string | null>(null);
   const [lastOrder, setLastOrder] = useState<UltimoPedido | null>(null);
   const [dadosAcessoConfirmacao, setDadosAcessoConfirmacao] =
     useState<DadosAcessoConfirmacao | null>(recuperarDadosAcesso);
@@ -92,6 +95,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         total,
         isCartOpen,
         setIsCartOpen,
+        cartTriggerId,
+        setCartTriggerId,
         lastOrder,
         setLastOrder,
         dadosAcessoConfirmacao,

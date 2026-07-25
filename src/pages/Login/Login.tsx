@@ -1,8 +1,8 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import { authService } from "../../services/authService";
+import { DefaultButton } from "../../Utils/Buttons/Buttons";
 import "./style.scss";
 
 interface LoginState {
@@ -11,25 +11,20 @@ interface LoginState {
 }
 
 const Login: React.FC = () => {
-  const [loginState, setLoginState] = useState<LoginState>({
-    email: "",
-    password: "",
-  });
+  const [loginState, setLoginState] = useState<LoginState>({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSignIn = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
+  const handleSignIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
 
     try {
-      setLoading(true);
-      setError(null);
-
-      const { error: loginError } = await authService.login(
-        loginState.email,
-        loginState.password,
-      );
+      const { error: loginError } = await authService.login(loginState.email, loginState.password);
 
       if (loginError) {
         setError(loginError.message);
@@ -42,67 +37,59 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setLoginState((prevState) => ({ ...prevState, [name]: value }));
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setLoginState((previous) => ({ ...previous, [name]: value }));
   };
 
-  const handleForgotPassword = async (): Promise<void> => {
+  const handleForgotPassword = async () => {
+    setError(null);
+    setMessage(null);
+
     if (!loginState.email) {
-      setError("Por favor, insira seu e-mail para redefinição de senha.");
+      setError("Informe seu e-mail para redefinir a senha.");
       return;
     }
 
-    const { error: resetError } = await authService.recuperarSenha(
-      loginState.email,
-    );
+    const { error: resetError } = await authService.recuperarSenha(loginState.email);
 
-    setError(
-      resetError
-        ? resetError.message
-        : "Link de redefinição de senha enviado. Verifique seu e-mail.",
-    );
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+
+    setMessage("Enviamos um link de redefinição para o seu e-mail.");
   };
 
   return (
-    <Container>
-      <Form onSubmit={handleSignIn}>
-        <Form.Group controlId="loginEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={loginState.email}
-            onChange={handleInputChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="loginPassword">
-          <Form.Label>Senha</Form.Label>
-          <Form.Control
-            type="password"
-            name="password"
-            value={loginState.password}
-            onChange={handleInputChange}
-          />
-        </Form.Group>
-        <DefaultButton customizarCSS="loginButton" type="submit" disabled={loading}>
-          {loading ? "Entrando..." : "Login"}
-        </DefaultButton>
-        <DefaultButton
-          customizarCSS="esqueceuSenhaButton"
-          onClick={handleForgotPassword}
-        >
-          Esqueceu a senha?
-        </DefaultButton>
-      </Form>
-      {error && (
-        <Alert variant="danger" style={{ marginTop: "1rem" }}>
-          {error}
-        </Alert>
-      )}
-    </Container>
+    <main className="login-page">
+      <Container className="login-page__container">
+        <section aria-labelledby="login-title" className="login-card">
+          <p className="login-card__eyebrow">Área administrativa</p>
+          <h1 id="login-title">Boas-vindas de volta</h1>
+          <p className="login-card__description">Acesse para cuidar do cardápio e acompanhar os pedidos.</p>
+          <Form onSubmit={handleSignIn}>
+            <Form.Group controlId="loginEmail">
+              <Form.Label>E-mail</Form.Label>
+              <Form.Control autoComplete="email" name="email" onChange={handleInputChange} required type="email" value={loginState.email} />
+            </Form.Group>
+            <Form.Group controlId="loginPassword">
+              <Form.Label>Senha</Form.Label>
+              <Form.Control autoComplete="current-password" name="password" onChange={handleInputChange} required type="password" value={loginState.password} />
+            </Form.Group>
+            <DefaultButton customizarCSS="loginButton" disabled={loading} type="submit">
+              {loading ? "Entrando..." : "Entrar"}
+            </DefaultButton>
+            <button className="forgot-password" onClick={() => void handleForgotPassword()} type="button">
+              Esqueceu a senha?
+            </button>
+          </Form>
+          {error && <Alert className="login-feedback" role="alert" variant="danger">{error}</Alert>}
+          {message && <Alert className="login-feedback" role="status" variant="success">{message}</Alert>}
+        </section>
+      </Container>
+    </main>
   );
 };
 
 export default Login;
-
