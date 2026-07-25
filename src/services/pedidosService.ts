@@ -1,9 +1,8 @@
 import { supabase } from "../Utils/supabase";
 import {
-  AtualizarPedidoDTO,
+  AtualizarStatusPedidoAdminDTO,
   ConfirmacaoCriada,
   CriarPedidoConfirmadoDTO,
-  CriarPedidoDTO,
   Pedido,
   PedidosCount,
   UltimoPedido,
@@ -46,6 +45,7 @@ export const pedidosService = {
       p_nome_cliente: pedido.nome_cliente,
       p_telefone: pedido.telefone,
       p_itens: pedido.itens,
+      p_chave_idempotencia: pedido.chave_idempotencia,
     });
 
     if (error) throw error;
@@ -119,33 +119,18 @@ export const pedidosService = {
     return anexarProdutos((data ?? []) as Pedido[]);
   },
 
-  async criarPedidos(pedidos: CriarPedidoDTO[]): Promise<Pedido[]> {
-    const { data, error } = await supabase
-      .from("pedidos")
-      .insert(pedidos)
-      .select("*");
+  async atualizarStatusPedidoAdmin({
+    pedido_id,
+    status_atual,
+    novo_status,
+  }: AtualizarStatusPedidoAdminDTO): Promise<void> {
+    const { error } = await supabase.rpc("atualizar_status_pedido_admin", {
+      p_pedido_id: pedido_id,
+      p_status_esperado: status_atual,
+      p_novo_status: novo_status,
+    });
 
     if (error) throw error;
-
-    return anexarProdutos((data ?? []) as Pedido[]);
-  },
-
-  async atualizarPedidoPorId(
-    id: string,
-    data: AtualizarPedidoDTO,
-  ): Promise<Pedido> {
-    const { data: pedidoAtualizado, error } = await supabase
-      .from("pedidos")
-      .update(data)
-      .eq("id", id)
-      .select("*")
-      .single();
-
-    if (error) throw error;
-
-    const [pedidoComProduto] = await anexarProdutos([pedidoAtualizado as Pedido]);
-
-    return pedidoComProduto;
   },
 
   calcularResumo(pedidos: Pedido[]): PedidosCount {

@@ -21,6 +21,20 @@ interface CartItem extends Produto {
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+const CHAVE_IDEMPOTENCIA_STORAGE_KEY = "cafeteria:pedido:chave-idempotencia";
+
+const criarChaveIdempotencia = () => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (caractere) => {
+    const aleatorio = Math.floor(Math.random() * 16);
+    const valor = caractere === "x" ? aleatorio : (aleatorio & 0x3) | 0x8;
+    return valor.toString(16);
+  });
+};
+
 const Pedidos: React.FC = () => {
   const {
     quantities,
@@ -35,6 +49,7 @@ const Pedidos: React.FC = () => {
   const [enviando, setEnviando] = useState(false);
   const [tentouEnviar, setTentouEnviar] = useState(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const cartSignatureRef = useRef<string | null>(null);
   const navigate = useNavigate();
 
   const cartItems: CartItem[] = Object.entries(quantities)
@@ -53,21 +68,44 @@ const Pedidos: React.FC = () => {
     (total, item) => total + item.valor * item.quantity,
     0,
   );
+  const cartSignature = cartItems
+    .map((item) => `${item.id}:${item.quantity}`)
+    .sort()
+    .join("|");
 
   useEffect(() => {
     if (erro) feedbackRef.current?.focus();
   }, [erro]);
 
+  useEffect(() => {
+    if (
+      cartSignatureRef.current !== null &&
+      cartSignatureRef.current !== cartSignature
+    ) {
+      sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+    }
+
+    cartSignatureRef.current = cartSignature;
+  }, [cartSignature]);
+
+  const reiniciarTentativa = () => {
+    sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+  };
+
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const digits = event.target.value.replace(/\D/g, "").slice(0, 11);
 
     if (digits.length <= 2) {
+      reiniciarTentativa();
       setPhone(digits);
     } else if (digits.length <= 6) {
+      reiniciarTentativa();
       setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
     } else if (digits.length <= 10) {
+      reiniciarTentativa();
       setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
     } else {
+      reiniciarTentativa();
       setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`);
     }
   };
@@ -81,6 +119,15 @@ const Pedidos: React.FC = () => {
       valor: item.valor,
       quantidade: item.quantity,
     }));
+
+  const obterChaveIdempotencia = () => {
+    const chaveExistente = sessionStorage.getItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
+    if (chaveExistente) return chaveExistente;
+
+    const novaChave = criarChaveIdempotencia();
+    sessionStorage.setItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY, novaChave);
+    return novaChave;
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -103,6 +150,7 @@ const Pedidos: React.FC = () => {
       const confirmacao = await pedidosService.criarPedidoConfirmado({
         nome_cliente: name.trim(),
         telefone: phone,
+        chave_idempotencia: obterChaveIdempotencia(),
         itens: cartItems.map((item) => ({
           produto_id: item.id,
           quantidade: item.quantity,
@@ -122,6 +170,7 @@ const Pedidos: React.FC = () => {
         codigoRetirada: confirmacao.codigo_retirada,
       });
       setQuantities({});
+      sessionStorage.removeItem(CHAVE_IDEMPOTENCIA_STORAGE_KEY);
       navigate(`/efetuacao/${confirmacao.confirmacao_id}`);
     } catch (error) {
       console.error("Erro ao enviar o pedido:", error);
@@ -163,7 +212,10 @@ const Pedidos: React.FC = () => {
                     aria-describedby={nomeInvalido ? "erro-nome" : undefined}
                     autoComplete="name"
                     isInvalid={nomeInvalido}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => setName(event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      reiniciarTentativa();
+                      setName(event.target.value);
+                    }}
                     required
                     type="text"
                     value={name}

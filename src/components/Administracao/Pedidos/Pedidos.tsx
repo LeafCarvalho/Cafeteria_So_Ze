@@ -13,6 +13,14 @@ const statusLabels: Record<PedidoStatus, string> = {
   cancelado: "Cancelado",
 };
 
+const proximosStatusPermitidos: Record<PedidoStatus, PedidoStatus[]> = {
+  criado: ["em_preparo", "cancelado"],
+  em_preparo: ["pronto", "cancelado"],
+  pronto: ["finalizado"],
+  finalizado: [],
+  cancelado: [],
+};
+
 const formatarData = (data: string) =>
   new Intl.DateTimeFormat("pt-BR", {
     year: "numeric",
@@ -26,7 +34,7 @@ const formatarMoeda = (valor: number) =>
   valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const Pedidos = () => {
-  const { pedidos, loading, erro, atualizarPedido, carregarPedidos } = usePedidos();
+  const { pedidos, loading, erro, atualizarStatusPedido, carregarPedidos } = usePedidos();
   const [pedidoEmAtualizacao, setPedidoEmAtualizacao] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
@@ -35,19 +43,26 @@ const Pedidos = () => {
 
     setPedidoEmAtualizacao(pedido.id);
     setFeedback(null);
-    const atualizou = await atualizarPedido(pedido.id, { status });
+    const resultado = await atualizarStatusPedido({
+      pedido_id: pedido.id,
+      status_atual: pedido.status,
+      novo_status: status,
+    });
 
-    setFeedback(
-      atualizou
-        ? `Status do pedido de ${pedido.nome_cliente} atualizado para ${statusLabels[status]}.`
-        : `Não foi possível atualizar o status do pedido de ${pedido.nome_cliente}. O status anterior foi mantido.`,
-    );
+    const mensagens = {
+      atualizado: `Status do pedido de ${pedido.nome_cliente} atualizado para ${statusLabels[status]}.`,
+      conflito: "Este pedido foi alterado por outra pessoa. A lista foi atualizada; revise o status antes de tentar novamente.",
+      erro: `Não foi possível atualizar o status do pedido de ${pedido.nome_cliente}. A lista foi atualizada.`,
+    };
+    setFeedback(mensagens[resultado]);
+
     setPedidoEmAtualizacao(null);
   };
 
   const renderPedidoItem = (pedido: Pedido) => {
     const selectId = `status-pedido-${pedido.id}`;
     const atualizando = pedidoEmAtualizacao === pedido.id;
+    const transicoes = proximosStatusPermitidos[pedido.status];
 
     return (
       <tr key={pedido.id}>
@@ -63,16 +78,17 @@ const Pedidos = () => {
           </label>
           <select
             aria-describedby={atualizando ? "atualizacao-status" : undefined}
-            disabled={atualizando}
+            disabled={atualizando || transicoes.length === 0}
             id={selectId}
             value={pedido.status}
             onChange={(event) =>
               void atualizarStatus(pedido, event.target.value as PedidoStatus)
             }
           >
-            {Object.entries(statusLabels).map(([status, label]) => (
+            <option value={pedido.status}>{statusLabels[pedido.status]}</option>
+            {transicoes.map((status) => (
               <option key={status} value={status}>
-                {label}
+                {statusLabels[status]}
               </option>
             ))}
           </select>

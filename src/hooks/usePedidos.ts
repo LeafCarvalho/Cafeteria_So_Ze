@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { pedidosService } from "../services/pedidosService";
-import { AtualizarPedidoDTO, Pedido } from "../types/pedidos";
+import {
+  AtualizarStatusPedidoAdminDTO,
+  Pedido,
+  ResultadoAtualizacaoStatusPedido,
+} from "../types/pedidos";
 
 export function usePedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -27,26 +31,29 @@ export function usePedidos() {
     carregarPedidos();
   }, []);
 
-  const atualizarPedido = async (
-    id: string,
-    data: AtualizarPedidoDTO,
-  ): Promise<boolean> => {
+  const atualizarStatusPedido = async (
+    data: AtualizarStatusPedidoAdminDTO,
+  ): Promise<ResultadoAtualizacaoStatusPedido> => {
     try {
       setErro(null);
 
-      const pedidoAtualizado = await pedidosService.atualizarPedidoPorId(id, data);
-
-      setPedidos((pedidosAtuais) =>
-        pedidosAtuais.map((pedido) =>
-          pedido.id === id ? pedidoAtualizado : pedido,
-        ),
-      );
-
-      return true;
+      await pedidosService.atualizarStatusPedidoAdmin(data);
+      await carregarPedidos();
+      return "atualizado";
     } catch (error) {
       console.error(error);
-      setErro("Erro ao atualizar pedido");
-      return false;
+      // A RPC rejeita tanto uma transição inválida quanto um status desatualizado.
+      // Recarregar evita uma nova ação sobre dados possivelmente defasados.
+      await carregarPedidos();
+
+      const mensagem = error instanceof Error ? error.message.toLowerCase() : "";
+      const codigo = typeof error === "object" && error !== null && "code" in error
+        ? String(error.code)
+        : "";
+      const conflito = codigo === "40001" || codigo === "P0002" || /conflito|status (atual|desatualizado)|transição/.test(mensagem);
+
+      if (!conflito) setErro("Erro ao atualizar pedido");
+      return conflito ? "conflito" : "erro";
     }
   };
 
@@ -55,7 +62,6 @@ export function usePedidos() {
     loading,
     erro,
     carregarPedidos,
-    atualizarPedido,
+    atualizarStatusPedido,
   };
 }
-
