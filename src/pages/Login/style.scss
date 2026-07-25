@@ -1,6 +1,79 @@
-.loginButton, .esqueceuSenhaButton {
-    margin-top: 1rem;
+.login-page {
+  display: grid;
+  min-height: calc(100vh - 7rem);
+  place-items: center;
+  padding: var(--space-7) var(--space-4);
+  background:
+    radial-gradient(circle at 18% 16%, rgb(122 219 209 / 12%), transparent 30rem),
+    radial-gradient(circle at 84% 82%, rgb(232 179 106 / 10%), transparent 26rem),
+    var(--color-surface);
 }
+
+.login-page__container {
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  width: min(100%, 30rem);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-md) * 2);
+  background: linear-gradient(145deg, rgb(34 42 39 / 92%), var(--color-surface-raised));
+  box-shadow: var(--shadow-md);
+
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .form-group {
+    margin-top: var(--space-4);
+  }
+
+  .form-control {
+    min-height: 3rem;
+    border-color: var(--color-border);
+    background: rgb(17 23 22 / 72%);
+    color: var(--color-text);
+
+    &:focus {
+      border-color: var(--color-primary);
+      background: rgb(17 23 22 / 92%);
+      box-shadow: var(--focus-ring);
+    }
+  }
+}
+
+.login-card__eyebrow {
+  margin-bottom: var(--space-2);
+  color: var(--color-primary);
+  font-size: var(--font-size-2);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-card__description {
+  color: var(--color-text-muted);
+}
+
 .loginButton {
-    margin-right: .5rem;
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
+.forgot-password {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.login-feedback {
+  margin-top: var(--space-4);
 }

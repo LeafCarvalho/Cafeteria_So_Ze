@@ -1,17 +1,18 @@
-import React, { FunctionComponent, MouseEvent, useEffect, useState } from "react";
-import { Col, Container, Nav, Navbar, Row } from "react-bootstrap";
+import React, { FunctionComponent, useEffect, useState } from "react";
+import { Container, Nav, Navbar } from "react-bootstrap";
+import { FiShoppingBag } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
 import { Link as ScrollLink, scroller } from "react-scroll";
-import "./style.scss";
 import { useCart } from "../../Context/CartContext";
-import logo from "../../assets/logoCafeteria.png";
+import logo from "../../assets/logoCafeteria-v2.png";
+import "./style.scss";
 
 interface HeaderProps {
   to: string;
   scroll: boolean;
   children: React.ReactNode;
   className?: string;
-  onClick?: (event?: React.MouseEvent<any> | undefined) => void;
+  onClick?: (event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
@@ -19,143 +20,121 @@ const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
   scroll,
   children,
   className,
-  ...rest
+  onClick,
 }) => {
   const { pathname } = useLocation();
-  const [clicked, setClicked] = useState(false);
 
-  const handleClick = (event?: React.MouseEvent<any>) => {
-    setClicked(true);
-    if (rest.onClick) {
-      rest.onClick(event);
-    }
+  const handleScroll = (event?: React.MouseEvent<HTMLElement>) => {
+    onClick?.(event);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    scroller.scrollTo(to, {
+      duration: reducedMotion ? 0 : 300,
+      smooth: reducedMotion ? false : "easeInOutQuart",
+      offset: -88,
+    });
   };
 
-  useEffect(() => {
-    if (pathname === "/" && scroll && clicked) {
-      scroller.scrollTo(to, {
-        duration: 800,
-        delay: 0,
-        smooth: "easeInOutQuart",
-      });
-    }
-  }, [pathname, to, scroll, clicked]);
-
-  return pathname === "/" ? (
+  return pathname === "/" && scroll ? (
     <ScrollLink
-      onClick={handleClick}
-      to={to}
       className={className}
-      {...rest}
-      smooth={true}
-      duration={100}
+      duration={0}
+      onClick={handleScroll}
+      smooth={false}
+      to={to}
     >
       {children}
     </ScrollLink>
   ) : (
-    <Link onClick={handleClick} to="/" className={className} {...rest}>
+    <Link className={className} onClick={onClick} state={{ scrollTo: to }} to="/">
       {children}
     </Link>
   );
 };
 
 export function Header() {
-  const { total, quantities, isCartOpen, setIsCartOpen } = useCart();
+  const {
+    total,
+    quantities,
+    isCartOpen,
+    setIsCartOpen,
+    setCartTriggerId,
+  } = useCart();
   const [sticky, setSticky] = useState(false);
   const { pathname } = useLocation();
-  const numItems = Object.keys(quantities).filter(
-    (id) => quantities[id] > 0
-  ).length;
   const [expanded, setExpanded] = useState(false);
+  const numItems = Object.values(quantities).filter((quantity) => quantity > 0).length;
 
-  const handleCartClick = () => {
+  const handleCartClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setCartTriggerId(event.currentTarget.id);
     setIsCartOpen(!isCartOpen);
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setSticky(window.scrollY > 0);
-    };
+    const handleScroll = () => setSticky(window.scrollY > 0);
 
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const closeNavbar = () => setExpanded(false);
+  const totalFormatado = total.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
-  const closeNavbar = () => {
-    setExpanded(false);
-  };
+  const CartTrigger = ({ id, className }: { id: string; className: string }) => (
+    <button
+      aria-controls="cart-drawer"
+      aria-expanded={isCartOpen}
+      aria-label={`Abrir carrinho: ${numItems} ${numItems === 1 ? "item" : "itens"}, total ${totalFormatado}`}
+      className={className}
+      id={id}
+      onClick={handleCartClick}
+      type="button"
+    >
+      <FiShoppingBag aria-hidden="true" />
+      <span className="cart-trigger__details">
+        <span>{numItems} {numItems === 1 ? "item" : "itens"}</span>
+        <strong>{totalFormatado}</strong>
+      </span>
+    </button>
+  );
 
   return (
     <Navbar
       collapseOnSelect
       expand="lg"
-      bg="light"
-      className={`w-100 position-sticky ${sticky ? 'navbar-sticky' : ''}`}
+      className={`w-100 position-sticky ${sticky ? "navbar-sticky" : ""}`}
       expanded={expanded}
-      onToggle={() => setExpanded(!expanded)}
+      onToggle={setExpanded}
     >
       <Container>
         {pathname !== "/login" && (
-          <Nav.Link
-            className="d-lg-none cart-icon-mobile"
-            onClick={handleCartClick}
-          >
-            🛒
-            <span>
-              {" "}
-              {total.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </span>
-          </Nav.Link>
+          <CartTrigger className="cart-trigger cart-trigger--mobile d-lg-none" id="cart-trigger-mobile" />
         )}
 
         <Navbar.Brand as={Link} to="/">
-          <img src={logo} alt="Logo" className="logoCafeteria" />
+          <img alt="Cafeteria Só Zé" className="logoCafeteria" src={logo} />
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={ScrollOrRouteLink} to="home" scroll={true} onClick={closeNavbar}>
+            <Nav.Link as={ScrollOrRouteLink} onClick={closeNavbar} scroll to="home">
               Início
             </Nav.Link>
-            <Nav.Link as={ScrollOrRouteLink} to="produtos" scroll={true} onClick={closeNavbar}>
+            <Nav.Link as={ScrollOrRouteLink} onClick={closeNavbar} scroll to="produtos">
               Produtos
             </Nav.Link>
           </Nav>
-          <Nav>
+          <Nav className="align-items-lg-center">
             <Nav.Link as={Link} to="/login">
               Entrar
             </Nav.Link>
             {pathname !== "/login" && (
-              <Nav.Link className="cart-icon-desktop d-none d-lg-block" onClick={handleCartClick}>
-                <Container fluid>
-                  <Row className="align-items-center">
-                    <Col xs="auto">
-                      <span role="img" aria-label="shopping cart">
-                        🛒
-                      </span>
-                    </Col>
-                    <Col>
-                      <Row>Itens: {numItems}</Row>
-                      <Row className="cart-total">
-                        Total:{" "}
-                        {total.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </Row>
-                    </Col>
-                  </Row>
-                </Container>
-              </Nav.Link>
+              <CartTrigger className="cart-trigger cart-trigger--desktop d-none d-lg-inline-flex" id="cart-trigger-desktop" />
             )}
           </Nav>
         </Navbar.Collapse>

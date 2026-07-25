@@ -1,5 +1,11 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../Context/CartContext";
 import { pedidosService } from "../../services/pedidosService";
@@ -11,6 +17,9 @@ import "./style.scss";
 interface CartItem extends Produto {
   quantity: number;
 }
+
+const formatCurrency = (value: number) =>
+  value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const Pedidos: React.FC = () => {
   const {
@@ -24,6 +33,8 @@ const Pedidos: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [tentouEnviar, setTentouEnviar] = useState(false);
+  const feedbackRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const cartItems: CartItem[] = Object.entries(quantities)
@@ -34,32 +45,31 @@ const Pedidos: React.FC = () => {
     })
     .filter((item): item is CartItem => Boolean(item));
 
+  const phoneDigits = phone.replace(/\D/g, "");
+  const nomeInvalido = tentouEnviar && name.trim().length < 2;
+  const telefoneInvalido =
+    tentouEnviar && phoneDigits.length !== 10 && phoneDigits.length !== 11;
   const totalValue = cartItems.reduce(
     (total, item) => total + item.valor * item.quantity,
     0,
   );
 
-  const formattedTotalValue = totalValue.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  useEffect(() => {
+    if (erro) feedbackRef.current?.focus();
+  }, [erro]);
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value.replace(/\D/g, "");
-    let formattedValue = "";
+    const digits = event.target.value.replace(/\D/g, "").slice(0, 11);
 
-    if (value.length > 2) {
-      formattedValue += `(${value.substring(0, 2)}) `;
-      value = value.substring(2);
-    }
-
-    if (value.length > 5) {
-      formattedValue += `${value.substring(0, 5)}-${value.substring(5, 9)}`;
+    if (digits.length <= 2) {
+      setPhone(digits);
+    } else if (digits.length <= 6) {
+      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
+    } else if (digits.length <= 10) {
+      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
     } else {
-      formattedValue += value;
+      setPhone(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`);
     }
-
-    setPhone(formattedValue);
   };
 
   const buildResumoProdutos = (): PedidoResumoItem[] =>
@@ -72,35 +82,36 @@ const Pedidos: React.FC = () => {
       quantidade: item.quantity,
     }));
 
-  const buildItensPedido = () =>
-    cartItems.map((item) => ({
-      produto_id: item.id,
-      quantidade: item.quantity,
-    }));
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (enviando) return;
 
-    if (!phone || cartItems.length === 0) {
-      setErro("Informe um telefone válido e adicione pelo menos um produto.");
+    setTentouEnviar(true);
+    if (name.trim().length < 2 || ![10, 11].includes(phoneDigits.length)) {
+      setErro("Revise os campos destacados para continuar.");
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      setErro("Seu carrinho está vazio. Escolha ao menos um item para finalizar.");
       return;
     }
 
     try {
       setEnviando(true);
       setErro(null);
-
       const confirmacao = await pedidosService.criarPedidoConfirmado({
-        nome_cliente: name,
+        nome_cliente: name.trim(),
         telefone: phone,
-        itens: buildItensPedido(),
+        itens: cartItems.map((item) => ({
+          produto_id: item.id,
+          quantidade: item.quantity,
+        })),
       });
 
       setLastOrder({
         confirmacao_id: confirmacao.confirmacao_id,
-        nome_cliente: name,
+        nome_cliente: name.trim(),
         senha_retirar_ped: confirmacao.codigo_retirada,
         expira_em: confirmacao.expira_em,
         total: confirmacao.total,
@@ -114,73 +125,99 @@ const Pedidos: React.FC = () => {
       navigate(`/efetuacao/${confirmacao.confirmacao_id}`);
     } catch (error) {
       console.error("Erro ao enviar o pedido:", error);
-      setErro("Erro ao enviar o pedido. Tente novamente.");
+      setErro("Não foi possível enviar o pedido. Tente novamente.");
     } finally {
       setEnviando(false);
     }
   };
 
   return (
-    <Container className="pedidos-page">
-      <Row>
-        <Col>
-          <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)}>
-            Voltar
-          </DefaultButton>
-          <div className="pedido-form">
-            <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formName">
-                <Form.Label>Nome completo</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={name}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    setName(event.target.value)
-                  }
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="formPhone">
-                <Form.Label>Telefone</Form.Label>
-                <Form.Control
-                  type="tel"
-                  value={phone}
-                  onChange={handlePhoneChange}
-                  placeholder="(XX) XXXXX-XXXX"
-                  required
-                />
-              </Form.Group>
-              {erro && <p className="mt-3 text-danger">{erro}</p>}
-              <Button style={{ marginTop: "1.5rem" }} type="submit" disabled={enviando}>
-                {enviando ? "Enviando..." : "Finalizar Pedido"}
-              </Button>
-            </Form>
-          </div>
-        </Col>
-        <Col>
-          <div className="pedido-resumo">
-            <h2>Seu Pedido</h2>
-            {cartItems.map((item) => (
-              <div key={item.id} className="item">
-                <img src={item.imagem} alt={item.nome} />
-                <div className="info">
-                  <h3>{item.nome}</h3>
-                  <p>Quantidade: {item.quantity}</p>
-                  <p>
-                    Preço:{" "}
-                    {item.valor.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </p>
-                </div>
+    <main className="pedidos-page">
+      <Container>
+        <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)} type="button">
+          Voltar
+        </DefaultButton>
+        <header className="pedidos-page__header">
+          <p>Finalização segura</p>
+          <h1>Seu pedido está quase pronto</h1>
+          <span>Confirme seus dados e retire no balcão quando receber o código.</span>
+        </header>
+
+        {cartItems.length === 0 ? (
+          <section className="pedido-vazio" aria-labelledby="pedido-vazio-title">
+            <h2 id="pedido-vazio-title">Seu carrinho está vazio</h2>
+            <p>Escolha algo especial no cardápio antes de finalizar o pedido.</p>
+            <DefaultButton onClick={() => navigate("/")} type="button">
+              Ver cardápio
+            </DefaultButton>
+          </section>
+        ) : (
+          <div className="pedido-layout">
+            <section className="pedido-form" aria-labelledby="dados-pedido-title">
+              <h2 id="dados-pedido-title">Dados para retirada</h2>
+              <p>Usaremos essas informações apenas para identificar seu pedido.</p>
+              <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group controlId="formName">
+                  <Form.Label>Nome completo</Form.Label>
+                  <Form.Control
+                    aria-describedby={nomeInvalido ? "erro-nome" : undefined}
+                    autoComplete="name"
+                    isInvalid={nomeInvalido}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => setName(event.target.value)}
+                    required
+                    type="text"
+                    value={name}
+                  />
+                  {nomeInvalido && <p className="field-error" id="erro-nome">Informe seu nome completo.</p>}
+                </Form.Group>
+                <Form.Group controlId="formPhone">
+                  <Form.Label>Telefone</Form.Label>
+                  <Form.Control
+                    aria-describedby={telefoneInvalido ? "erro-telefone" : "ajuda-telefone"}
+                    autoComplete="tel"
+                    inputMode="tel"
+                    isInvalid={telefoneInvalido}
+                    maxLength={15}
+                    onChange={handlePhoneChange}
+                    placeholder="(00) 00000-0000"
+                    required
+                    type="tel"
+                    value={phone}
+                  />
+                  {telefoneInvalido ? (
+                    <p className="field-error" id="erro-telefone">Informe um telefone com DDD.</p>
+                  ) : <p className="field-hint" id="ajuda-telefone">Usaremos este número caso precisemos falar com você.</p>}
+                </Form.Group>
+                {erro && <div className="pedido-feedback" ref={feedbackRef} role="alert" tabIndex={-1}>{erro}</div>}
+                <DefaultButton aria-busy={enviando} customizarCSS="pedido-submit" disabled={enviando} type="submit">
+                  {enviando ? "Enviando pedido..." : "Finalizar pedido"}
+                </DefaultButton>
+              </Form>
+            </section>
+
+            <aside className="pedido-resumo" aria-labelledby="resumo-pedido-title">
+              <div className="pedido-resumo__heading">
+                <p>{cartItems.length} {cartItems.length === 1 ? "item" : "itens"}</p>
+                <h2 id="resumo-pedido-title">Resumo do pedido</h2>
               </div>
-            ))}
-            <div className="total">Valor Total: {formattedTotalValue}</div>
+              <div className="pedido-resumo__items">
+                {cartItems.map((item) => (
+                  <article key={item.id} className="item">
+                    <img src={item.imagem} alt="" />
+                    <div className="info">
+                      <h3>{item.nome}</h3>
+                      <p>Quantidade: {item.quantity}</p>
+                    </div>
+                    <strong>{formatCurrency(item.valor * item.quantity)}</strong>
+                  </article>
+                ))}
+              </div>
+              <div className="total"><span>Total</span><strong>{formatCurrency(totalValue)}</strong></div>
+            </aside>
           </div>
-        </Col>
-      </Row>
-    </Container>
+        )}
+      </Container>
+    </main>
   );
 };
 
