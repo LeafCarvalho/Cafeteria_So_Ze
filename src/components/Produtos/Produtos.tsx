@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Col, Container, Modal, Row } from "react-bootstrap";
-import { FiMinus, FiPlus } from "react-icons/fi";
+import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import { useCart } from "@/Context/CartContext";
@@ -16,6 +16,7 @@ export const Produtos = () => {
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState("Todos");
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [displayCount, setDisplayCount] = useState(getInitialDisplayCount);
   const [isLoading, setIsLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -123,6 +124,13 @@ export const Produtos = () => {
     setAnnouncement(`${product.nome}: ${nextQuantity} ${nextQuantity === 1 ? "unidade" : "unidades"} no carrinho.`);
   };
 
+  const addSelectedProductToCart = () => {
+    if (!selectedProduct) return;
+
+    addProduct(selectedProduct);
+    setSelectedProduct(null);
+  };
+
   const removeProduct = (product: Produto) => {
     const nextQuantity = Math.max(0, (itemQuantities[product.id] || 0) - 1);
     setItemQuantities((prevQuantities) => ({ ...prevQuantities, [product.id]: nextQuantity }));
@@ -136,6 +144,7 @@ export const Produtos = () => {
   const clearFilters = () => {
     setSearch("");
     setSelectedType("Todos");
+    setIsCategoryMenuOpen(false);
     setDisplayCount(getInitialDisplayCount());
   };
 
@@ -174,17 +183,43 @@ export const Produtos = () => {
               value={search}
             />
           </div>
-          <div className="field-group">
-            <label htmlFor="filtro-categoria">Categoria</label>
-            <select
+          <div className="field-group field-group--category">
+            <span id="filtro-categoria-label">Categoria</span>
+            <button
+              aria-controls="filtro-categoria-menu"
+              aria-expanded={isCategoryMenuOpen}
+              aria-haspopup="menu"
+              aria-labelledby="filtro-categoria-label filtro-categoria"
+              className="category-select__trigger"
               id="filtro-categoria"
-              onChange={(event) => handleFilterChange(() => setSelectedType(event.target.value))}
-              value={selectedType}
+              onClick={() => setIsCategoryMenuOpen((isOpen) => !isOpen)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setIsCategoryMenuOpen(false);
+              }}
+              type="button"
             >
+              <span>{selectedType}</span>
+              <FiChevronDown aria-hidden="true" />
+            </button>
+            {isCategoryMenuOpen && (
+              <ul aria-labelledby="filtro-categoria-label" className="category-select__menu" id="filtro-categoria-menu" role="menu">
               {types.map((type) => (
-                <option key={type} value={type}>{type}</option>
+                <li key={type}>
+                  <button
+                    aria-checked={selectedType === type}
+                    onClick={() => {
+                      handleFilterChange(() => setSelectedType(type));
+                      setIsCategoryMenuOpen(false);
+                    }}
+                    role="menuitemradio"
+                    type="button"
+                  >
+                    {type}
+                  </button>
+                </li>
               ))}
-            </select>
+              </ul>
+            )}
           </div>
           {(search || selectedType !== "Todos") && (
             <button className="clear-filters" onClick={clearFilters} type="button">
@@ -283,7 +318,7 @@ export const Produtos = () => {
           <img alt="" className="product-modal__image" src={selectedProduct?.imagem} />
           <p className="mt-3">{selectedProduct?.descricao}</p>
           {selectedProduct && (
-            <DefaultButton onClick={() => addProduct(selectedProduct)} type="button">
+            <DefaultButton onClick={addSelectedProductToCart} type="button">
               Adicionar ao carrinho
             </DefaultButton>
           )}
