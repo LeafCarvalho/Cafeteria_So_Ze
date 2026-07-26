@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useRef, useState } from "react";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { FiShoppingBag } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
@@ -63,11 +63,13 @@ export function Header() {
   const [sticky, setSticky] = useState(false);
   const { pathname } = useLocation();
   const [expanded, setExpanded] = useState(false);
+  const navbarRef = useRef<HTMLElement>(null);
   const cartItemCount = Object.values(itemQuantities).filter((quantity) => quantity > 0).length;
 
   const handleCartClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setCartTriggerId(event.currentTarget.id);
     setIsCartOpen(!isCartOpen);
+    setExpanded(false);
   };
 
   useEffect(() => {
@@ -76,6 +78,32 @@ export function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!expanded) return;
+
+    const closeOnOutsideInteraction = (event: PointerEvent) => {
+      if (!navbarRef.current?.contains(event.target as Node)) {
+        setExpanded(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpanded(false);
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideInteraction);
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideInteraction);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [expanded]);
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [pathname]);
 
   const closeNavbar = () => setExpanded(false);
   const totalFormatado = total.toLocaleString("pt-BR", {
@@ -108,6 +136,7 @@ export function Header() {
       className={`w-100 position-sticky ${sticky ? "navbar-sticky" : ""}`}
       expanded={expanded}
       onToggle={setExpanded}
+      ref={navbarRef}
     >
       <Container>
         <button
@@ -121,7 +150,7 @@ export function Header() {
           <span aria-hidden="true" className="navbar-toggler__icon" />
         </button>
 
-        <Navbar.Brand as={Link} to="/">
+        <Navbar.Brand as={Link} onClick={closeNavbar} to="/">
           <img alt="Cafeteria Sô Zé" className="logoCafeteria" src={logo} />
         </Navbar.Brand>
 
@@ -139,9 +168,6 @@ export function Header() {
             </Nav.Link>
           </Nav>
           <Nav className="align-items-lg-center">
-            <Nav.Link as={Link} to="/login">
-              Entrar
-            </Nav.Link>
             {pathname !== "/login" && (
               <CartTrigger className="cart-trigger cart-trigger--desktop d-none d-lg-inline-flex" id="cart-trigger-desktop" />
             )}
