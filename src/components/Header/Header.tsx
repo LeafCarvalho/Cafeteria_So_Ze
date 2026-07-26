@@ -64,11 +64,12 @@ export function Header() {
   const { pathname } = useLocation();
   const [expanded, setExpanded] = useState(false);
   const navbarRef = useRef<HTMLElement>(null);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
   const cartItemCount = Object.values(itemQuantities).filter((quantity) => quantity > 0).length;
 
   const handleCartClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setCartTriggerId(event.currentTarget.id);
-    setIsCartOpen(!isCartOpen);
+    setIsCartOpen((isOpen) => !isOpen);
     setExpanded(false);
   };
 
@@ -89,7 +90,10 @@ export function Header() {
     };
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setExpanded(false);
+      if (event.key !== "Escape") return;
+
+      setExpanded(false);
+      window.setTimeout(() => menuToggleRef.current?.focus(), 0);
     };
 
     document.addEventListener("pointerdown", closeOnOutsideInteraction);
@@ -144,7 +148,8 @@ export function Header() {
           aria-expanded={expanded}
           aria-label={expanded ? "Fechar menu principal" : "Abrir menu principal"}
           className="navbar-toggler navbar-toggler--mobile"
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => setExpanded((isExpanded) => !isExpanded)}
+          ref={menuToggleRef}
           type="button"
         >
           <span aria-hidden="true" className="navbar-toggler__icon" />
