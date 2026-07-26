@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Container, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "@/Context/CartContext";
@@ -31,7 +31,7 @@ const Efetuacao = () => {
     if (errorMessage) feedbackRef.current?.focus();
   }, [errorMessage]);
 
-  const recoverOrder = async (pickupCodeToValidate: string) => {
+  const recoverOrder = useCallback(async (pickupCodeToValidate: string) => {
     if (!confirmacaoId) return;
 
     setIsLoading(true);
@@ -52,13 +52,13 @@ const Efetuacao = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [confirmacaoId, setConfirmationAccessData, setLastOrderConfirmation]);
 
   useEffect(() => {
     if (confirmacaoId && confirmationAccessData?.confirmacaoId === confirmacaoId && !orderConfirmation) {
       void recoverOrder(confirmationAccessData.codigoRetirada);
     }
-  }, [confirmacaoId, confirmationAccessData, orderConfirmation]);
+  }, [confirmacaoId, confirmationAccessData, orderConfirmation, recoverOrder]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
