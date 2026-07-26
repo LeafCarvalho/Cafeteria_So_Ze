@@ -52,6 +52,16 @@ O projeto Cafeteria Sô Zé é uma loja online para uma cafeteria gourmet. Foi d
       <br>
       <strong>XLSX</strong>
     </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/vitest-dev/vitest/main/docs/public/logo.svg" alt="vitest" width="40" height="40"/>
+      <br>
+      <strong>Vitest</strong>
+    </td>
+    <td align="center">
+      <img src="https://testing-library.com/img/octopus-128x128.png" alt="react-testing-library" width="40" height="40"/>
+      <br>
+      <strong>React Testing Library</strong>
+    </td>
   </tr>
 </table>
 
@@ -101,10 +111,23 @@ Pedidos públicos usam RPCs; preços, códigos de retirada e total são definido
 
 > A última migration altera a RPC de criação de pedidos. Aplique-a junto à publicação do frontend correspondente.
 
+## Testes unitários
+
+Os testes usam **Vitest** como executor e **React Testing Library** para validar a interface pelo comportamento acessível. A primeira suíte cobre o carrinho e os contratos críticos das RPCs de pedido, sem acessar o Supabase real.
+
+```bash
+# Executa a suíte uma vez
+npm run test
+
+# Reexecuta os testes ao salvar arquivos
+npm run test:watch
+```
+
 ## Comandos úteis
 
 ```bash
 npm run tsc
+npm run test
 npm run build
 npm run preview
 npm run deploy

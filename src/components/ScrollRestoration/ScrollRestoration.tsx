@@ -21,8 +21,9 @@ export function ScrollRestoration() {
   }, []);
 
   useLayoutEffect(() => {
+    const positions = positionsRef.current;
     const requestedSection = (location.state as { scrollTo?: string } | null)?.scrollTo;
-    const savedPosition = positionsRef.current.get(location.key);
+    const savedPosition = positions.get(location.key);
 
     if (requestedSection !== "produtos") {
       const targetPosition = navigationType === "POP" && savedPosition
@@ -36,7 +37,7 @@ export function ScrollRestoration() {
     }
 
     return () => {
-      positionsRef.current.set(location.key, {
+      positions.set(location.key, {
         x: window.scrollX,
         y: window.scrollY,
       });

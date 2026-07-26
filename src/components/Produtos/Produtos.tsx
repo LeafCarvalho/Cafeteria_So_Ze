@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Col, Container, Modal, Row } from "react-bootstrap";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { Link } from "react-router-dom";
