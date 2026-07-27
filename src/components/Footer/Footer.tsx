@@ -1,4 +1,5 @@
 import { Container, Row } from "react-bootstrap";
+import { FaWhatsapp } from "react-icons/fa";
 import { FiClipboard } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "./style.scss";
@@ -38,7 +39,7 @@ export const Footer = () => {
           </button>
           <p>
             <a aria-label="Falar pelo WhatsApp (abre em nova aba)" href={urlWpp} rel="noopener noreferrer" target="_blank">
-              (31) 99999-9999 <span aria-hidden="true">↗</span>
+              (31) 99999-9999 <FaWhatsapp aria-hidden="true" className="footer__whatsapp-icon" />
             </a>
           </p>
           <p>© 2023-{anoAtual} Cafeteria Sô Zé. Todos os direitos reservados. | Desenvolvido por Rafael Carvalho</p>
