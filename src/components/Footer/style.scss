@@ -14,6 +14,13 @@ footer {
   }
 }
 
+.footer__whatsapp-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-left: var(--space-1);
+  vertical-align: -0.18em;
+}
+
 .footer__email {
   display: inline-flex;
   gap: var(--space-2);
