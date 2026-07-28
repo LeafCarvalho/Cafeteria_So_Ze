@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "@/pages/Home/Home";
 import Pedidos from "@/pages/Pedidos/Pedidos";
@@ -5,10 +6,19 @@ import Login from "@/pages/Login/Login";
 import DefaultLayout from "@/Layout/DefaultLayout";
 import Efetuacao from "@/pages/Efetuacao/Efetuacao";
 import PrivateRoute from "./PrivateRoute";
-import Administracao from "@/pages/Administracao/Administracao";
 import { ProdutosProvider } from "@/Context/ProdutosProvider";
-import React from "react";
 import RedefinirSenha from "../pages/RedefinirSenha/RedefinirSenha";
+
+const Administracao = lazy(
+  () => import("@/pages/Administracao/Administracao"),
+);
+
+const CarregandoAdministracao = () => (
+  <main className="route-loading" role="status">
+    <span aria-hidden="true" />
+    <p>Carregando área administrativa...</p>
+  </main>
+);
 
 const Router = () => {
   return (
@@ -23,16 +33,16 @@ const Router = () => {
         </Route>
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<PrivateRoute />}>
-          <React.Fragment>
-            <Route
-              path="/administracao"
-              element={
+          <Route
+            path="/administracao"
+            element={
+              <Suspense fallback={<CarregandoAdministracao />}>
                 <ProdutosProvider>
                   <Administracao />
                 </ProdutosProvider>
-              }
-            />
-          </React.Fragment>
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </>
