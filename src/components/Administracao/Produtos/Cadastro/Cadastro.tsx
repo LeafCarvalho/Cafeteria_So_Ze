@@ -1,10 +1,9 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { produtosService } from "@/services/produtosService";
-import { CriarProdutoDTO } from "@/types/produtos";
+import type { CriarProdutoDTO, FormFields } from "@/types/produtos";
 import "./style.scss";
 
-type FormFields = Record<keyof CriarProdutoDTO, string>;
 const initialFormFields: FormFields = {
   nome: "",
   tipo: "",

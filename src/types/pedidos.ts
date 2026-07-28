@@ -64,6 +64,10 @@ export interface PedidoResumoItem {
   quantidade: number;
 }
 
+export interface CartItem extends Produto {
+  quantity: number;
+}
+
 export interface UltimoPedido {
   confirmacao_id: string;
   nome_cliente: string;

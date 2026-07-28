@@ -11,6 +11,8 @@ export interface Produto {
 
 export type CriarProdutoDTO = Omit<Produto, "id" | "created_at" | "updated_at">;
 
+export type FormFields = Record<keyof CriarProdutoDTO, string>;
+
 export type AtualizarProdutoDTO = Partial<
   Pick<Produto, "nome" | "tipo" | "valor" | "descricao" | "imagem">
 >;

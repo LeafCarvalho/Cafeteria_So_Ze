@@ -5,17 +5,10 @@ import { Link, useLocation } from "react-router-dom";
 import { Link as ScrollLink, scroller } from "react-scroll";
 import { useCart } from "@/Context/CartContext";
 import logo from "@/assets/logoCafeteria-v2.png";
+import type { ScrollOrRouteLinkProps } from "@/types/navegacao";
 import "./style.scss";
 
-interface HeaderProps {
-  to: string;
-  scroll: boolean;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: (event?: React.MouseEvent<HTMLElement>) => void;
-}
-
-const ScrollOrRouteLink: FunctionComponent<HeaderProps> = ({
+const ScrollOrRouteLink: FunctionComponent<ScrollOrRouteLinkProps> = ({
   to,
   scroll,
   children,
