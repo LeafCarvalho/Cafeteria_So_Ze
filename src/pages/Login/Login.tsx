@@ -2,13 +2,9 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
+import type { LoginState } from "@/types/autenticacao";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
-
-interface LoginState {
-  email: string;
-  password: string;
-}
 
 const Login: React.FC = () => {
   const [loginState, setLoginState] = useState<LoginState>({

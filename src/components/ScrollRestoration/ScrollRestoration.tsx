@@ -1,10 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
-
-type ScrollPosition = {
-  x: number;
-  y: number;
-};
+import type { ScrollPosition } from "@/types/navegacao";
 
 export function ScrollRestoration() {
   const location = useLocation();

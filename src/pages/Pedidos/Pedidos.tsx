@@ -9,14 +9,9 @@ import { Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/Context/CartContext";
 import { pedidosService } from "@/services/pedidosService";
-import { PedidoResumoItem } from "@/types/pedidos";
-import { Produto } from "@/types/produtos";
+import type { CartItem, PedidoResumoItem } from "@/types/pedidos";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
 import "./style.scss";
-
-interface CartItem extends Produto {
-  quantity: number;
-}
 
 const formatCurrency = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

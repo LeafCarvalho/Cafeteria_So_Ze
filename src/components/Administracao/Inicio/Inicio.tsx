@@ -15,12 +15,8 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { pedidosService } from "@/services/pedidosService";
 import { PedidosCount } from "@/types/pedidos";
+import type { ChartDataFormat } from "@/types/administracao";
 import "./style.scss";
-
-interface ChartDataFormat {
-  Periodo: string;
-  Quantidade: number;
-}
 
 const exportToExcel = (chartData: ChartData<"bar">) => {
   if (!chartData.labels) return;
