@@ -295,7 +295,12 @@ export const Produtos = () => {
                       onClick={() => setSelectedProduct(product)}
                       type="button"
                     >
-                      <img alt="" src={product.imagem} />
+                      <img
+                        alt=""
+                        decoding="async"
+                        loading="lazy"
+                        src={product.imagem}
+                      />
                       <span>Ver detalhes</span>
                     </button>
                     <div className="product-card__content">

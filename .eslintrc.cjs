@@ -19,6 +19,7 @@ module.exports = {
   plugins: ['react-refresh', '@typescript-eslint'],
   rules: {
     'react-refresh/only-export-components': 'warn',
+    'react/no-unknown-property': ['error', { ignore: ['fetchPriority'] }],
     '@typescript-eslint/no-unused-vars': ['error']
   },
 }
