@@ -72,6 +72,18 @@
       }
     }
   }
+
+  @media (max-width: 768px) {
+    height: 22rem;
+
+    .banner-principal-img {
+      height: 22rem;
+    }
+
+    .banner-principal__content p {
+      font-size: var(--font-size-3);
+    }
+  }
 }
 
 @keyframes hero-enter {
@@ -86,13 +98,3 @@
   }
 }
 
-@media (max-width: 768px) {
-  #banner-principal,
-  #banner-principal .banner-principal-img {
-    height: 22rem;
-  }
-
-  #banner-principal .banner-principal__content p {
-    font-size: var(--font-size-3);
-  }
-}

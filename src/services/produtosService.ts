@@ -1,4 +1,8 @@
-import { AtualizarProdutoDTO, CriarProdutoDTO, Produto } from "@/types/produtos";
+import {
+  AtualizarProdutoDTO,
+  CriarProdutoDTO,
+  Produto,
+} from "@/types/produtos";
 import { supabase } from "@/Utils/supabase";
 
 export const produtosService = {

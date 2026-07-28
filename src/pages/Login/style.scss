@@ -4,14 +4,22 @@
   place-items: center;
   padding: var(--space-7) var(--space-4);
   background:
-    radial-gradient(circle at 18% 16%, rgb(122 219 209 / 12%), transparent 30rem),
-    radial-gradient(circle at 84% 82%, rgb(232 179 106 / 10%), transparent 26rem),
+    radial-gradient(
+      circle at 18% 16%,
+      rgb(122 219 209 / 12%),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 84% 82%,
+      rgb(232 179 106 / 10%),
+      transparent 26rem
+    ),
     var(--color-surface);
-}
 
-.login-page__container {
-  display: flex;
-  justify-content: center;
+  &__container {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .login-card {
@@ -19,7 +27,11 @@
   padding: clamp(1.5rem, 5vw, 3rem);
   border: 1px solid var(--color-border);
   border-radius: calc(var(--radius-md) * 2);
-  background: linear-gradient(145deg, rgb(34 42 39 / 92%), var(--color-surface-raised));
+  background: linear-gradient(
+    145deg,
+    rgb(34 42 39 / 92%),
+    var(--color-surface-raised)
+  );
   box-shadow: var(--shadow-md);
 
   h1 {
@@ -42,19 +54,19 @@
       box-shadow: var(--focus-ring);
     }
   }
-}
 
-.login-card__eyebrow {
-  margin-bottom: var(--space-2);
-  color: var(--color-primary);
-  font-size: var(--font-size-2);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+  &__eyebrow {
+    margin-bottom: var(--space-2);
+    color: var(--color-primary);
+    font-size: var(--font-size-2);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
-.login-card__description {
-  color: var(--color-text-muted);
+  &__description {
+    color: var(--color-text-muted);
+  }
 }
 
 .loginButton {

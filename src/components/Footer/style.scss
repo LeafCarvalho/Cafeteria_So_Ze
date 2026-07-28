@@ -1,4 +1,4 @@
-footer {
+.footer {
   padding: var(--space-5) 0;
   background-color: var(--color-surface-subtle);
   color: var(--color-text);
@@ -12,29 +12,29 @@ footer {
     color: var(--color-link);
     font-weight: 700;
   }
-}
 
-.footer__whatsapp-icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  margin-left: var(--space-1);
-  vertical-align: -0.18em;
-}
-
-.footer__email {
-  display: inline-flex;
-  gap: var(--space-2);
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  border: 0;
-  background: transparent;
-  color: var(--color-link);
-  font-weight: 700;
-  text-decoration: underline;
-
-  svg {
+  &__whatsapp-icon {
     width: 1.125rem;
     height: 1.125rem;
+    margin-left: var(--space-1);
+    vertical-align: -0.18em;
+  }
+
+  &__email {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: var(--color-link);
+    font-weight: 700;
+    text-decoration: underline;
+
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
   }
 }

@@ -28,8 +28,12 @@ const CartHarness = () => {
     <>
       <output data-testid="cart-product-count">{cartProducts.length}</output>
       <output data-testid="cart-total">{total}</output>
-      <output data-testid="cart-quantity">{itemQuantities[cartProduct.id] ?? 0}</output>
-      <output data-testid="confirmation-id">{confirmationAccessData?.confirmacaoId ?? ""}</output>
+      <output data-testid="cart-quantity">
+        {itemQuantities[cartProduct.id] ?? 0}
+      </output>
+      <output data-testid="confirmation-id">
+        {confirmationAccessData?.confirmacaoId ?? ""}
+      </output>
       <button
         onClick={() => {
           setCartProducts([cartProduct]);
@@ -40,7 +44,12 @@ const CartHarness = () => {
         Preencher carrinho
       </button>
       <button
-        onClick={() => setConfirmationAccessData({ confirmacaoId: "confirmacao-123", codigoRetirada: "123456" })}
+        onClick={() =>
+          setConfirmationAccessData({
+            confirmacaoId: "confirmacao-123",
+            codigoRetirada: "123456",
+          })
+        }
         type="button"
       >
         Salvar confirmação
@@ -52,11 +61,12 @@ const CartHarness = () => {
   );
 };
 
-const renderCart = () => render(
-  <CartProvider>
-    <CartHarness />
-  </CartProvider>,
-);
+const renderCart = () =>
+  render(
+    <CartProvider>
+      <CartHarness />
+    </CartProvider>,
+  );
 
 describe("CartContext", () => {
   it("inicia com o carrinho vazio e calcula o total pelas quantidades selecionadas", async () => {
@@ -67,7 +77,9 @@ describe("CartContext", () => {
     expect(screen.getByTestId("cart-quantity")).toHaveTextContent("0");
     expect(screen.getByTestId("cart-total")).toHaveTextContent("0");
 
-    await user.click(screen.getByRole("button", { name: "Preencher carrinho" }));
+    await user.click(
+      screen.getByRole("button", { name: "Preencher carrinho" }),
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId("cart-total")).toHaveTextContent("25");
@@ -80,16 +92,25 @@ describe("CartContext", () => {
     const user = userEvent.setup();
     renderCart();
 
-    await user.click(screen.getByRole("button", { name: "Salvar confirmação" }));
+    await user.click(
+      screen.getByRole("button", { name: "Salvar confirmação" }),
+    );
 
     await waitFor(() => {
       expect(sessionStorage.getItem("cafeteria-so-ze-confirmacao")).toBe(
-        JSON.stringify({ confirmacaoId: "confirmacao-123", codigoRetirada: "123456" }),
+        JSON.stringify({
+          confirmacaoId: "confirmacao-123",
+          codigoRetirada: "123456",
+        }),
       );
     });
-    expect(screen.getByTestId("confirmation-id")).toHaveTextContent("confirmacao-123");
+    expect(screen.getByTestId("confirmation-id")).toHaveTextContent(
+      "confirmacao-123",
+    );
 
-    await user.click(screen.getByRole("button", { name: "Limpar confirmação" }));
+    await user.click(
+      screen.getByRole("button", { name: "Limpar confirmação" }),
+    );
 
     await waitFor(() => {
       expect(sessionStorage.getItem("cafeteria-so-ze-confirmacao")).toBeNull();
