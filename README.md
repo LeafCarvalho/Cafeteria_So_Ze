@@ -10,6 +10,11 @@ O projeto Cafeteria Sô Zé é uma loja online para uma cafeteria gourmet. Foi d
 <img width="380" height="868" alt="mobile" src="https://github.com/user-attachments/assets/65917b94-9d2a-46ea-9cc4-663e50bbb685" />
 <img width="380" height="868" alt="mobile2" src="https://github.com/user-attachments/assets/c9637681-2c63-48d4-b265-7d08ac485b66" />
 
+## Performance e experiência responsiva
+
+<img width="620" height="420" alt="Captura de tela 2026-07-28 174520" src="https://github.com/user-attachments/assets/6aadce68-906f-440b-8911-8b3b415cf200" />
+<img width="620" height="420" alt="Captura de tela 2026-07-28 174535" src="https://github.com/user-attachments/assets/648de964-4e49-42c6-8278-059763b36379" />
+
 
 ## Tecnologias Utilizadas
 
