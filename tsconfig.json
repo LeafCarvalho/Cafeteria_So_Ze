@@ -21,6 +21,6 @@
       "types": ["node"],
       "jsx": "react-jsx"
     },
-    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/vite-env.d.ts"],
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/vite-env.d.ts", "test/**/*.ts", "test/**/*.tsx"],
     "exclude": ["node_modules"]
   }

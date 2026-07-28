@@ -12,7 +12,7 @@ export default defineConfig({
   base: "/Cafeteria_So_Ze/",
   test: {
     environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    setupFiles: ["./test/setup.ts"],
     clearMocks: true,
   },
 });
