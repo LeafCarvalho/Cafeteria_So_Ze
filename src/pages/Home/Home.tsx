@@ -34,7 +34,12 @@ const Home = () => {
     <main>
       <Element name="home">
         <section aria-labelledby="titulo-principal" id="banner-principal">
-          <img src={BannerHome} alt="" className="banner-principal-img" />
+          <img
+            alt=""
+            className="banner-principal-img"
+            fetchPriority="high"
+            src={BannerHome}
+          />
           <Container className="banner-principal__content">
             <p className="banner-principal__eyebrow">
               Café especial, feito para você
