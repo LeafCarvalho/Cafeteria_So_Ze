@@ -11,6 +11,7 @@ import { useCart } from "@/Context/CartContext";
 import { pedidosService } from "@/services/pedidosService";
 import type { CartItem, PedidoResumoItem } from "@/types/pedidos";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const formatCurrency = (value: number) =>
@@ -189,7 +190,10 @@ const Pedidos: React.FC = () => {
       sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
       navigate(`/efetuacao/${confirmacao.confirmacao_id}`);
     } catch (error) {
-      console.error("Erro ao enviar o pedido:", error);
+      logError(error, {
+        operation: "pedido.confirmar",
+        category: "indisponibilidade",
+      });
       setErrorMessage("Não foi possível enviar o pedido. Tente novamente.");
     } finally {
       setIsSubmitting(false);

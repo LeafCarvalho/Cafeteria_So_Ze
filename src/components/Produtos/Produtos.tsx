@@ -7,6 +7,7 @@ import { useCart } from "@/Context/CartContext";
 import { produtosService } from "@/services/produtosService";
 import { Produto } from "@/types/produtos";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const getInitialDisplayCount = () =>
@@ -41,7 +42,10 @@ export const Produtos = () => {
       const produtos = await produtosService.listarProdutos();
       setCartProducts(produtos);
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "catalogo.carregar",
+        category: "indisponibilidade",
+      });
       setErro("Não foi possível carregar os produtos.");
     } finally {
       setIsLoading(false);

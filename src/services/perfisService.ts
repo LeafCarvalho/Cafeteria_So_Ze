@@ -18,10 +18,7 @@ export const perfisService = {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Erro ao buscar perfil:", error);
-      return false;
-    }
+    if (error) throw error;
 
     return perfilEhAdmin(data as Perfil | null);
   },

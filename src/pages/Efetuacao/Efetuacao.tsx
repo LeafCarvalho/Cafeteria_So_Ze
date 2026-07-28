@@ -5,6 +5,7 @@ import { useCart } from "@/Context/CartContext";
 import { pedidosService } from "@/services/pedidosService";
 import { UltimoPedido } from "@/types/pedidos";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const formatCurrency = (value: number) =>
@@ -59,7 +60,10 @@ const Efetuacao = () => {
           codigoRetirada: pickupCodeToValidate,
         });
       } catch (error) {
-        console.error("Erro ao recuperar pedido:", error);
+        logError(error, {
+          operation: "pedido.confirmacao.recuperar",
+          category: "indisponibilidade",
+        });
         setErrorMessage(
           "Não foi possível consultar este pedido agora. Tente novamente.",
         );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card } from "react-bootstrap";
 import { Bar } from "react-chartjs-2";
 import { ChartData, ChartOptions } from "chart.js";
@@ -13,8 +13,7 @@ import {
 } from "chart.js";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import { pedidosService } from "@/services/pedidosService";
-import { PedidosCount } from "@/types/pedidos";
+import { useResumoPedidos } from "@/hooks/useResumoPedidos";
 import type { ChartDataFormat } from "@/types/administracao";
 import "./style.scss";
 
@@ -47,31 +46,12 @@ ChartJS.register(
 );
 
 const Inicio: React.FC = () => {
-  const [pedidosCount, setPedidosCount] = useState<PedidosCount>({
-    diario: 0,
-    semanal: 0,
-    mensal: 0,
-    anual: 0,
-  });
-  const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchPedidos = async () => {
-      try {
-        setLoading(true);
-        setErro(null);
-        const pedidos = await pedidosService.listarPedidos();
-        setPedidosCount(pedidosService.calcularResumo(pedidos));
-      } catch (error) {
-        console.error(error);
-        setErro("Não foi possível carregar o resumo dos pedidos.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPedidos();
-  }, []);
+  const {
+    data: pedidosCount,
+    loading,
+    erro,
+    recarregar,
+  } = useResumoPedidos();
 
   const data: ChartData<"bar"> = {
     labels: ["Diário", "Semanal", "Mensal", "Anual"],
@@ -127,9 +107,12 @@ const Inicio: React.FC = () => {
         </p>
       )}
       {erro && (
-        <p className="admin-feedback admin-feedback--error" role="alert">
-          {erro}
-        </p>
+        <div className="admin-feedback admin-feedback--error" role="alert">
+          <p>{erro}</p>
+          <button type="button" onClick={() => void recarregar()}>
+            Tentar novamente
+          </button>
+        </div>
       )}
       {!loading && !erro && (
         <>

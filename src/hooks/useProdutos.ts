@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { produtosService } from "@/services/produtosService";
 import { AtualizarProdutoDTO, Produto } from "@/types/produtos";
+import { logError } from "@/Utils/logger";
 
 export function useProdutos() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -16,7 +17,10 @@ export function useProdutos() {
 
       setProdutos(produtos);
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "admin.produtos.carregar",
+        category: "indisponibilidade",
+      });
       setErro("Erro ao carregar produtos");
     } finally {
       setLoading(false);
@@ -48,7 +52,10 @@ export function useProdutos() {
 
       return true;
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "admin.produtos.atualizar",
+        category: "indisponibilidade",
+      });
       setErro("Erro ao atualizar produto");
       return false;
     } finally {
@@ -68,7 +75,10 @@ export function useProdutos() {
 
       return true;
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "admin.produtos.deletar",
+        category: "indisponibilidade",
+      });
       setErro("Erro ao deletar produto");
       return false;
     }

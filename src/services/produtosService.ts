@@ -24,10 +24,7 @@ export const produtosService = {
       .eq("id", id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Erro ao buscar produto por id:", error);
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   },
