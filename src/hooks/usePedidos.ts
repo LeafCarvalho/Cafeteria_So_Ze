@@ -46,11 +46,16 @@ export function usePedidos() {
       // Recarregar evita uma nova ação sobre dados possivelmente defasados.
       await carregarPedidos();
 
-      const mensagem = error instanceof Error ? error.message.toLowerCase() : "";
-      const codigo = typeof error === "object" && error !== null && "code" in error
-        ? String(error.code)
-        : "";
-      const conflito = codigo === "40001" || codigo === "P0002" || /conflito|status (atual|desatualizado)|transição/.test(mensagem);
+      const mensagem =
+        error instanceof Error ? error.message.toLowerCase() : "";
+      const codigo =
+        typeof error === "object" && error !== null && "code" in error
+          ? String(error.code)
+          : "";
+      const conflito =
+        codigo === "40001" ||
+        codigo === "P0002" ||
+        /conflito|status (atual|desatualizado)|transição/.test(mensagem);
 
       if (!conflito) setErro("Erro ao atualizar pedido");
       return conflito ? "conflito" : "erro";

@@ -1,19 +1,253 @@
-.my-col { padding: clamp(var(--space-4), 3vw, var(--space-6)); color: var(--color-text); }
-.product-list { max-width: 60rem; margin: auto; }
-.product-item { position: relative; display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-4); padding: clamp(var(--space-4), 3vw, var(--space-5)); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised); box-shadow: var(--shadow-sm); }
-.product-info { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
-.image-container { position: relative; flex: 0 0 6.5rem; width: 6.5rem; height: 6.5rem; overflow: hidden; border: 2px solid var(--color-secondary); border-radius: 50%; background: var(--color-surface); }
-.image-container img { width: 100%; height: 100%; object-fit: cover; }
-.image-edit-button { position: absolute; right: 2px; bottom: 2px; background: var(--color-surface); }
-.product-details { display: grid; flex: 1; gap: var(--space-2); min-width: 0; }
-.editable-field, .edit-input, .image-editor, .description-container, .description-editor { display: flex; align-items: center; gap: var(--space-2); }
-.editable-field p, .description-container p { margin: 0; color: var(--color-text); overflow-wrap: anywhere; }
-.description-container { align-items: flex-start; padding-right: 2.75rem; }.description-container p { flex: 1; color: var(--color-text-muted); }
-.edit-input, .image-editor, .description-editor { width: 100%; }.description-editor { align-items: flex-start; }.inline-actions { display: flex; gap: var(--space-1); }
-.icon-button { display: inline-grid; place-items: center; flex: 0 0 2.75rem; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--color-primary); transition: background var(--motion-duration-fast) var(--motion-ease), color var(--motion-duration-fast) var(--motion-ease); }
-.icon-button:hover { background: var(--color-primary); color: var(--color-on-primary); }.icon-button:focus-visible, .page-link:focus-visible { box-shadow: var(--focus-ring); outline: 0; }.icon-button--confirm { color: var(--color-success); }.icon-button--delete { position: absolute; top: var(--space-4); right: var(--space-4); color: var(--color-danger); }
-.my-col .form-control { min-height: 2.75rem; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); }.my-col .form-control:focus { color: var(--color-text); background: var(--color-surface); border-color: var(--color-primary); box-shadow: var(--focus-ring); }
-.product-feedback { margin: 0 0 var(--space-4); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-raised); color: var(--color-text-muted); }.product-feedback--error { color: var(--color-danger); border-color: var(--color-danger); background: var(--color-danger-surface); }
-.pagination-container { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); margin: var(--space-5) 0 0; }.pagination-container .page-item { margin: 0; }.pagination-container .page-link { display: grid; min-width: 2.75rem; min-height: 2.75rem; place-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-raised); color: var(--color-text); }.pagination-container .page-link:hover { background: var(--color-primary); color: var(--color-on-primary); }.pagination-container .active .page-link { border-color: var(--color-secondary); background: var(--color-secondary); color: var(--color-on-secondary); }.pagination-container .disabled .page-link { background: var(--color-surface); color: var(--color-disabled); }
-.product-modal .modal-content { color: var(--color-text); background: var(--color-surface-raised); border: 1px solid var(--color-border); }.product-modal .modal-header, .product-modal .modal-footer { border-color: var(--color-border); }.product-modal .btn-close { filter: invert(1); }.button-secondary, .button-danger { min-height: 2.75rem; border-radius: var(--radius-pill); }.button-secondary { border: 1px solid var(--color-border); background: var(--color-surface-subtle); color: var(--color-text); }.button-danger { border: 1px solid var(--color-danger); background: var(--color-danger); color: var(--color-on-danger); }.button-secondary:hover { background: var(--color-surface); }.button-danger:hover { filter: brightness(1.08); }
-@media (max-width: 575px) { .product-info { align-items: flex-start; }.image-container { flex-basis: 4.75rem; width: 4.75rem; height: 4.75rem; }.product-item { padding-top: 3.75rem; }.icon-button--delete { top: var(--space-3); right: var(--space-3); }.description-editor, .edit-input, .image-editor { align-items: stretch; flex-direction: column; }.inline-actions { align-self: flex-end; } }
+.my-col {
+  padding: clamp(var(--space-4), 3vw, var(--space-6));
+  color: var(--color-text);
+}
+.product-list {
+  max-width: 60rem;
+  margin: auto;
+}
+.product-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding: clamp(var(--space-4), 3vw, var(--space-5));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.image-container {
+  position: relative;
+  flex: 0 0 6.5rem;
+  width: 6.5rem;
+  height: 6.5rem;
+  overflow: hidden;
+  border: 2px solid var(--color-secondary);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-edit-button {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  background: var(--color-surface);
+}
+.product-details {
+  display: grid;
+  flex: 1;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.editable-field,
+.edit-input,
+.image-editor,
+.description-container,
+.description-editor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.editable-field p,
+.description-container p {
+  margin: 0;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.description-container {
+  align-items: flex-start;
+  padding-right: 2.75rem;
+}
+.description-container p {
+  flex: 1;
+  color: var(--color-text-muted);
+}
+.edit-input,
+.image-editor,
+.description-editor {
+  width: 100%;
+}
+.description-editor {
+  align-items: flex-start;
+}
+.inline-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primary);
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease),
+    color var(--motion-duration-fast) var(--motion-ease);
+
+  &--confirm {
+    color: var(--color-success);
+  }
+
+  &--delete {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    color: var(--color-danger);
+
+    @media (max-width: 575px) {
+      top: var(--space-3);
+      right: var(--space-3);
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: 0;
+  }
+
+  &:hover {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+.my-col .form-control {
+  min-height: 2.75rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.my-col .form-control:focus {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+.product-feedback {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-text-muted);
+
+  &--error {
+    border-color: var(--color-danger);
+    background: var(--color-danger-surface);
+    color: var(--color-danger);
+  }
+}
+.pagination-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 0;
+
+  .page-item {
+    margin: 0;
+  }
+
+  .page-link {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+
+    &:hover {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+    }
+
+    &:focus-visible {
+      box-shadow: var(--focus-ring);
+      outline: 0;
+    }
+  }
+
+  .active .page-link {
+    border-color: var(--color-secondary);
+    background: var(--color-secondary);
+    color: var(--color-on-secondary);
+  }
+
+  .disabled .page-link {
+    background: var(--color-surface);
+    color: var(--color-disabled);
+  }
+}
+.product-modal .modal-content {
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+.product-modal .modal-header,
+.product-modal .modal-footer {
+  border-color: var(--color-border);
+}
+.product-modal .btn-close {
+  filter: invert(1);
+}
+.button-secondary,
+.button-danger {
+  min-height: 2.75rem;
+  border-radius: var(--radius-pill);
+}
+.button-secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+.button-danger {
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+.button-secondary:hover {
+  background: var(--color-surface);
+}
+.button-danger:hover {
+  filter: brightness(1.08);
+}
+@media (max-width: 575px) {
+  .product-info {
+    align-items: flex-start;
+  }
+  .image-container {
+    flex-basis: 4.75rem;
+    width: 4.75rem;
+    height: 4.75rem;
+  }
+  .product-item {
+    padding-top: 3.75rem;
+  }
+  .description-editor,
+  .edit-input,
+  .image-editor {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .inline-actions {
+    align-self: flex-end;
+  }
+}

@@ -16,9 +16,13 @@
     animation: route-loading-spin 800ms linear infinite;
   }
 
-  p { margin: 0; }
+  p {
+    margin: 0;
+  }
 }
 
 @keyframes route-loading-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

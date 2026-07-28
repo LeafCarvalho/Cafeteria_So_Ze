@@ -24,15 +24,22 @@ const formatCurrency = (value: number) =>
 const IDEMPOTENCY_STORAGE_KEY = "cafeteria:pedido:chave-idempotencia";
 
 const createIdempotencyKey = () => {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
 
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
-    const randomValue = Math.floor(Math.random() * 16);
-    const hexadecimalValue = character === "x" ? randomValue : (randomValue & 0x3) | 0x8;
-    return hexadecimalValue.toString(16);
-  });
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    /[xy]/g,
+    (character) => {
+      const randomValue = Math.floor(Math.random() * 16);
+      const hexadecimalValue =
+        character === "x" ? randomValue : (randomValue & 0x3) | 0x8;
+      return hexadecimalValue.toString(16);
+    },
+  );
 };
 
 const Pedidos: React.FC = () => {
@@ -61,9 +68,12 @@ const Pedidos: React.FC = () => {
     .filter((item): item is CartItem => Boolean(item));
 
   const phoneDigits = phoneNumber.replace(/\D/g, "");
-  const isCustomerNameInvalid = hasAttemptedSubmit && customerName.trim().length < 2;
+  const isCustomerNameInvalid =
+    hasAttemptedSubmit && customerName.trim().length < 2;
   const isPhoneNumberInvalid =
-    hasAttemptedSubmit && phoneDigits.length !== 10 && phoneDigits.length !== 11;
+    hasAttemptedSubmit &&
+    phoneDigits.length !== 10 &&
+    phoneDigits.length !== 11;
   const totalValue = cartItems.reduce(
     (total, item) => total + item.valor * item.quantity,
     0,
@@ -104,10 +114,14 @@ const Pedidos: React.FC = () => {
       setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
     } else if (digits.length <= 10) {
       resetCheckoutAttempt();
-      setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
+      setPhoneNumber(
+        `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`,
+      );
     } else {
       resetCheckoutAttempt();
-      setPhoneNumber(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`);
+      setPhoneNumber(
+        `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`,
+      );
     }
   };
 
@@ -136,13 +150,18 @@ const Pedidos: React.FC = () => {
     if (isSubmitting) return;
 
     setHasAttemptedSubmit(true);
-    if (customerName.trim().length < 2 || ![10, 11].includes(phoneDigits.length)) {
+    if (
+      customerName.trim().length < 2 ||
+      ![10, 11].includes(phoneDigits.length)
+    ) {
       setErrorMessage("Revise os campos destacados para continuar.");
       return;
     }
 
     if (cartItems.length === 0) {
-      setErrorMessage("Seu carrinho está vazio. Escolha ao menos um item para finalizar.");
+      setErrorMessage(
+        "Seu carrinho está vazio. Escolha ao menos um item para finalizar.",
+      );
       return;
     }
 
@@ -185,33 +204,51 @@ const Pedidos: React.FC = () => {
   return (
     <main className="pedidos-page">
       <Container>
-        <DefaultButton customizarCSS="voltarButton" onClick={() => navigate(-1)} type="button">
+        <DefaultButton
+          customizarCSS="voltarButton"
+          onClick={() => navigate(-1)}
+          type="button"
+        >
           Voltar
         </DefaultButton>
         <header className="pedidos-page__header">
           <p>Finalização segura</p>
           <h1>Seu pedido está quase pronto</h1>
-          <span>Confirme seus dados e retire no balcão quando receber o código.</span>
+          <span>
+            Confirme seus dados e retire no balcão quando receber o código.
+          </span>
         </header>
 
         {cartItems.length === 0 ? (
-          <section className="pedido-vazio" aria-labelledby="pedido-vazio-title">
+          <section
+            className="pedido-vazio"
+            aria-labelledby="pedido-vazio-title"
+          >
             <h2 id="pedido-vazio-title">Seu carrinho está vazio</h2>
-            <p>Escolha algo especial no cardápio antes de finalizar o pedido.</p>
+            <p>
+              Escolha algo especial no cardápio antes de finalizar o pedido.
+            </p>
             <DefaultButton onClick={() => navigate("/")} type="button">
               Ver cardápio
             </DefaultButton>
           </section>
         ) : (
           <div className="pedido-layout">
-            <section className="pedido-form" aria-labelledby="dados-pedido-title">
+            <section
+              className="pedido-form"
+              aria-labelledby="dados-pedido-title"
+            >
               <h2 id="dados-pedido-title">Dados para retirada</h2>
-              <p>Usaremos essas informações apenas para identificar seu pedido.</p>
+              <p>
+                Usaremos essas informações apenas para identificar seu pedido.
+              </p>
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group controlId="formName">
                   <Form.Label>Nome completo</Form.Label>
                   <Form.Control
-                    aria-describedby={isCustomerNameInvalid ? "erro-nome" : undefined}
+                    aria-describedby={
+                      isCustomerNameInvalid ? "erro-nome" : undefined
+                    }
                     autoComplete="name"
                     isInvalid={isCustomerNameInvalid}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -222,12 +259,18 @@ const Pedidos: React.FC = () => {
                     type="text"
                     value={customerName}
                   />
-                  {isCustomerNameInvalid && <p className="field-error" id="erro-nome">Informe seu nome completo.</p>}
+                  {isCustomerNameInvalid && (
+                    <p className="field-error" id="erro-nome">
+                      Informe seu nome completo.
+                    </p>
+                  )}
                 </Form.Group>
                 <Form.Group controlId="formPhone">
                   <Form.Label>Telefone</Form.Label>
                   <Form.Control
-                    aria-describedby={isPhoneNumberInvalid ? "erro-telefone" : "ajuda-telefone"}
+                    aria-describedby={
+                      isPhoneNumberInvalid ? "erro-telefone" : "ajuda-telefone"
+                    }
                     autoComplete="tel"
                     inputMode="tel"
                     isInvalid={isPhoneNumberInvalid}
@@ -239,19 +282,44 @@ const Pedidos: React.FC = () => {
                     value={phoneNumber}
                   />
                   {isPhoneNumberInvalid ? (
-                    <p className="field-error" id="erro-telefone">Informe um telefone com DDD.</p>
-                  ) : <p className="field-hint" id="ajuda-telefone">Usaremos este número caso precisemos falar com você.</p>}
+                    <p className="field-error" id="erro-telefone">
+                      Informe um telefone com DDD.
+                    </p>
+                  ) : (
+                    <p className="field-hint" id="ajuda-telefone">
+                      Usaremos este número caso precisemos falar com você.
+                    </p>
+                  )}
                 </Form.Group>
-                {errorMessage && <div className="pedido-feedback" ref={feedbackRef} role="alert" tabIndex={-1}>{errorMessage}</div>}
-                <DefaultButton aria-busy={isSubmitting} customizarCSS="pedido-submit" disabled={isSubmitting} type="submit">
+                {errorMessage && (
+                  <div
+                    className="pedido-feedback"
+                    ref={feedbackRef}
+                    role="alert"
+                    tabIndex={-1}
+                  >
+                    {errorMessage}
+                  </div>
+                )}
+                <DefaultButton
+                  aria-busy={isSubmitting}
+                  customizarCSS="pedido-submit"
+                  disabled={isSubmitting}
+                  type="submit"
+                >
                   {isSubmitting ? "Enviando pedido..." : "Finalizar pedido"}
                 </DefaultButton>
               </Form>
             </section>
 
-            <aside className="pedido-resumo" aria-labelledby="resumo-pedido-title">
+            <aside
+              className="pedido-resumo"
+              aria-labelledby="resumo-pedido-title"
+            >
               <div className="pedido-resumo__heading">
-                <p>{cartItems.length} {cartItems.length === 1 ? "item" : "itens"}</p>
+                <p>
+                  {cartItems.length} {cartItems.length === 1 ? "item" : "itens"}
+                </p>
                 <h2 id="resumo-pedido-title">Resumo do pedido</h2>
               </div>
               <div className="pedido-resumo__items">
@@ -262,11 +330,16 @@ const Pedidos: React.FC = () => {
                       <h3>{item.nome}</h3>
                       <p>Quantidade: {item.quantity}</p>
                     </div>
-                    <strong>{formatCurrency(item.valor * item.quantity)}</strong>
+                    <strong>
+                      {formatCurrency(item.valor * item.quantity)}
+                    </strong>
                   </article>
                 ))}
               </div>
-              <div className="total"><span>Total</span><strong>{formatCurrency(totalValue)}</strong></div>
+              <div className="total">
+                <span>Total</span>
+                <strong>{formatCurrency(totalValue)}</strong>
+              </div>
             </aside>
           </div>
         )}

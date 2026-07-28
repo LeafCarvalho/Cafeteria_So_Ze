@@ -4,11 +4,22 @@
   place-items: center;
   padding: var(--space-7) var(--space-4);
   background:
-    radial-gradient(circle at 18% 16%, rgb(122 219 209 / 12%), transparent 30rem),
-    radial-gradient(circle at 84% 82%, rgb(232 179 106 / 10%), transparent 26rem),
+    radial-gradient(
+      circle at 18% 16%,
+      rgb(122 219 209 / 12%),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 84% 82%,
+      rgb(232 179 106 / 10%),
+      transparent 26rem
+    ),
     var(--color-surface);
 
-  &__container { display: flex; justify-content: center; }
+  &__container {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .redefinir-senha-card {
@@ -16,22 +27,60 @@
   padding: clamp(1.5rem, 5vw, 3rem);
   border: 1px solid var(--color-border);
   border-radius: calc(var(--radius-md) * 2);
-  background: linear-gradient(145deg, rgb(34 42 39 / 92%), var(--color-surface-raised));
+  background: linear-gradient(
+    145deg,
+    rgb(34 42 39 / 92%),
+    var(--color-surface-raised)
+  );
   box-shadow: var(--shadow-md);
 
-  h1 { margin-bottom: var(--space-3); }
-  .form-group { margin-top: var(--space-4); }
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .form-group {
+    margin-top: var(--space-4);
+  }
+
   .form-control {
     min-height: 3rem;
     border-color: var(--color-border);
     background: rgb(17 23 22 / 72%);
     color: var(--color-text);
-    &:focus { border-color: var(--color-primary); background: rgb(17 23 22 / 92%); box-shadow: var(--focus-ring); }
+    &:focus {
+      border-color: var(--color-primary);
+      background: rgb(17 23 22 / 92%);
+      box-shadow: var(--focus-ring);
+    }
+  }
+
+  &__eyebrow {
+    margin-bottom: var(--space-2);
+    color: var(--color-primary);
+    font-size: var(--font-size-2);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__description {
+    color: var(--color-text-muted);
   }
 }
-
-.redefinir-senha-card__eyebrow { margin-bottom: var(--space-2); color: var(--color-primary); font-size: var(--font-size-2); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.redefinir-senha-card__description { color: var(--color-text-muted); }
-.redefinir-senha-button { width: 100%; margin-top: var(--space-5); }
-.redefinir-senha-feedback { margin-top: var(--space-4); }
-.redefinir-senha-link { width: 100%; min-height: 2.75rem; margin-top: var(--space-2); border: 0; background: transparent; color: var(--color-primary); font-weight: 700; text-decoration: underline; }
+.redefinir-senha-button {
+  width: 100%;
+  margin-top: var(--space-5);
+}
+.redefinir-senha-feedback {
+  margin-top: var(--space-4);
+}
+.redefinir-senha-link {
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: underline;
+}

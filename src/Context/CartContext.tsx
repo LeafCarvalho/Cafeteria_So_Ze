@@ -38,7 +38,9 @@ const CONFIRMATION_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
 const getStoredConfirmationAccessData = (): DadosAcessoConfirmacao | null => {
   try {
     const storedData = sessionStorage.getItem(CONFIRMATION_STORAGE_KEY);
-    return storedData ? (JSON.parse(storedData) as DadosAcessoConfirmacao) : null;
+    return storedData
+      ? (JSON.parse(storedData) as DadosAcessoConfirmacao)
+      : null;
   } catch {
     return null;
   }
@@ -57,11 +59,14 @@ export const useCart = (): CartContextData => {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartProducts, setCartProducts] = useState<Produto[]>([]);
-  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>(
+    {},
+  );
   const [total, setTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartTriggerId, setCartTriggerId] = useState<string | null>(null);
-  const [lastOrderConfirmation, setLastOrderConfirmation] = useState<UltimoPedido | null>(null);
+  const [lastOrderConfirmation, setLastOrderConfirmation] =
+    useState<UltimoPedido | null>(null);
   const [confirmationAccessData, setConfirmationAccessData] =
     useState<DadosAcessoConfirmacao | null>(getStoredConfirmationAccessData);
 
