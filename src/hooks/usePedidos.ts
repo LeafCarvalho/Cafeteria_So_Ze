@@ -5,6 +5,7 @@ import {
   Pedido,
   ResultadoAtualizacaoStatusPedido,
 } from "@/types/pedidos";
+import { logError } from "@/Utils/logger";
 
 export function usePedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -20,7 +21,10 @@ export function usePedidos() {
 
       setPedidos(pedidosCarregados);
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "admin.pedidos.carregar",
+        category: "indisponibilidade",
+      });
       setErro("Erro ao carregar pedidos");
     } finally {
       setLoading(false);
@@ -41,16 +45,25 @@ export function usePedidos() {
       await carregarPedidos();
       return "atualizado";
     } catch (error) {
-      console.error(error);
       // A RPC rejeita tanto uma transição inválida quanto um status desatualizado.
       // Recarregar evita uma nova ação sobre dados possivelmente defasados.
       await carregarPedidos();
 
-      const mensagem = error instanceof Error ? error.message.toLowerCase() : "";
-      const codigo = typeof error === "object" && error !== null && "code" in error
-        ? String(error.code)
-        : "";
-      const conflito = codigo === "40001" || codigo === "P0002" || /conflito|status (atual|desatualizado)|transição/.test(mensagem);
+      const mensagem =
+        error instanceof Error ? error.message.toLowerCase() : "";
+      const codigo =
+        typeof error === "object" && error !== null && "code" in error
+          ? String(error.code)
+          : "";
+      const conflito =
+        codigo === "40001" ||
+        codigo === "P0002" ||
+        /conflito|status (atual|desatualizado)|transição/.test(mensagem);
+
+      logError(error, {
+        operation: "admin.pedidos.atualizar-status",
+        category: conflito ? "conflito" : "indisponibilidade",
+      });
 
       if (!conflito) setErro("Erro ao atualizar pedido");
       return conflito ? "conflito" : "erro";

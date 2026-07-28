@@ -1,10 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
-
-type ScrollPosition = {
-  x: number;
-  y: number;
-};
+import type { ScrollPosition } from "@/types/navegacao";
 
 export function ScrollRestoration() {
   const location = useLocation();
@@ -22,15 +18,18 @@ export function ScrollRestoration() {
 
   useLayoutEffect(() => {
     const positions = positionsRef.current;
-    const requestedSection = (location.state as { scrollTo?: string } | null)?.scrollTo;
+    const requestedSection = (location.state as { scrollTo?: string } | null)
+      ?.scrollTo;
     const savedPosition = positions.get(location.key);
 
     if (requestedSection !== "produtos") {
-      const targetPosition = navigationType === "POP" && savedPosition
-        ? savedPosition
-        : { x: 0, y: 0 };
+      const targetPosition =
+        navigationType === "POP" && savedPosition
+          ? savedPosition
+          : { x: 0, y: 0 };
 
-      const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+      const previousScrollBehavior =
+        document.documentElement.style.scrollBehavior;
       document.documentElement.style.scrollBehavior = "auto";
       window.scrollTo(targetPosition.x, targetPosition.y);
       document.documentElement.style.scrollBehavior = previousScrollBehavior;

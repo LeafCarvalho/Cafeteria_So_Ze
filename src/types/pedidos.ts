@@ -1,6 +1,11 @@
 import { Produto } from "./produtos";
 
-export type PedidoStatus = "criado" | "em_preparo" | "pronto" | "finalizado" | "cancelado";
+export type PedidoStatus =
+  | "criado"
+  | "em_preparo"
+  | "pronto"
+  | "finalizado"
+  | "cancelado";
 
 export interface Pedido {
   id: string;
@@ -45,7 +50,10 @@ export interface AtualizarStatusPedidoAdminDTO {
   novo_status: PedidoStatus;
 }
 
-export type ResultadoAtualizacaoStatusPedido = "atualizado" | "conflito" | "erro";
+export type ResultadoAtualizacaoStatusPedido =
+  | "atualizado"
+  | "conflito"
+  | "erro";
 
 export interface PedidoResumoItem {
   id: string;
@@ -54,6 +62,10 @@ export interface PedidoResumoItem {
   imagem: string;
   valor: number;
   quantidade: number;
+}
+
+export interface CartItem extends Produto {
+  quantity: number;
 }
 
 export interface UltimoPedido {

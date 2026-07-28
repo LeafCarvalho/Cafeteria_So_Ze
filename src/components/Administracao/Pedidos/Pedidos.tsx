@@ -34,8 +34,11 @@ const formatarMoeda = (valor: number) =>
   valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const Pedidos = () => {
-  const { pedidos, loading, erro, atualizarStatusPedido, carregarPedidos } = usePedidos();
-  const [pedidoEmAtualizacao, setPedidoEmAtualizacao] = useState<string | null>(null);
+  const { pedidos, loading, erro, atualizarStatusPedido, carregarPedidos } =
+    usePedidos();
+  const [pedidoEmAtualizacao, setPedidoEmAtualizacao] = useState<string | null>(
+    null,
+  );
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const atualizarStatus = async (pedido: Pedido, status: PedidoStatus) => {
@@ -51,7 +54,8 @@ const Pedidos = () => {
 
     const mensagens = {
       atualizado: `Status do pedido de ${pedido.nome_cliente} atualizado para ${statusLabels[status]}.`,
-      conflito: "Este pedido foi alterado por outra pessoa. A lista foi atualizada; revise o status antes de tentar novamente.",
+      conflito:
+        "Este pedido foi alterado por outra pessoa. A lista foi atualizada; revise o status antes de tentar novamente.",
       erro: `Não foi possível atualizar o status do pedido de ${pedido.nome_cliente}. A lista foi atualizada.`,
     };
     setFeedback(mensagens[resultado]);
@@ -69,7 +73,9 @@ const Pedidos = () => {
         <td data-label="Cliente">{pedido.nome_cliente}</td>
         <td data-label="Telefone">{pedido.telefone}</td>
         <td data-label="Código">{pedido.senha_retirar_ped}</td>
-        <td data-label="Produto">{pedido.produto?.nome ?? pedido.produto_id}</td>
+        <td data-label="Produto">
+          {pedido.produto?.nome ?? pedido.produto_id}
+        </td>
         <td data-label="Total">{formatarMoeda(pedido.total)}</td>
         <td data-label="Data e hora">{formatarData(pedido.created_at)}</td>
         <td data-label="Status">
@@ -104,7 +110,10 @@ const Pedidos = () => {
         <h2 id="pedidos-titulo">Pedidos</h2>
       </div>
 
-      <div aria-label="Legenda de status dos pedidos" className="legenda-status">
+      <div
+        aria-label="Legenda de status dos pedidos"
+        className="legenda-status"
+      >
         <p>Status dos pedidos</p>
         <ul>
           {Object.entries(statusLabels).map(([status, label]) => (
@@ -119,15 +128,27 @@ const Pedidos = () => {
         </ul>
       </div>
 
-      <p aria-atomic="true" aria-live="polite" className="pedidos-feedback" id="atualizacao-status" role="status">
+      <p
+        aria-atomic="true"
+        aria-live="polite"
+        className="pedidos-feedback"
+        id="atualizacao-status"
+        role="status"
+      >
         {pedidoEmAtualizacao ? "Atualizando status do pedido..." : feedback}
       </p>
 
-      {loading && <p className="pedidos-state" role="status">Carregando pedidos...</p>}
+      {loading && (
+        <p className="pedidos-state" role="status">
+          Carregando pedidos...
+        </p>
+      )}
       {erro && !loading && (
         <div className="pedidos-state pedidos-state--error" role="alert">
           <p>{erro}.</p>
-          <button onClick={() => void carregarPedidos()} type="button">Tentar novamente</button>
+          <button onClick={() => void carregarPedidos()} type="button">
+            Tentar novamente
+          </button>
         </div>
       )}
       {!loading && !erro && pedidos.length === 0 && (

@@ -1,36 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Dispatch, ReactNode, SetStateAction } from "react";
-import { DadosAcessoConfirmacao, UltimoPedido } from "@/types/pedidos";
-import { Produto } from "@/types/produtos";
-
-export interface ScrollOrRouteLinkProps {
-  to: string;
-  scroll: boolean;
-  children: ReactNode;
-  className?: string;
-}
-
-export interface CartContextData {
-  cartProducts: Produto[];
-  setCartProducts: Dispatch<SetStateAction<Produto[]>>;
-  itemQuantities: Record<string, number>;
-  setItemQuantities: Dispatch<SetStateAction<Record<string, number>>>;
-  total: number;
-  isCartOpen: boolean;
-  setIsCartOpen: Dispatch<SetStateAction<boolean>>;
-  cartTriggerId: string | null;
-  setCartTriggerId: Dispatch<SetStateAction<string | null>>;
-  lastOrderConfirmation: UltimoPedido | null;
-  setLastOrderConfirmation: Dispatch<SetStateAction<UltimoPedido | null>>;
-  confirmationAccessData: DadosAcessoConfirmacao | null;
-  setConfirmationAccessData: Dispatch<
-    SetStateAction<DadosAcessoConfirmacao | null>
-  >;
-}
-
-export interface CartProviderProps {
-  children: ReactNode;
-}
+import type { CartContextData, CartProviderProps } from "@/types/carrinho";
+import type { DadosAcessoConfirmacao, UltimoPedido } from "@/types/pedidos";
+import type { Produto } from "@/types/produtos";
 
 const CartContext = createContext<CartContextData | undefined>(undefined);
 const CONFIRMATION_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
@@ -38,7 +9,9 @@ const CONFIRMATION_STORAGE_KEY = "cafeteria-so-ze-confirmacao";
 const getStoredConfirmationAccessData = (): DadosAcessoConfirmacao | null => {
   try {
     const storedData = sessionStorage.getItem(CONFIRMATION_STORAGE_KEY);
-    return storedData ? (JSON.parse(storedData) as DadosAcessoConfirmacao) : null;
+    return storedData
+      ? (JSON.parse(storedData) as DadosAcessoConfirmacao)
+      : null;
   } catch {
     return null;
   }
@@ -57,11 +30,14 @@ export const useCart = (): CartContextData => {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartProducts, setCartProducts] = useState<Produto[]>([]);
-  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>(
+    {},
+  );
   const [total, setTotal] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartTriggerId, setCartTriggerId] = useState<string | null>(null);
-  const [lastOrderConfirmation, setLastOrderConfirmation] = useState<UltimoPedido | null>(null);
+  const [lastOrderConfirmation, setLastOrderConfirmation] =
+    useState<UltimoPedido | null>(null);
   const [confirmationAccessData, setConfirmationAccessData] =
     useState<DadosAcessoConfirmacao | null>(getStoredConfirmationAccessData);
 

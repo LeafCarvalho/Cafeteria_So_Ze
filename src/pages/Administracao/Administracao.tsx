@@ -7,6 +7,7 @@ import Pedidos from "@/components/Administracao/Pedidos/Pedidos";
 import Cadastro from "@/components/Administracao/Produtos/Cadastro/Cadastro";
 import TodosProdutos from "@/components/Administracao/Produtos/TodosProdutos/TodosProdutos";
 import { authService } from "@/services/authService";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const Administracao = () => {
@@ -31,8 +32,10 @@ const Administracao = () => {
   }, [isSidebarVisible]);
 
   useEffect(() => {
-    if (wasSidebarVisible.current && !isSidebarVisible) menuToggleRef.current?.focus();
-    if (isSidebarVisible) sidebarRef.current?.querySelector<HTMLElement>("a, button")?.focus();
+    if (wasSidebarVisible.current && !isSidebarVisible)
+      menuToggleRef.current?.focus();
+    if (isSidebarVisible)
+      sidebarRef.current?.querySelector<HTMLElement>("a, button")?.focus();
     wasSidebarVisible.current = isSidebarVisible;
   }, [isSidebarVisible]);
 
@@ -46,7 +49,7 @@ const Administracao = () => {
       await authService.logout();
       navigate("/login");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      logError(error, { operation: "auth.logout", category: "indisponibilidade" });
     } finally {
       closeSidebar();
     }
@@ -60,10 +63,18 @@ const Administracao = () => {
         className="menu-toggle"
         aria-controls="admin-navigation"
         aria-expanded={isSidebarVisible}
-        aria-label={isSidebarVisible ? "Fechar menu administrativo" : "Abrir menu administrativo"}
+        aria-label={
+          isSidebarVisible
+            ? "Fechar menu administrativo"
+            : "Abrir menu administrativo"
+        }
         onClick={() => setSidebarVisible((visible) => !visible)}
       >
-        {isSidebarVisible ? <FiX aria-hidden="true" /> : <FiMenu aria-hidden="true" />}
+        {isSidebarVisible ? (
+          <FiX aria-hidden="true" />
+        ) : (
+          <FiMenu aria-hidden="true" />
+        )}
         <span>Menu</span>
       </button>
 
@@ -86,14 +97,28 @@ const Administracao = () => {
           <strong>Administração</strong>
         </div>
         <Nav className="flex-column" activeKey={activeKey}>
-          <Nav.Link eventKey="inicio" onClick={() => selectPage("inicio")}>Início</Nav.Link>
-          <Nav.Link eventKey="pedidos" onClick={() => selectPage("pedidos")}>Pedidos</Nav.Link>
+          <Nav.Link eventKey="inicio" onClick={() => selectPage("inicio")}>
+            Início
+          </Nav.Link>
+          <Nav.Link eventKey="pedidos" onClick={() => selectPage("pedidos")}>
+            Pedidos
+          </Nav.Link>
           <Accordion className="admin-products-nav">
             <Accordion.Item eventKey="0">
               <Accordion.Header>Produtos</Accordion.Header>
               <Accordion.Body>
-                <Nav.Link eventKey="todosProdutos" onClick={() => selectPage("todosProdutos")}>Todos os produtos</Nav.Link>
-                <Nav.Link eventKey="cadastro" onClick={() => selectPage("cadastro")}>Cadastrar produto</Nav.Link>
+                <Nav.Link
+                  eventKey="todosProdutos"
+                  onClick={() => selectPage("todosProdutos")}
+                >
+                  Todos os produtos
+                </Nav.Link>
+                <Nav.Link
+                  eventKey="cadastro"
+                  onClick={() => selectPage("cadastro")}
+                >
+                  Cadastrar produto
+                </Nav.Link>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>

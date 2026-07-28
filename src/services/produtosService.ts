@@ -1,4 +1,8 @@
-import { AtualizarProdutoDTO, CriarProdutoDTO, Produto } from "@/types/produtos";
+import {
+  AtualizarProdutoDTO,
+  CriarProdutoDTO,
+  Produto,
+} from "@/types/produtos";
 import { supabase } from "@/Utils/supabase";
 
 export const produtosService = {
@@ -20,10 +24,7 @@ export const produtosService = {
       .eq("id", id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Erro ao buscar produto por id:", error);
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   },

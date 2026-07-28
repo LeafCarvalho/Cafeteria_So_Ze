@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { supabase } from "../../Utils/supabase";
 import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const RedefinirSenha = () => {
@@ -22,7 +23,9 @@ const RedefinirSenha = () => {
       if (!ativo) return;
 
       if (sessionError || !data.session) {
-        setErro("Este link de redefinição é inválido ou expirou. Solicite outro link.");
+        setErro(
+          "Este link de redefinição é inválido ou expirou. Solicite outro link.",
+        );
       }
       setCarregando(false);
     };
@@ -58,7 +61,10 @@ const RedefinirSenha = () => {
       await authService.logout();
       navigate("/login", { replace: true });
     } catch (updateError) {
-      console.error("Erro ao atualizar senha:", updateError);
+      logError(updateError, {
+        operation: "auth.redefinicao-senha.atualizar",
+        category: "indisponibilidade",
+      });
       setErro("Não foi possível atualizar sua senha. Solicite um novo link.");
     } finally {
       setEnviando(false);
@@ -68,10 +74,15 @@ const RedefinirSenha = () => {
   return (
     <main className="redefinir-senha-page">
       <Container className="redefinir-senha-page__container">
-        <section aria-labelledby="redefinir-senha-title" className="redefinir-senha-card">
+        <section
+          aria-labelledby="redefinir-senha-title"
+          className="redefinir-senha-card"
+        >
           <p className="redefinir-senha-card__eyebrow">Área administrativa</p>
           <h1 id="redefinir-senha-title">Crie uma nova senha</h1>
-          <p className="redefinir-senha-card__description">Escolha uma senha forte para voltar a acessar a administração.</p>
+          <p className="redefinir-senha-card__description">
+            Escolha uma senha forte para voltar a acessar a administração.
+          </p>
 
           {carregando ? (
             <p role="status">Validando link de redefinição...</p>
@@ -79,20 +90,53 @@ const RedefinirSenha = () => {
             <Form noValidate onSubmit={handleSubmit}>
               <Form.Group controlId="novaSenha">
                 <Form.Label>Nova senha</Form.Label>
-                <Form.Control autoComplete="new-password" onChange={(event) => setSenha(event.target.value)} required type="password" value={senha} />
+                <Form.Control
+                  autoComplete="new-password"
+                  onChange={(event) => setSenha(event.target.value)}
+                  required
+                  type="password"
+                  value={senha}
+                />
               </Form.Group>
               <Form.Group controlId="confirmacaoNovaSenha">
                 <Form.Label>Confirme a nova senha</Form.Label>
-                <Form.Control autoComplete="new-password" onChange={(event) => setConfirmacaoSenha(event.target.value)} required type="password" value={confirmacaoSenha} />
+                <Form.Control
+                  autoComplete="new-password"
+                  onChange={(event) => setConfirmacaoSenha(event.target.value)}
+                  required
+                  type="password"
+                  value={confirmacaoSenha}
+                />
               </Form.Group>
-              <DefaultButton aria-busy={enviando} customizarCSS="redefinir-senha-button" disabled={Boolean(erro?.includes("inválido")) || enviando} type="submit">
+              <DefaultButton
+                aria-busy={enviando}
+                customizarCSS="redefinir-senha-button"
+                disabled={Boolean(erro?.includes("inválido")) || enviando}
+                type="submit"
+              >
                 {enviando ? "Salvando nova senha..." : "Salvar nova senha"}
               </DefaultButton>
             </Form>
           )}
 
-          {erro && <Alert className="redefinir-senha-feedback" role="alert" variant="danger">{erro}</Alert>}
-          {!carregando && erro?.includes("inválido") && <button className="redefinir-senha-link" onClick={() => navigate("/login")} type="button">Voltar ao login</button>}
+          {erro && (
+            <Alert
+              className="redefinir-senha-feedback"
+              role="alert"
+              variant="danger"
+            >
+              {erro}
+            </Alert>
+          )}
+          {!carregando && erro?.includes("inválido") && (
+            <button
+              className="redefinir-senha-link"
+              onClick={() => navigate("/login")}
+              type="button"
+            >
+              Voltar ao login
+            </button>
+          )}
         </section>
       </Container>
     </main>

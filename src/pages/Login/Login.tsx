@@ -2,16 +2,16 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
+import type { LoginState } from "@/types/autenticacao";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
-interface LoginState {
-  email: string;
-  password: string;
-}
-
 const Login: React.FC = () => {
-  const [loginState, setLoginState] = useState<LoginState>({ email: "", password: "" });
+  const [loginState, setLoginState] = useState<LoginState>({
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -24,16 +24,26 @@ const Login: React.FC = () => {
     setMessage(null);
 
     try {
-      const { error: loginError } = await authService.login(loginState.email, loginState.password);
+      const { error: loginError } = await authService.login(
+        loginState.email,
+        loginState.password,
+      );
 
       if (loginError) {
-        setError(loginError.message);
+        logError(loginError, {
+          operation: "auth.login",
+          category: "autorizacao",
+        });
+        setError("Não foi possível entrar com essas credenciais.");
         return;
       }
 
       navigate("/administracao");
     } catch (signInError) {
-      console.error("Erro inesperado ao entrar:", signInError);
+      logError(signInError, {
+        operation: "auth.login",
+        category: "indisponibilidade",
+      });
       setError("Não foi possível entrar agora. Tente novamente.");
     } finally {
       setLoading(false);
@@ -56,17 +66,32 @@ const Login: React.FC = () => {
 
     try {
       setLoading(true);
-      const { error: resetError } = await authService.recuperarSenha(loginState.email);
+      const { error: resetError } = await authService.recuperarSenha(
+        loginState.email,
+      );
 
       if (resetError) {
-        setError("Não foi possível enviar o link de redefinição. Tente novamente.");
+        logError(resetError, {
+          operation: "auth.redefinicao-senha.solicitar",
+          category: "indisponibilidade",
+        });
+        setError(
+          "Não foi possível enviar o link de redefinição. Tente novamente.",
+        );
         return;
       }
 
-      setMessage("Se o e-mail estiver cadastrado, enviaremos um link de redefinição.");
+      setMessage(
+        "Se o e-mail estiver cadastrado, enviaremos um link de redefinição.",
+      );
     } catch (resetError) {
-      console.error("Erro ao solicitar redefinição de senha:", resetError);
-      setError("Não foi possível enviar o link de redefinição. Tente novamente.");
+      logError(resetError, {
+        operation: "auth.redefinicao-senha.solicitar",
+        category: "indisponibilidade",
+      });
+      setError(
+        "Não foi possível enviar o link de redefinição. Tente novamente.",
+      );
     } finally {
       setLoading(false);
     }
@@ -78,25 +103,58 @@ const Login: React.FC = () => {
         <section aria-labelledby="login-title" className="login-card">
           <p className="login-card__eyebrow">Área administrativa</p>
           <h1 id="login-title">Boas-vindas de volta</h1>
-          <p className="login-card__description">Acesse para cuidar do cardápio e acompanhar os pedidos.</p>
+          <p className="login-card__description">
+            Acesse para cuidar do cardápio e acompanhar os pedidos.
+          </p>
           <Form onSubmit={handleSignIn}>
             <Form.Group controlId="loginEmail">
               <Form.Label>E-mail</Form.Label>
-              <Form.Control autoComplete="email" name="email" onChange={handleInputChange} required type="email" value={loginState.email} />
+              <Form.Control
+                autoComplete="email"
+                name="email"
+                onChange={handleInputChange}
+                required
+                type="email"
+                value={loginState.email}
+              />
             </Form.Group>
             <Form.Group controlId="loginPassword">
               <Form.Label>Senha</Form.Label>
-              <Form.Control autoComplete="current-password" name="password" onChange={handleInputChange} required type="password" value={loginState.password} />
+              <Form.Control
+                autoComplete="current-password"
+                name="password"
+                onChange={handleInputChange}
+                required
+                type="password"
+                value={loginState.password}
+              />
             </Form.Group>
-            <DefaultButton customizarCSS="loginButton" disabled={loading} type="submit">
+            <DefaultButton
+              customizarCSS="loginButton"
+              disabled={loading}
+              type="submit"
+            >
               {loading ? "Entrando..." : "Entrar"}
             </DefaultButton>
-            <button className="forgot-password" disabled={loading} onClick={() => void handleForgotPassword()} type="button">
+            <button
+              className="forgot-password"
+              disabled={loading}
+              onClick={() => void handleForgotPassword()}
+              type="button"
+            >
               {loading ? "Enviando link..." : "Esqueceu a senha?"}
             </button>
           </Form>
-          {error && <Alert className="login-feedback" role="alert" variant="danger">{error}</Alert>}
-          {message && <Alert className="login-feedback" role="status" variant="success">{message}</Alert>}
+          {error && (
+            <Alert className="login-feedback" role="alert" variant="danger">
+              {error}
+            </Alert>
+          )}
+          {message && (
+            <Alert className="login-feedback" role="status" variant="success">
+              {message}
+            </Alert>
+          )}
         </section>
       </Container>
     </main>

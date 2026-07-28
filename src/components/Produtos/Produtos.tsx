@@ -7,6 +7,7 @@ import { useCart } from "@/Context/CartContext";
 import { produtosService } from "@/services/produtosService";
 import { Produto } from "@/types/produtos";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const getInitialDisplayCount = () =>
@@ -41,7 +42,10 @@ export const Produtos = () => {
       const produtos = await produtosService.listarProdutos();
       setCartProducts(produtos);
     } catch (error) {
-      console.error(error);
+      logError(error, {
+        operation: "catalogo.carregar",
+        category: "indisponibilidade",
+      });
       setErro("Não foi possível carregar os produtos.");
     } finally {
       setIsLoading(false);
@@ -105,15 +109,23 @@ export const Produtos = () => {
       const product = cartProducts.find((item) => item.id === id);
       return product ? { product, quantity } : null;
     })
-    .filter((item): item is { product: Produto; quantity: number } => Boolean(item));
+    .filter((item): item is { product: Produto; quantity: number } =>
+      Boolean(item),
+    );
 
-  const totalItems = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const totalItems = cartItems.reduce(
+    (count, item) => count + item.quantity,
+    0,
+  );
   const filteredProducts = cartProducts.filter(
     (product) =>
       (selectedType === "Todos" || product.tipo === selectedType) &&
       product.nome.toLowerCase().includes(search.toLowerCase()),
   );
-  const types = ["Todos", ...new Set(cartProducts.map((product) => product.tipo))];
+  const types = [
+    "Todos",
+    ...new Set(cartProducts.map((product) => product.tipo)),
+  ];
 
   const addProduct = (product: Produto) => {
     const nextQuantity = (itemQuantities[product.id] || 0) + 1;
@@ -121,7 +133,9 @@ export const Produtos = () => {
       ...prevQuantities,
       [product.id]: nextQuantity,
     }));
-    setAnnouncement(`${product.nome}: ${nextQuantity} ${nextQuantity === 1 ? "unidade" : "unidades"} no carrinho.`);
+    setAnnouncement(
+      `${product.nome}: ${nextQuantity} ${nextQuantity === 1 ? "unidade" : "unidades"} no carrinho.`,
+    );
   };
 
   const addSelectedProductToCart = () => {
@@ -133,7 +147,10 @@ export const Produtos = () => {
 
   const removeProduct = (product: Produto) => {
     const nextQuantity = Math.max(0, (itemQuantities[product.id] || 0) - 1);
-    setItemQuantities((prevQuantities) => ({ ...prevQuantities, [product.id]: nextQuantity }));
+    setItemQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [product.id]: nextQuantity,
+    }));
     setAnnouncement(
       nextQuantity > 0
         ? `${product.nome}: ${nextQuantity} unidades no carrinho.`
@@ -177,7 +194,9 @@ export const Produtos = () => {
             <label htmlFor="pesquisa-produtos">Buscar no cardápio</label>
             <input
               id="pesquisa-produtos"
-              onChange={(event) => handleFilterChange(() => setSearch(event.target.value))}
+              onChange={(event) =>
+                handleFilterChange(() => setSearch(event.target.value))
+              }
               placeholder="Ex.: cappuccino"
               type="search"
               value={search}
@@ -202,36 +221,49 @@ export const Produtos = () => {
               <FiChevronDown aria-hidden="true" />
             </button>
             {isCategoryMenuOpen && (
-              <ul aria-labelledby="filtro-categoria-label" className="category-select__menu" id="filtro-categoria-menu" role="menu">
-              {types.map((type) => (
-                <li key={type}>
-                  <button
-                    aria-checked={selectedType === type}
-                    onClick={() => {
-                      handleFilterChange(() => setSelectedType(type));
-                      setIsCategoryMenuOpen(false);
-                    }}
-                    role="menuitemradio"
-                    type="button"
-                  >
-                    {type}
-                  </button>
-                </li>
-              ))}
+              <ul
+                aria-labelledby="filtro-categoria-label"
+                className="category-select__menu"
+                id="filtro-categoria-menu"
+                role="menu"
+              >
+                {types.map((type) => (
+                  <li key={type}>
+                    <button
+                      aria-checked={selectedType === type}
+                      onClick={() => {
+                        handleFilterChange(() => setSelectedType(type));
+                        setIsCategoryMenuOpen(false);
+                      }}
+                      role="menuitemradio"
+                      type="button"
+                    >
+                      {type}
+                    </button>
+                  </li>
+                ))}
               </ul>
             )}
           </div>
           {(search || selectedType !== "Todos") && (
-            <button className="clear-filters" onClick={clearFilters} type="button">
+            <button
+              className="clear-filters"
+              onClick={clearFilters}
+              type="button"
+            >
               Limpar filtros
             </button>
           )}
         </div>
 
         <p aria-live="polite" className="results-summary">
-          {isLoading ? "Carregando produtos…" : `${filteredProducts.length} ${filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}.`}
+          {isLoading
+            ? "Carregando produtos…"
+            : `${filteredProducts.length} ${filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}.`}
         </p>
-        <p aria-live="polite" className="visually-hidden">{announcement}</p>
+        <p aria-live="polite" className="visually-hidden">
+          {announcement}
+        </p>
 
         <Row className="g-4">
           {isLoading ? (
@@ -243,7 +275,12 @@ export const Produtos = () => {
             <Col className="catalog-feedback" role="alert">
               <h3>Não foi possível carregar o cardápio</h3>
               <p>Tente novamente em instantes.</p>
-              <DefaultButton onClick={() => void carregarProdutos()} type="button">Tentar novamente</DefaultButton>
+              <DefaultButton
+                onClick={() => void carregarProdutos()}
+                type="button"
+              >
+                Tentar novamente
+              </DefaultButton>
             </Col>
           ) : filteredProducts.length > 0 ? (
             filteredProducts.slice(0, displayCount).map((product) => {
@@ -258,16 +295,27 @@ export const Produtos = () => {
                       onClick={() => setSelectedProduct(product)}
                       type="button"
                     >
-                      <img alt="" src={product.imagem} />
+                      <img
+                        alt=""
+                        decoding="async"
+                        loading="lazy"
+                        src={product.imagem}
+                      />
                       <span>Ver detalhes</span>
                     </button>
                     <div className="product-card__content">
                       <div>
                         <h3>{product.nome}</h3>
                         <p className="product-card__type">{product.tipo}</p>
-                        <p className="product-card__price">{formatCurrency(product.valor)}</p>
+                        <p className="product-card__price">
+                          {formatCurrency(product.valor)}
+                        </p>
                       </div>
-                      <div aria-label={`Quantidade de ${product.nome}`} className="quantity-control" role="group">
+                      <div
+                        aria-label={`Quantidade de ${product.nome}`}
+                        className="quantity-control"
+                        role="group"
+                      >
                         <button
                           aria-label={`Remover uma unidade de ${product.nome}`}
                           disabled={quantity === 0}
@@ -276,7 +324,12 @@ export const Produtos = () => {
                         >
                           <FiMinus aria-hidden="true" />
                         </button>
-                        <output aria-live="polite" className="quantity-control__value">{quantity}</output>
+                        <output
+                          aria-live="polite"
+                          className="quantity-control__value"
+                        >
+                          {quantity}
+                        </output>
                         <button
                           aria-label={`Adicionar uma unidade de ${product.nome}`}
                           onClick={() => addProduct(product)}
@@ -294,7 +347,9 @@ export const Produtos = () => {
             <Col className="catalog-feedback" role="status">
               <h3>Nenhum produto encontrado</h3>
               <p>Experimente outra busca ou categoria.</p>
-              <DefaultButton onClick={clearFilters} type="button">Limpar filtros</DefaultButton>
+              <DefaultButton onClick={clearFilters} type="button">
+                Limpar filtros
+              </DefaultButton>
             </Col>
           )}
         </Row>
@@ -302,20 +357,40 @@ export const Produtos = () => {
         {filteredProducts.length > getInitialDisplayCount() && (
           <div className="catalog-pagination">
             {filteredProducts.length > displayCount ? (
-              <DefaultButton onClick={() => setDisplayCount((count) => count + getInitialDisplayCount())} type="button">Ver mais produtos</DefaultButton>
+              <DefaultButton
+                onClick={() =>
+                  setDisplayCount((count) => count + getInitialDisplayCount())
+                }
+                type="button"
+              >
+                Ver mais produtos
+              </DefaultButton>
             ) : (
-              <DefaultButton onClick={() => setDisplayCount(getInitialDisplayCount())} type="button">Ver menos</DefaultButton>
+              <DefaultButton
+                onClick={() => setDisplayCount(getInitialDisplayCount())}
+                type="button"
+              >
+                Ver menos
+              </DefaultButton>
             )}
           </div>
         )}
       </Container>
 
-      <Modal centered onHide={() => setSelectedProduct(null)} show={selectedProduct !== null}>
+      <Modal
+        centered
+        onHide={() => setSelectedProduct(null)}
+        show={selectedProduct !== null}
+      >
         <Modal.Header closeButton>
           <Modal.Title>{selectedProduct?.nome}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <img alt="" className="product-modal__image" src={selectedProduct?.imagem} />
+          <img
+            alt=""
+            className="product-modal__image"
+            src={selectedProduct?.imagem}
+          />
           <p className="mt-3">{selectedProduct?.descricao}</p>
           {selectedProduct && (
             <DefaultButton onClick={addSelectedProductToCart} type="button">
@@ -325,7 +400,12 @@ export const Produtos = () => {
         </Modal.Body>
       </Modal>
 
-      <button aria-label="Fechar carrinho" className={`cart-backdrop ${isCartOpen ? "open" : ""}`} onClick={closeCart} type="button" />
+      <button
+        aria-label="Fechar carrinho"
+        className={`cart-backdrop ${isCartOpen ? "open" : ""}`}
+        onClick={closeCart}
+        type="button"
+      />
       <aside
         aria-hidden={!isCartOpen}
         aria-labelledby="cart-title"
@@ -340,11 +420,22 @@ export const Produtos = () => {
             <p className="cart-overlay__eyebrow">Seu pedido</p>
             <h2 id="cart-title">Carrinho</h2>
           </div>
-          <button aria-label="Fechar carrinho" className="cart-close" onClick={closeCart} ref={closeCartButtonRef} type="button">×</button>
+          <button
+            aria-label="Fechar carrinho"
+            className="cart-close"
+            onClick={closeCart}
+            ref={closeCartButtonRef}
+            type="button"
+          >
+            ×
+          </button>
         </div>
         {cartItems.length > 0 ? (
           <>
-            <p className="cart-summary" aria-live="polite">{totalItems} {totalItems === 1 ? "item" : "itens"} · {formatCurrency(total)}</p>
+            <p className="cart-summary" aria-live="polite">
+              {totalItems} {totalItems === 1 ? "item" : "itens"} ·{" "}
+              {formatCurrency(total)}
+            </p>
             <div className="cart-items">
               {cartItems.map(({ product, quantity }) => (
                 <article className="cart-item" key={product.id}>
@@ -352,25 +443,62 @@ export const Produtos = () => {
                   <div className="cart-item__content">
                     <h3>{product.nome}</h3>
                     <p>{formatCurrency(product.valor)}</p>
-                    <div aria-label={`Quantidade de ${product.nome} no carrinho`} className="quantity-control" role="group">
-                      <button aria-label={`Remover uma unidade de ${product.nome}`} onClick={() => removeProduct(product)} type="button"><FiMinus aria-hidden="true" /></button>
+                    <div
+                      aria-label={`Quantidade de ${product.nome} no carrinho`}
+                      className="quantity-control"
+                      role="group"
+                    >
+                      <button
+                        aria-label={`Remover uma unidade de ${product.nome}`}
+                        onClick={() => removeProduct(product)}
+                        type="button"
+                      >
+                        <FiMinus aria-hidden="true" />
+                      </button>
                       <output>{quantity}</output>
-                      <button aria-label={`Adicionar uma unidade de ${product.nome}`} onClick={() => addProduct(product)} type="button"><FiPlus aria-hidden="true" /></button>
+                      <button
+                        aria-label={`Adicionar uma unidade de ${product.nome}`}
+                        onClick={() => addProduct(product)}
+                        type="button"
+                      >
+                        <FiPlus aria-hidden="true" />
+                      </button>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
             <div className="cart-overlay__footer">
-              <p>Total: <strong>{formatCurrency(total)}</strong></p>
-              <Link className="continueButton" onClick={() => setIsCartOpen(false)} to="/pedidos">Ir para finalizar pedido</Link>
-              <button className="empty-cart" onClick={() => { setItemQuantities({}); setAnnouncement("Carrinho esvaziado."); }} type="button">Esvaziar carrinho</button>
+              <p>
+                Total: <strong>{formatCurrency(total)}</strong>
+              </p>
+              <Link
+                className="continueButton"
+                onClick={() => setIsCartOpen(false)}
+                to="/pedidos"
+              >
+                Ir para finalizar pedido
+              </Link>
+              <button
+                className="empty-cart"
+                onClick={() => {
+                  setItemQuantities({});
+                  setAnnouncement("Carrinho esvaziado.");
+                }}
+                type="button"
+              >
+                Esvaziar carrinho
+              </button>
             </div>
           </>
         ) : (
           <div className="cart-empty">
             <p>Seu carrinho está vazio.</p>
-            <DefaultButton customizarCSS="cart-empty__action" onClick={closeCart} type="button">
+            <DefaultButton
+              customizarCSS="cart-empty__action"
+              onClick={closeCart}
+              type="button"
+            >
               Ver produtos
             </DefaultButton>
           </div>

@@ -140,7 +140,11 @@ export const pedidosService = {
     const inicioDaSemana = new Date(hoje);
     inicioDaSemana.setDate(hoje.getDate() - hoje.getDay());
     inicioDaSemana.setHours(0, 0, 0, 0);
-    const inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const inicioDoDia = new Date(
+      hoje.getFullYear(),
+      hoje.getMonth(),
+      hoje.getDate(),
+    );
 
     return pedidos.reduce<PedidosCount>(
       (count, pedido) => {
