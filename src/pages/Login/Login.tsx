@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
 import type { LoginState } from "@/types/autenticacao";
 import { DefaultButton } from "@/Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const Login: React.FC = () => {
@@ -29,13 +30,20 @@ const Login: React.FC = () => {
       );
 
       if (loginError) {
-        setError(loginError.message);
+        logError(loginError, {
+          operation: "auth.login",
+          category: "autorizacao",
+        });
+        setError("Não foi possível entrar com essas credenciais.");
         return;
       }
 
       navigate("/administracao");
     } catch (signInError) {
-      console.error("Erro inesperado ao entrar:", signInError);
+      logError(signInError, {
+        operation: "auth.login",
+        category: "indisponibilidade",
+      });
       setError("Não foi possível entrar agora. Tente novamente.");
     } finally {
       setLoading(false);
@@ -63,6 +71,10 @@ const Login: React.FC = () => {
       );
 
       if (resetError) {
+        logError(resetError, {
+          operation: "auth.redefinicao-senha.solicitar",
+          category: "indisponibilidade",
+        });
         setError(
           "Não foi possível enviar o link de redefinição. Tente novamente.",
         );
@@ -73,7 +85,10 @@ const Login: React.FC = () => {
         "Se o e-mail estiver cadastrado, enviaremos um link de redefinição.",
       );
     } catch (resetError) {
-      console.error("Erro ao solicitar redefinição de senha:", resetError);
+      logError(resetError, {
+        operation: "auth.redefinicao-senha.solicitar",
+        category: "indisponibilidade",
+      });
       setError(
         "Não foi possível enviar o link de redefinição. Tente novamente.",
       );

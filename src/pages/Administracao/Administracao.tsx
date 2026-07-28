@@ -7,6 +7,7 @@ import Pedidos from "@/components/Administracao/Pedidos/Pedidos";
 import Cadastro from "@/components/Administracao/Produtos/Cadastro/Cadastro";
 import TodosProdutos from "@/components/Administracao/Produtos/TodosProdutos/TodosProdutos";
 import { authService } from "@/services/authService";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const Administracao = () => {
@@ -48,7 +49,7 @@ const Administracao = () => {
       await authService.logout();
       navigate("/login");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      logError(error, { operation: "auth.logout", category: "indisponibilidade" });
     } finally {
       closeSidebar();
     }

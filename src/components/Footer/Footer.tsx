@@ -2,6 +2,7 @@ import { Container, Row } from "react-bootstrap";
 import { FaWhatsapp } from "react-icons/fa";
 import { FiClipboard } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 export const Footer = () => {
@@ -20,7 +21,7 @@ export const Footer = () => {
         toastId: "copy-email-feedback",
       });
     } catch (error) {
-      console.error("Não foi possível copiar o e-mail:", error);
+      logError(error, { operation: "contato.copiar-email", category: "indisponibilidade" });
       toast.dismiss("copy-email-feedback");
       toast.error("Não foi possível copiar. Selecione o e-mail manualmente.", {
         autoClose: 5000,

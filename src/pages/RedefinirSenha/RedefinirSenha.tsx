@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { supabase } from "../../Utils/supabase";
 import { DefaultButton } from "../../Utils/Buttons/Buttons";
+import { logError } from "@/Utils/logger";
 import "./style.scss";
 
 const RedefinirSenha = () => {
@@ -60,7 +61,10 @@ const RedefinirSenha = () => {
       await authService.logout();
       navigate("/login", { replace: true });
     } catch (updateError) {
-      console.error("Erro ao atualizar senha:", updateError);
+      logError(updateError, {
+        operation: "auth.redefinicao-senha.atualizar",
+        category: "indisponibilidade",
+      });
       setErro("Não foi possível atualizar sua senha. Solicite um novo link.");
     } finally {
       setEnviando(false);

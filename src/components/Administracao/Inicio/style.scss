@@ -29,6 +29,20 @@
   &--error {
     border-color: var(--color-danger);
     color: var(--color-danger);
+
+    p {
+      margin: 0 0 var(--space-3);
+    }
+
+    button {
+      min-height: 2.5rem;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid currentColor;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: inherit;
+      font-weight: 700;
+    }
   }
 }
 
